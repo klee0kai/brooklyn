@@ -1,0 +1,379 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="09caed80-a21d-4cca-a76d-4be2f6ccfdea" name="Changes" comment="ignore up to date">
+      <change afterPath="$PROJECT_DIR$/.idea/kotlinc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ChangesViewManager">
+    <option name="groupingKeys">
+      <option value="directory" />
+    </option>
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[/home/panda/.android/avd/Pixel_3_API_29_ActThreadLog.avd]" />
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="ExternalProjectsManager">
+    <system id="GRADLE">
+      <state>
+        <task path="$PROJECT_DIR$/example">
+          <activation />
+        </task>
+        <task path="$PROJECT_DIR$">
+          <activation />
+        </task>
+        <projects_view>
+          <tree_state>
+            <expand />
+            <select />
+          </tree_state>
+        </projects_view>
+      </state>
+    </system>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Kotlin Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitRewordedCommitMessages">
+    <option name="commitMessagesMapping">
+      <RewordedCommitMessageMapping>
+        <option name="originalMessage" value="simple ir compiler" />
+        <option name="rewordedMessage" value="plugin arch idea" />
+      </RewordedCommitMessageMapping>
+    </option>
+    <option name="currentCommit" value="1" />
+    <option name="onto" value="c33c080d729fcf6431bbf61f97b924b3378bbb9d" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="2TFY0NUrsKGqWxaBezxllSTzDZO" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;jdk.selected.JAVA_MODULE&quot;: &quot;corretto-17&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/panda/Documents/IdeaProjects/brooklyn_bridge/.idea&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/.idea" />
+      <recent name="$PROJECT_DIR$/brooklyn" />
+      <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/compiler-plugin" />
+      <recent name="$PROJECT_DIR$/example" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/brooklyn/kotlin-ir-plugin/src/test/kotlin/com/github/klee0kai/bridge/brooklyn" />
+      <recent name="$PROJECT_DIR$/brooklyn/kotlin-ir-plugin/src/main/kotlin/com/github/klee0kai/bridge/brooklyn" />
+    </key>
+    <key name="MoveKotlinTopLevelDeclarationsDialog.RECENTS_KEY">
+      <recent name="com.github.klee0kai.bridge.brooklyn" />
+      <recent name="com.github.klee0kai.bridge.brooklyn.plugin" />
+      <recent name="com.github.klee0kai.bridge.brooklyn.lib" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Gradle.brooklyn_bridge:example [build]">
+    <configuration name="IrPluginTest.IR plugin success" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":brooklyn:kotlin-ir-plugin:test" />
+            <option value="--tests" />
+            <option value="&quot;com.github.klee0kai.bridge.brooklyn.IrPluginTest.IR plugin success&quot;" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>true</RunAsTest>
+      <method v="2" />
+    </configuration>
+    <configuration name="brooklyn_bridge:example [build]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/example" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="build" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>false</RunAsTest>
+      <method v="2" />
+    </configuration>
+    <configuration name="brooklyn_bridge:example [clean]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/example" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value="clean" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>false</RunAsTest>
+      <method v="2" />
+    </configuration>
+    <configuration name="MainKt" type="JetRunConfigurationType" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="MainKt" />
+      <module name="BrooklynBridge.example.main" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="TemplateSimple" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="TemplateSimple" />
+      <option name="filePath" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="Gradle.assemble --rerun-tasks" />
+      <item itemvalue="Gradle.brooklyn_bridge:example [build]" />
+      <item itemvalue="Gradle.brooklyn_bridge:example [clean]" />
+      <item itemvalue="Gradle.IrPluginTest.IR plugin success" />
+      <item itemvalue="Kotlin.MainKt" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Gradle.brooklyn_bridge:example [build]" />
+        <item itemvalue="Gradle.brooklyn_bridge:example [clean]" />
+        <item itemvalue="Kotlin.MainKt" />
+        <item itemvalue="Gradle.IrPluginTest.IR plugin success" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="09caed80-a21d-4cca-a76d-4be2f6ccfdea" name="Changes" comment="" />
+      <created>1690640071297</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1690640071297</updated>
+      <workItem from="1690640072282" duration="4450000" />
+      <workItem from="1690644540050" duration="3316000" />
+      <workItem from="1690648448831" duration="1425000" />
+      <workItem from="1690651770691" duration="677000" />
+      <workItem from="1690655677808" duration="2746000" />
+      <workItem from="1690659110815" duration="2500000" />
+      <workItem from="1690661619024" duration="617000" />
+      <workItem from="1690663908390" duration="692000" />
+      <workItem from="1690665703939" duration="7000" />
+      <workItem from="1690665733531" duration="141000" />
+      <workItem from="1690665882935" duration="287000" />
+      <workItem from="1690666176127" duration="240000" />
+    </task>
+    <task id="LOCAL-00001" summary="init">
+      <option name="closed" value="true" />
+      <created>1690642789159</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1690642789159</updated>
+    </task>
+    <task id="LOCAL-00002" summary="simple ir compiler">
+      <option name="closed" value="true" />
+      <created>1690644189711</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1690644189711</updated>
+    </task>
+    <task id="LOCAL-00003" summary="project structure">
+      <option name="closed" value="true" />
+      <created>1690646280258</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1690646280258</updated>
+    </task>
+    <task id="LOCAL-00004" summary="project structure">
+      <option name="closed" value="true" />
+      <created>1690648457241</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1690648457241</updated>
+    </task>
+    <task id="LOCAL-00005" summary="plugin from irr template">
+      <option name="closed" value="true" />
+      <created>1690655918353</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1690655918353</updated>
+    </task>
+    <task id="LOCAL-00006" summary="plugin project structure">
+      <option name="closed" value="true" />
+      <created>1690657596932</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1690657596932</updated>
+    </task>
+    <task id="LOCAL-00007" summary="rename constants and rename configs">
+      <option name="closed" value="true" />
+      <created>1690660241886</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1690660241886</updated>
+    </task>
+    <task id="LOCAL-00008" summary="enable, disable plugin">
+      <option name="closed" value="true" />
+      <created>1690660469744</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1690660469744</updated>
+    </task>
+    <task id="LOCAL-00009" summary="enable, disable plugin">
+      <option name="closed" value="true" />
+      <created>1690661086586</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1690661086586</updated>
+    </task>
+    <task id="LOCAL-00010" summary="ignore up to date">
+      <option name="closed" value="true" />
+      <created>1690664369826</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1690664369826</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="init" />
+    <MESSAGE value="simple ir compiler" />
+    <MESSAGE value="project structure" />
+    <MESSAGE value="plugin from irr template" />
+    <MESSAGE value="plugin project structure" />
+    <MESSAGE value="rename constants and rename configs" />
+    <MESSAGE value="enable, disable plugin" />
+    <MESSAGE value="ignore up to date" />
+    <option name="LAST_COMMIT_MESSAGE" value="ignore up to date" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="kotlin-line">
+          <url>file://$PROJECT_DIR$/compiler-plugin/src/main/kotlin/com/github/klee0kai/bridge/brooklyn/plugin/BrooklynPlugin.kt</url>
+          <line>8</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="kotlin-line">
+          <url>file://$PROJECT_DIR$/compiler-plugin/src/main/kotlin/com/github/klee0kai/bridge/brooklyn/plugin/BrooklynComponentRegister.kt</url>
+          <line>13</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="kotlin-line">
+          <url>file://$PROJECT_DIR$/compiler-plugin/src/main/kotlin/com/github/klee0kai/bridge/brooklyn/plugin/BrooklynSubPlugin.kt</url>
+          <line>28</line>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="kotlin-line">
+          <url>file://$PROJECT_DIR$/compiler-plugin/src/main/kotlin/com/github/klee0kai/bridge/brooklyn/plugin/BrooklynSubPlugin.kt</url>
+          <line>32</line>
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="kotlin-line">
+          <url>file://$PROJECT_DIR$/compiler-plugin/src/main/kotlin/com/github/klee0kai/bridge/brooklyn/plugin/BrooklynSubPlugin.kt</url>
+          <line>24</line>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="kotlin-line">
+          <url>file://$PROJECT_DIR$/brooklyn/kotlin-ir-plugin/src/main/kotlin/com/github/klee0kai/bridge/brooklyn/BrooklynIrGenerationExtension.kt</url>
+          <line>27</line>
+          <option name="timeStamp" value="8" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>
