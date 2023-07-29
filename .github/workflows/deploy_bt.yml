@@ -1,0 +1,72 @@
+name: Deploy Button
+
+on:
+  workflow_dispatch:
+
+jobs:
+  tests:
+    name: Run Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          cache: gradle
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Test with Gradle
+        continue-on-error: true
+        run: ./gradlew test
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-report
+          path: |
+            ./**/build/reports
+            ./**/build/test-results
+
+  dorny_report:
+    name: Prepare Dorny Test Report
+    needs: tests
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Download Test Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: test-report
+
+      - name: Publish Dorny Test Report
+        uses: dorny/test-reporter@v1
+        with:
+          name: Dorny JUnit Test Report
+          path: '**/build/test-results/**/*.xml'
+          reporter: java-junit
+          list-tests: 'all'
+
+  mikepenz_report:
+    name: Prepare Mikepenz Test Report
+    needs: tests
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Download Test Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: test-report
+
+      - name: Publish Test Report
+        uses: mikepenz/action-junit-report@v3
+        with:
+          report_paths: '**/build/test-results/**/*.xml'
+          detailed_summary: true
+          check_name: Mikepenz JUnit Test Report
+
+
+
+      
