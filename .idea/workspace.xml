@@ -4,16 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="09caed80-a21d-4cca-a76d-4be2f6ccfdea" name="Changes" comment="ignore up to date">
-      <change afterPath="$PROJECT_DIR$/brooklyn/kotlin-ir-plugin/src/main/kotlin/com/github/klee0kai/bridge/brooklyn/codgen/CppBuildExt.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/brooklyn/kotlin-ir-plugin/src/main/kotlin/com/github/klee0kai/bridge/brooklyn/codgen/CppHeaderCreater.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/brooklyn/kotlin-ir-plugin-gradle/src/main/kotlin/com/github/klee0kai/bridge/brooklyn/BrooklynExtension.kt" beforeDir="false" afterPath="$PROJECT_DIR$/brooklyn/kotlin-ir-plugin-gradle/src/main/kotlin/com/github/klee0kai/bridge/brooklyn/BrooklynSourceSet.kt" afterDir="false" />
+    <list default="true" id="09caed80-a21d-4cca-a76d-4be2f6ccfdea" name="Changes" comment="generate first header file. working with source sets">
+      <change afterPath="$PROJECT_DIR$/brooklyn/kotlin-ir-plugin/src/main/kotlin/com/github/klee0kai/bridge/brooklyn/codgen/FileBuildersCollection.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/brooklyn/kotlin-ir-plugin-gradle/src/main/kotlin/com/github/klee0kai/bridge/brooklyn/BrooklynGradlePlugin.kt" beforeDir="false" afterPath="$PROJECT_DIR$/brooklyn/kotlin-ir-plugin-gradle/src/main/kotlin/com/github/klee0kai/bridge/brooklyn/BrooklynGradlePlugin.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/brooklyn/kotlin-ir-plugin/src/main/kotlin/com/github/klee0kai/bridge/brooklyn/BrooklynComponentRegistrar.kt" beforeDir="false" afterPath="$PROJECT_DIR$/brooklyn/kotlin-ir-plugin/src/main/kotlin/com/github/klee0kai/bridge/brooklyn/BrooklynComponentRegistrar.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/brooklyn/kotlin-ir-plugin/src/main/kotlin/com/github/klee0kai/bridge/brooklyn/BrooklynIrGenerationExtension.kt" beforeDir="false" afterPath="$PROJECT_DIR$/brooklyn/kotlin-ir-plugin/src/main/kotlin/com/github/klee0kai/bridge/brooklyn/BrooklynIrGenerationExtension.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/example/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/src/main/kotlin/Main.kt" beforeDir="false" afterPath="$PROJECT_DIR$/example/src/main/kotlin/Main.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/brooklyn/kotlin-ir-plugin/src/main/kotlin/com/github/klee0kai/bridge/brooklyn/codgen/CppBuildExt.kt" beforeDir="false" afterPath="$PROJECT_DIR$/brooklyn/kotlin-ir-plugin/src/main/kotlin/com/github/klee0kai/bridge/brooklyn/codgen/CppBuildExt.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/brooklyn/kotlin-ir-plugin/src/main/kotlin/com/github/klee0kai/bridge/brooklyn/codgen/CppHeaderCreater.kt" beforeDir="false" afterPath="$PROJECT_DIR$/brooklyn/kotlin-ir-plugin/src/main/kotlin/com/github/klee0kai/bridge/brooklyn/codgen/KotlinVisitor.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -52,8 +48,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Kotlin Class" />
         <option value="Kotlin File" />
+        <option value="Kotlin Class" />
       </list>
     </option>
   </component>
@@ -242,7 +238,7 @@
       <workItem from="1690667331766" duration="148000" />
       <workItem from="1690734911845" duration="8286000" />
       <workItem from="1690816624012" duration="2344000" />
-      <workItem from="1690818975620" duration="457000" />
+      <workItem from="1690818975620" duration="4717000" />
     </task>
     <task id="LOCAL-00001" summary="init">
       <option name="closed" value="true" />
@@ -324,7 +320,15 @@
       <option name="project" value="LOCAL" />
       <updated>1690664369826</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="generate first header file. working with source sets">
+      <option name="closed" value="true" />
+      <created>1690819489400</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1690819489400</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -350,7 +354,8 @@
     <MESSAGE value="rename constants and rename configs" />
     <MESSAGE value="enable, disable plugin" />
     <MESSAGE value="ignore up to date" />
-    <option name="LAST_COMMIT_MESSAGE" value="ignore up to date" />
+    <MESSAGE value="generate first header file. working with source sets" />
+    <option name="LAST_COMMIT_MESSAGE" value="generate first header file. working with source sets" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -381,19 +386,9 @@
           <option name="timeStamp" value="5" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="kotlin-line">
-          <url>file://$PROJECT_DIR$/brooklyn/kotlin-ir-plugin/src/main/kotlin/com/github/klee0kai/bridge/brooklyn/BrooklynIrGenerationExtension.kt</url>
-          <line>22</line>
-          <option name="timeStamp" value="11" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="kotlin-line">
-          <url>file://$PROJECT_DIR$/brooklyn/kotlin-ir-plugin/src/main/kotlin/com/github/klee0kai/bridge/brooklyn/BrooklynIrGenerationExtension.kt</url>
-          <line>20</line>
-          <option name="timeStamp" value="12" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="kotlin-line">
-          <url>file://$PROJECT_DIR$/brooklyn/kotlin-ir-plugin/src/main/kotlin/com/github/klee0kai/bridge/brooklyn/codgen/CppHeaderCreater.kt</url>
-          <line>24</line>
-          <option name="timeStamp" value="13" />
+          <url>file://$PROJECT_DIR$/brooklyn/kotlin-ir-plugin/src/main/kotlin/com/github/klee0kai/bridge/brooklyn/codgen/FileBuildersCollection.kt</url>
+          <line>16</line>
+          <option name="timeStamp" value="20" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -401,6 +396,7 @@
       <configuration name="GradleRunConfiguration">
         <watch expression="func.name" language="kotlin" />
         <watch expression="kotlinCompilation.compilationName" language="kotlin" />
+        <watch expression="declaration.packageFragmentDescriptor.name" language="kotlin" />
       </configuration>
     </watches-manager>
   </component>

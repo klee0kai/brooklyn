@@ -7,12 +7,15 @@ fun StringBuilder.headers(unicHeaderName: String, body: String): StringBuilder =
         include("<android/log.h>")
         include("<ostream>")
         include("<list>")
+        lines(1)
 
         line("#ifndef $unicHeaderName")
         line("#define $unicHeaderName")
+        lines(2)
 
         append(body)
 
+        lines(2)
         line("#endif //$unicHeaderName")
     }
 
@@ -23,4 +26,8 @@ fun StringBuilder.include(lib: String): StringBuilder = apply {
 
 fun StringBuilder.line(code: String): StringBuilder = apply {
     append("${code}\n")
+}
+
+fun StringBuilder.lines(count: Int): StringBuilder = apply {
+    repeat(count) { append("\n") }
 }

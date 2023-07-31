@@ -2,6 +2,7 @@ package com.github.klee0kai.bridge.brooklyn
 
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.SourceSetContainer
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilerPluginSupportPlugin
@@ -57,10 +58,13 @@ class BrooklynGradlePlugin : KotlinCompilerPluginSupportPlugin {
 }
 
 
-private fun KotlinCompilation<*>.findBrooklynSourceSet(): BrooklynSourceSet? =
+private fun KotlinCompilation<*>.sourceSet(): SourceSet? =
     target.project.extensions
         .getByType(SourceSetContainer::class.java)
         .first { sourceSet -> sourceSet.name == defaultSourceSet.name }
-        .extensions
-        .getByType(BrooklynSourceSet::class.java)
+
+private fun KotlinCompilation<*>.findBrooklynSourceSet(): BrooklynSourceSet? =
+    sourceSet()
+        ?.extensions
+        ?.getByType(BrooklynSourceSet::class.java)
 
