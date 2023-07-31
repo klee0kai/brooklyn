@@ -4,6 +4,12 @@ class Person {
     var age: Int = 0
 }
 
+object Engine {
+
+    external fun helloWorld(): String
+
+}
+
 fun main(arg: Array<String>) {
     val p = Person()
 

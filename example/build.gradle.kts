@@ -5,10 +5,12 @@ plugins {
 
 }
 
-brooklyn {
-    enabled = true
-
-    outDir = file("some")
+sourceSets {
+    main {
+        brooklyn {
+            enabled = true
+        }
+    }
 }
 
 dependencies {

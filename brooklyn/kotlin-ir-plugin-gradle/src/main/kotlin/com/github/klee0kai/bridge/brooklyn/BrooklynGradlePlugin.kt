@@ -2,19 +2,34 @@ package com.github.klee0kai.bridge.brooklyn
 
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.SourceSetContainer
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilerPluginSupportPlugin
 import org.jetbrains.kotlin.gradle.plugin.SubpluginArtifact
 import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
+import java.io.File
 
 class BrooklynGradlePlugin : KotlinCompilerPluginSupportPlugin {
 
+
     override fun apply(target: Project): Unit = with(target) {
-        extensions.create("brooklyn", BrooklynExtension::class.java)
+        extensions.extraProperties.properties
+        project.extensions.getByType(SourceSetContainer::class.java).forEach { sourceSet ->
+            val extension = sourceSet.extensions.create(
+                "brooklyn",
+                BrooklynSourceSet::class.java,
+                "${sourceSet.name} Brooklyn source set",
+                project.objects
+            )
+            extension.outDir = File(project.buildDir, "generated/sources/brooklyn/headers/${sourceSet.name}")
+        }
     }
 
-    override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean =
-        kotlinCompilation.target.project.extensions.findByType(BrooklynExtension::class.java)?.enabled == true
+
+    override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean {
+        val brooklynSourceSet = kotlinCompilation.findBrooklynSourceSet()
+        return brooklynSourceSet?.enabled == true
+    }
 
     override fun getCompilerPluginId(): String = BuildConfig.KOTLIN_PLUGIN_ID
 
@@ -29,14 +44,23 @@ class BrooklynGradlePlugin : KotlinCompilerPluginSupportPlugin {
         kotlinCompilation: KotlinCompilation<*>
     ): Provider<List<SubpluginOption>> {
         val project = kotlinCompilation.target.project
-        val extension = project.extensions.getByType(BrooklynExtension::class.java)
+        val brooklynSourceSet = kotlinCompilation.findBrooklynSourceSet()
+
         return project.provider {
             buildList {
-                extension.outDir?.path?.let { path ->
+                brooklynSourceSet?.outDir?.path?.let { path ->
                     add(SubpluginOption(key = "outDir", value = path))
                 }
-
             }
         }
     }
 }
+
+
+private fun KotlinCompilation<*>.findBrooklynSourceSet(): BrooklynSourceSet? =
+    target.project.extensions
+        .getByType(SourceSetContainer::class.java)
+        .first { sourceSet -> sourceSet.name == defaultSourceSet.name }
+        .extensions
+        .getByType(BrooklynSourceSet::class.java)
+
