@@ -15,7 +15,11 @@ class BrooklynGradlePlugin : KotlinCompilerPluginSupportPlugin {
 
     override fun apply(target: Project): Unit = with(target) {
         extensions.extraProperties.properties
-        project.extensions.getByType(SourceSetContainer::class.java).forEach { sourceSet ->
+        dependencies.add(
+            "implementation",
+            "${BuildConfig.KOTLIN_PLUGIN_GROUP}:annotations:${BuildConfig.KOTLIN_PLUGIN_VERSION}"
+        )
+        extensions.getByType(SourceSetContainer::class.java).forEach { sourceSet ->
             val extension = sourceSet.extensions.create(
                 "brooklyn",
                 BrooklynSourceSet::class.java,

@@ -2,7 +2,6 @@ plugins {
     id("java")
     kotlin("jvm")
     id("brooklyn")
-
 }
 
 sourceSets {

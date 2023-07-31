@@ -5,7 +5,6 @@ buildscript {
     extra["description"] = "Compile plugin to generate C++ code for jni"
     extra["version"] = "0.0.1"
 
-    extra["kotlin_plugin_id"] = "com.github.klee0kai.bridge.brooklyn.kotlin-ir-plugin"
 }
 
 plugins {
