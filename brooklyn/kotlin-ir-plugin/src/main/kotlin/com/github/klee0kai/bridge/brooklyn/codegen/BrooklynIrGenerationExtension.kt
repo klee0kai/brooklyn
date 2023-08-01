@@ -18,7 +18,7 @@ class BrooklynIrGenerationExtension(
         buildCollections.createCommonHeaders()
 
         moduleFragment.files.forEach { file ->
-            val headerCreator = KotlinVisitor(buildCollections)
+            val headerCreator = KotlinVisitor(gen = buildCollections)
             file.acceptVoid(headerCreator)
         }
         buildCollections.genAll()

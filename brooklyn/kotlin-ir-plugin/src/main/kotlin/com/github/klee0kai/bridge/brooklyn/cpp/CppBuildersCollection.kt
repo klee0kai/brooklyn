@@ -9,8 +9,7 @@ class CppBuildersCollection(
     private val builders = HashMap<File, CodeBuilder>()
 
     fun getOrCreate(pkg: String, clName: String, create: (CodeBuilder) -> Unit): CodeBuilder {
-        val pkgName = pkg.replace(".", "_").filter { it !in "<>" }
-        val name = "${pkgName}_${clName}.h"
+        val name = "${pkg.snakeCase()}_${clName.snakeCase()}.h"
         val file = File(outDir, name)
 
         if (!builders.contains(file)) {
@@ -30,3 +29,6 @@ class CppBuildersCollection(
     }
 
 }
+
+val CppBuildersCollection.jmappersHeader get() = getOrCreate("jmappers.h")
+val CppBuildersCollection.jmappersCpp get() = getOrCreate("jmappers.cpp")

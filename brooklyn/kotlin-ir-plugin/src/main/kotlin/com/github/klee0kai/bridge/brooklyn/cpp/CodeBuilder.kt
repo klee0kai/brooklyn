@@ -8,6 +8,7 @@ import java.io.File
 class CodeBuilder(
     val file: File,
     val header: Poet = Poet(),
+    val variables: Poet = Poet(),
     val footer: Poet = Poet(),
     val body: Poet = Poet()
 ) : PoetDelegate by body {
@@ -30,6 +31,7 @@ class CodeBuilder(
             Poet()
                 .brooklynHeaderComment()
                 .post(header)
+                .post(variables)
                 .post(body)
                 .post(footer)
                 .toString()
