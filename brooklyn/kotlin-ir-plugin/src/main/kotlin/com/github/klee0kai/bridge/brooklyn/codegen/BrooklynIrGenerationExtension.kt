@@ -1,7 +1,7 @@
-package com.github.klee0kai.bridge.brooklyn
+package com.github.klee0kai.bridge.brooklyn.codegen
 
-import com.github.klee0kai.bridge.brooklyn.codgen.FileBuildersCollection
-import com.github.klee0kai.bridge.brooklyn.codgen.KotlinVisitor
+import com.github.klee0kai.bridge.brooklyn.cpp.CppBuildersCollection
+import com.github.klee0kai.bridge.brooklyn.cpp.allJniHeaders
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
@@ -14,12 +14,19 @@ class BrooklynIrGenerationExtension(
     private val outDirFile: String
 ) : IrGenerationExtension {
     override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
-        val buildCollections = FileBuildersCollection(File(outDirFile))
+        val buildCollections = CppBuildersCollection(File(outDirFile))
+        buildCollections.createCommonHeaders()
+
         moduleFragment.files.forEach { file ->
             val headerCreator = KotlinVisitor(buildCollections)
             file.acceptVoid(headerCreator)
         }
         buildCollections.genAll()
+    }
+
+    private fun CppBuildersCollection.createCommonHeaders() {
+        getOrCreate(fileName = "brooklyn.h")
+            .allJniHeaders()
     }
 
 }

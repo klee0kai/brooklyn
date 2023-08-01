@@ -1,5 +1,6 @@
 package com.github.klee0kai.bridge.brooklyn
 
+import com.github.klee0kai.bridge.brooklyn.codegen.BrooklynIrGenerationExtension
 import com.google.auto.service.AutoService
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys
