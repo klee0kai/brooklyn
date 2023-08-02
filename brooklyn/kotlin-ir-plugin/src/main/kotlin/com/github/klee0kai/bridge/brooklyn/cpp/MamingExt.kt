@@ -1,5 +1,17 @@
 package com.github.klee0kai.bridge.brooklyn.cpp
 
+import org.jetbrains.kotlin.name.ClassId
+import java.io.File
+
+
+val ClassId.mapperHeaderFile
+    get() = File("mappers", "${cppFilePrefix}_mapper.h")
+
+val ClassId.mapperCppFile
+    get() = File("mappers", "${cppFilePrefix}_mapper.cpp")
+
+val ClassId.structuresHeaderFile
+    get() = File("${cppFilePrefix}.header")
 
 fun String.camelCase() = buildString {
     var specSymbol = false
@@ -35,6 +47,8 @@ fun String.snakeCase() = buildString {
     }
 }
 
+private val ClassId.cppFilePrefix
+    get() = "${packageFqName.toString().snakeCase()}_${shortClassName.toString().snakeCase()}"
 
 private fun String.trimSpecSymbols() =
     this.replace(".", "_").filter { it !in "<>" }
