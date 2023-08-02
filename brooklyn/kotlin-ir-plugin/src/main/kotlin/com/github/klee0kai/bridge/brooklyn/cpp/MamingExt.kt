@@ -29,13 +29,16 @@ fun String.camelCase() = buildString {
 }
 
 
-fun String.snakeCase() = buildString {
+fun String.firstCamelCase() = first().uppercaseChar() + substring(1)
+
+
+fun String.snakeCase(sep: String = "_") = buildString {
     var specSymbol = false
     trimSpecSymbols().forEach {
         when {
-            it in "._" -> specSymbol = true
+            it in "._/" -> specSymbol = true
             specSymbol -> {
-                append("_")
+                append(sep)
                 append(it)
                 specSymbol = false
             }

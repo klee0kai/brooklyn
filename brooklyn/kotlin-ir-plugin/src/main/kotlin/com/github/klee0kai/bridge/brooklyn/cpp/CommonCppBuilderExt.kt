@@ -15,21 +15,31 @@ fun CodeBuilder.defHeaders() = apply {
         .preLine("#endif //$unicHeaderName")
 }
 
+fun CodeBuilder.namespaces(vararg namespaces: String) = apply {
+    namespaces.forEach { namespace ->
+        header.line("namespace $namespace {")
+        footer.preLine("} // namespace $namespace")
+    }
+}
 
-fun <T: PoetDelegate> T.include(lib: String) = apply {
+fun <T : PoetDelegate> T.include(lib: String) = apply {
     var formated = lib.trim()
     if (!formated.startsWith("\"") && !formated.startsWith("\"")) formated = "\"${formated}\""
     post("#include ${formated}\n")
 }
 
-fun <T: PoetDelegate> T.line(code: String) = apply { post("${code}\n") }
-fun <T: PoetDelegate> T.preLine(code: String) = apply { pre("${code}\n") }
+fun <T : PoetDelegate> T.line(code: String) = apply { post("${code}\n") }
+fun <T : PoetDelegate> T.statement(code: String) = apply { post("${code};\n") }
 
-fun <T: PoetDelegate> T.lines(count: Int) = apply {
+fun <T : PoetDelegate> T.str(code: String) = apply { post("\"${code}\"") }
+
+fun <T : PoetDelegate> T.preLine(code: String) = apply { pre("${code}\n") }
+
+fun <T : PoetDelegate> T.lines(count: Int) = apply {
     repeat(count) { post("\n") }
 }
 
-fun <T: PoetDelegate> T.brooklynHeaderComment() = apply {
+fun <T : PoetDelegate> T.brooklynHeaderComment() = apply {
     post("// Generated code \n")
     post("// Brooklyn Bridge ${BuildConfig.KOTLIN_PLUGIN_VERSION} \n")
     post("// Project ${BuildConfig.KOTLIN_PLUGIN_SITE} \n")
@@ -37,4 +47,4 @@ fun <T: PoetDelegate> T.brooklynHeaderComment() = apply {
     lines(1)
 }
 
-fun <T: PoetDelegate> T.comment(body: String) = apply { post("// ${body}\n") }
+fun <T : PoetDelegate> T.comment(body: String) = apply { post("// ${body}\n") }

@@ -8,15 +8,15 @@ class CppBuildersCollection(
 
     private val builders = HashMap<File, CodeBuilder>()
 
-    fun getOrCreate(fileName: String): CodeBuilder {
+    fun getOrCreate(fileName: String, initBlock: CodeBuilder.() -> Unit = {}): CodeBuilder {
         val file = File(outDir, fileName)
-        builders.putIfAbsent(file, CodeBuilder(file))
+        if (!builders.contains(file)) builders.putIfAbsent(file, CodeBuilder(file).apply(initBlock))
         return builders[file]!!
     }
 
-    fun getOrCreate(relativeFile: File): CodeBuilder {
+    fun getOrCreate(relativeFile: File, initBlock: CodeBuilder.() -> Unit = {}): CodeBuilder {
         val file = File(outDir, relativeFile.path)
-        builders.putIfAbsent(file, CodeBuilder(file))
+        if (!builders.contains(file)) builders.putIfAbsent(file, CodeBuilder(file).apply(initBlock))
         return builders[file]!!
     }
 

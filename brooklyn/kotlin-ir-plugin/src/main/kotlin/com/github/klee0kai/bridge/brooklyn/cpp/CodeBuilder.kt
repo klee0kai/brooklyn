@@ -15,6 +15,11 @@ class CodeBuilder(
 
     private val delayed = mutableListOf<CodeBuilder.() -> Unit>()
 
+    fun header(block: Poet.() -> Unit) = apply { header.apply(block) }
+    fun variables(block: Poet.() -> Unit) = apply { variables.apply(block) }
+    fun body(block: Poet.() -> Unit) = apply { body.apply(block) }
+    fun footer(block: Poet.() -> Unit) = apply { footer.apply(block) }
+
     fun delayed(block: CodeBuilder.() -> Unit) = apply { delayed.add(block) }
 
     fun collectDelayed() {
@@ -31,8 +36,11 @@ class CodeBuilder(
             Poet()
                 .brooklynHeaderComment()
                 .post(header)
+                .lines(1)
                 .post(variables)
+                .lines(1)
                 .post(body)
+                .lines(1)
                 .post(footer)
                 .toString()
                 .encodeToByteArray()
