@@ -32,7 +32,7 @@ fun CodeBuilder.initJniClassApi(jClass: IrClass) = apply {
     body.post(Poet().apply {
         val clId = jClass.classId!!
         lines(1)
-        statement("int ${clId.initIndexFuncName}(JavaVM *pVM)")
+        statement("int ${clId.initIndexFuncName}(JNIEnv *env)")
     })
 }
 
@@ -41,10 +41,8 @@ fun CodeBuilder.initJniClassImpl(jClass: IrClass) = apply {
         lines(1)
         val clId = jClass.classId!!
         val clPathName = "${clId.packageFqName}/${clId.shortClassName}".snakeCase("/")
-        line("int ${clId.initIndexFuncName}(JavaVM *pVM) {")
+        line("int ${clId.initIndexFuncName}(JNIEnv *env) {")
         statement("if (${clId.indexVariableName}) return 0")
-        statement("JNIEnv *env = NULL")
-        statement("pVM->GetEnv((void **) &env, JNI_VERSION_1_6)")
         statement("${clId.indexVariableName} = new ${clId.indexStructName} {}")
         statement("jclass cls = env->FindClass(\"$clPathName\")")
         jClass.fields.forEach { field ->

@@ -3,22 +3,31 @@ package com.github.klee0kai.bridge.brooklyn.cpp
 import com.github.klee0kai.bridge.brooklyn.BuildConfig
 import com.github.klee0kai.bridge.brooklyn.poet.PoetDelegate
 
-fun CodeBuilder.defHeaders() = apply {
-    val unicHeaderName = file.nameWithoutExtension
-    header
-        .line("#ifndef $unicHeaderName")
-        .line("#define $unicHeaderName")
-        .include("brooklyn.h")
-        .lines(2)
+fun CodeBuilder.defHeaders(doubleImportCheck: Boolean = false) = apply {
+    val unicHeaderName = "BROOKLYN_${file.nameWithoutExtension}"
+    header {
+        if (doubleImportCheck) {
+            line("#ifndef $unicHeaderName")
+            line("#define $unicHeaderName")
+        }
 
-    footer
-        .preLine("#endif //$unicHeaderName")
+        include("brooklyn.h")
+        lines(2)
+    }
+
+    footer {
+        if (doubleImportCheck) preLine("#endif //$unicHeaderName")
+    }
 }
 
 fun CodeBuilder.namespaces(vararg namespaces: String) = apply {
     namespaces.forEach { namespace ->
-        header.line("namespace $namespace {")
-        footer.preLine("} // namespace $namespace")
+        body {
+            line("namespace $namespace {")
+        }
+        footer {
+            preLine("} // namespace $namespace")
+        }
     }
 }
 

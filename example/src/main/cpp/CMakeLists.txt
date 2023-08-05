@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.18.1)
 
 project(native_lib)
-include(../../../build/generated/sources/brooklyn/headers/main/FindBrooklynBridge.cmake)
+include(../../../build/generated/sources/brooklyn/main/FindBrooklynBridge.cmake)
 
 
 find_package(JNI REQUIRED)

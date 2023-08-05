@@ -1,13 +1,13 @@
 #include <jni.h>
 #include <string>
-#include "mappers/com_klee0kai_example_model_Simple_mapper.h"
+#include "mappers/mapper.h"
 
 extern "C" JNIEXPORT jint JNICALL
 Java_com_klee0kai_example_engine_SimpleJniEngine_initLib(
-        JNIEnv* env,
+        JNIEnv *env,
         jclass /* class */
-){
-brooklyn::mapper::initComKlee0kaiExampleModelSimple()
+) {
+    brooklyn::mapper::init(env);
     return 1;
 }
 
@@ -15,9 +15,9 @@ brooklyn::mapper::initComKlee0kaiExampleModelSimple()
 
 extern "C" JNIEXPORT jint JNICALL
 Java_com_klee0kai_example_engine_SimpleJniEngine_deinitLib(
-        JNIEnv* env,
+        JNIEnv *env,
         jclass /* class */
-){
+) {
     return 2;
 }
 

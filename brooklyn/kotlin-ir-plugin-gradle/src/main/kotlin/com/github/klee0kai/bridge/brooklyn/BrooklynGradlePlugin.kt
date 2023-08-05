@@ -26,7 +26,7 @@ class BrooklynGradlePlugin : KotlinCompilerPluginSupportPlugin {
                 "${sourceSet.name} Brooklyn source set",
                 project.objects
             )
-            extension.outDir = File(project.buildDir, "generated/sources/brooklyn/headers/${sourceSet.name}")
+            extension.outDir = File(project.buildDir, "generated/sources/brooklyn/${sourceSet.name}")
         }
     }
 
