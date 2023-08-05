@@ -1,5 +1,7 @@
 package com.github.klee0kai.bridge.brooklyn.codegen
 
+import com.github.klee0kai.bridge.brooklyn.cmake.cmakeLib
+import com.github.klee0kai.bridge.brooklyn.cpp.CodeBuilder
 import com.github.klee0kai.bridge.brooklyn.cpp.CppBuildersCollection
 import com.github.klee0kai.bridge.brooklyn.cpp.allJniHeaders
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
@@ -22,6 +24,17 @@ class BrooklynIrGenerationExtension(
             file.acceptVoid(headerCreator)
         }
         buildCollections.genAll()
+
+        CodeBuilder(file = File(outDirFile, "FindBrooklynBridge.cmake"))
+            .cmakeLib(
+                libName = "brooklyn",
+                rootDir = outDirFile,
+                src = buildCollections.files
+                    .filter { it.extension.endsWith("cpp") }
+                    .map { it.absolutePath }
+            )
+            .gen(sym = "#")
+
     }
 
     private fun CppBuildersCollection.createCommonHeaders() {

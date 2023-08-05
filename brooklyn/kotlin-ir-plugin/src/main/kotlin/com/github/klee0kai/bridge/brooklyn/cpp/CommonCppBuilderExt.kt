@@ -24,11 +24,12 @@ fun CodeBuilder.namespaces(vararg namespaces: String) = apply {
 
 fun <T : PoetDelegate> T.include(lib: String) = apply {
     var formated = lib.trim()
-    if (!formated.startsWith("\"") && !formated.startsWith("\"")) formated = "\"${formated}\""
+    if (!formated.startsWith("\"") && !formated.startsWith("<")) formated = "\"${formated}\""
     post("#include ${formated}\n")
 }
 
 fun <T : PoetDelegate> T.line(code: String) = apply { post("${code}\n") }
+
 fun <T : PoetDelegate> T.statement(code: String) = apply { post("${code};\n") }
 
 fun <T : PoetDelegate> T.str(code: String) = apply { post("\"${code}\"") }
@@ -39,12 +40,13 @@ fun <T : PoetDelegate> T.lines(count: Int) = apply {
     repeat(count) { post("\n") }
 }
 
-fun <T : PoetDelegate> T.brooklynHeaderComment() = apply {
-    post("// Generated code \n")
-    post("// Brooklyn Bridge ${BuildConfig.KOTLIN_PLUGIN_VERSION} \n")
-    post("// Project ${BuildConfig.KOTLIN_PLUGIN_SITE} \n")
-    post("// Copyright (c) 2023 Andrey Kuzubov \n")
+fun <T : PoetDelegate> T.brooklynHeaderComment(sym: String = "//") = apply {
+    post("$sym Generated code \n")
+    post("$sym Brooklyn Bridge ${BuildConfig.KOTLIN_PLUGIN_VERSION} \n")
+    post("$sym Project ${BuildConfig.KOTLIN_PLUGIN_SITE} \n")
+    post("$sym Copyright (c) 2023 Andrey Kuzubov \n")
     lines(1)
 }
+
 
 fun <T : PoetDelegate> T.comment(body: String) = apply { post("// ${body}\n") }

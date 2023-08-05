@@ -29,12 +29,12 @@ class CodeBuilder(
         if (delayed.isNotEmpty()) collectDelayed()
     }
 
-    fun gen() {
+    fun gen(sym: String = "//") {
         collectDelayed()
         file.parentFile.mkdirsOrThrow()
         file.writeBytes(
             Poet()
-                .brooklynHeaderComment()
+                .brooklynHeaderComment(sym)
                 .post(header)
                 .lines(1)
                 .post(variables)

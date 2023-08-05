@@ -5,7 +5,6 @@ import com.github.klee0kai.bridge.brooklyn.poet.PoetDelegate
 fun <T: PoetDelegate> T.allJniHeaders() = apply {
     include("<jni.h>")
     include("<string>")
-    include("<android/log.h>")
     include("<ostream>")
     include("<list>")
 }

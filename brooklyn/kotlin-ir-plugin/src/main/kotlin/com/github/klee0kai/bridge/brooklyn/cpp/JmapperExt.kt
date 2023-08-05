@@ -7,6 +7,7 @@ import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.name.ClassId
+import kotlin.math.absoluteValue
 
 fun CodeBuilder.declareClassIndexStructure(jClass: IrClass) = apply {
     variables.post(Poet().apply {
@@ -81,6 +82,7 @@ fun CodeBuilder.initJniClassImpl(jClass: IrClass) = apply {
         }
 
         statement("return 0")
+        line("}")
     })
 }
 
@@ -114,13 +116,13 @@ val ClassId.deinitIndexFuncName
 
 
 val ClassId.indexStructName
-    get() = "${packageFqName}${shortClassName}_index".camelCase()
+    get() = "${packageFqName}${shortClassName}IndexStructure".camelCase().firstCamelCase()
 
 val ClassId.indexVariableName
     get() = "${packageFqName}${shortClassName}Index".camelCase()
 
 val IrFunction.cppNameMirror
-    get() = "$name${fullValueParameterList.map { it.type to it.isVararg }.hashCode()}".camelCase()
+    get() = "$name${fullValueParameterList.map { it.type to it.isVararg }.hashCode().absoluteValue}".camelCase()
 
 
 // https://docs.oracle.com/javase/8/docs/technotes/guides/jni/spec/types.html

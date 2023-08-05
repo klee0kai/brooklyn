@@ -8,6 +8,8 @@ class CppBuildersCollection(
 
     private val builders = HashMap<File, CodeBuilder>()
 
+    val files get() = builders.keys
+
     fun getOrCreate(fileName: String, initBlock: CodeBuilder.() -> Unit = {}): CodeBuilder {
         val file = File(outDir, fileName)
         if (!builders.contains(file)) builders.putIfAbsent(file, CodeBuilder(file).apply(initBlock))
@@ -19,7 +21,6 @@ class CppBuildersCollection(
         if (!builders.contains(file)) builders.putIfAbsent(file, CodeBuilder(file).apply(initBlock))
         return builders[file]!!
     }
-
 
     fun genAll() {
         builders.forEach { (_, builder) -> builder.gen() }

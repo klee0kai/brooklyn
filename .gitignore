@@ -61,6 +61,14 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 
+### clion project artefacts ####
+example/src/main/cpp/.idea/**
+example/src/main/cpp/.idea/
+example/src/main/cpp/**build**/
+example/src/main/cpp/**build**/**
+
+
+
 ### Eclipse ###
 .apt_generated
 .classpath
