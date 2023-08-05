@@ -39,6 +39,9 @@ crosscompile {
     }
 }
 
+tasks.getByName<Test>("test") {
+    useJUnitPlatform()
+}
 
 
 dependencies {
