@@ -7,8 +7,8 @@ Java_com_klee0kai_example_engine_SimpleJniEngine_initLib(
         JNIEnv *env,
         jclass /* class */
 ) {
-    brooklyn::mapper::init(env);
-    return 1;
+    int initResult = brooklyn::mapper::init(env);
+    return initResult;
 }
 
 
@@ -18,6 +18,7 @@ Java_com_klee0kai_example_engine_SimpleJniEngine_deinitLib(
         JNIEnv *env,
         jclass /* class */
 ) {
-    return 2;
+    int deinitResult = brooklyn::mapper::deinit();
+    return deinitResult;
 }
 

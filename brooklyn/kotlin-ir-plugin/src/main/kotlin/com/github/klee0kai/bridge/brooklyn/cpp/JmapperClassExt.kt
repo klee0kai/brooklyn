@@ -50,7 +50,7 @@ fun CodeBuilder.initJniClassImpl(jClass: IrClass) = apply {
             str(field.name.toString())
             post(",")
             str(field.type.cppTypeMirror)
-            statement(");")
+            statement(")")
             statement("if(!${clId.indexVariableName}->${field.name}) return -1")
         }
         jClass.properties.forEach { property ->
@@ -59,23 +59,25 @@ fun CodeBuilder.initJniClassImpl(jClass: IrClass) = apply {
             post("${clId.indexVariableName}->${property.name}_getter = env->GetMethodID(cls, ")
             str("get${property.name.toString().firstCamelCase()}")
             post(", ")
-            str("")
-            statement(");")
+            str("()${type.cppTypeMirror}")
+            statement(")")
             statement("if(!${clId.indexVariableName}->${property.name}_getter) return -1")
             //setter
             post("${clId.indexVariableName}->${property.name}_setter = env->GetMethodID(cls, ")
             str("set${property.name.toString().firstCamelCase()}")
-            post(", ")
-            str(type.cppTypeMirror)
-            statement(");")
+            post(",")
+            post("\"(${type.cppTypeMirror})V\"")
+            statement(")")
             statement("if(!${clId.indexVariableName}->${property.name}_setter) return -1")
         }
         (jClass.constructors + jClass.functions).forEach { func ->
             post("${clId.indexVariableName}->${func.cppNameMirror} = env->GetMethodID(cls, ")
             str(func.name.toString())
             post(", ")
-            str(func.fullValueParameterList.joinToString("") { it.type.cppTypeMirror })
-            statement(");")
+            val argTypes = func.fullValueParameterList.joinToString("") { it.type.cppTypeMirror }
+            val returnType = if (func.isConstructor) "V" else func.returnType.cppTypeMirror
+            post("\"(${argTypes})${returnType}\"")
+            statement(")")
             statement("if(!${clId.indexVariableName}->${func.cppNameMirror}) return -1")
         }
 
@@ -122,6 +124,9 @@ val ClassId.indexVariableName
 val IrFunction.cppNameMirror
     get() = "$name${fullValueParameterList.map { it.type to it.isVararg }.hashCode().absoluteValue}".camelCase()
 
+val IrFunction.isConstructor
+    get() = name.toString() == "<init>"
+
 
 // https://docs.oracle.com/javase/8/docs/technotes/guides/jni/spec/types.html
 val IrType.cppTypeMirror
@@ -134,7 +139,12 @@ val IrType.cppTypeMirror
         isLong() -> "J"
         isFloat() -> "F"
         isDouble() -> "D"
-        isArray() -> "[" + ""
-        else -> "L${classFqName.toString().snakeCase("/")};"
+        isString() || isNullableString() -> "Ljava/lang/String;"
+        isAny() || isNullableAny() -> "Ljava/lang/Object;"
+        isArray() || isNullableArray() -> "[" + ""
+        else -> {
+            "L${classFqName.toString().snakeCase("/")};"
+        }
+
     }
 

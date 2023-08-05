@@ -11,7 +11,7 @@ class InitLibTests {
         //when
         val initResult = SimpleJniEngine.initLib()
 
-        assertEquals(1, initResult)
+        assertEquals(0, initResult, "Init should return 0, if init is correct")
     }
 
 }
