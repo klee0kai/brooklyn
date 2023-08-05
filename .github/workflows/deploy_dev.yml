@@ -1,7 +1,12 @@
-name: Deploy Button
+name: Deploy Dev Branch
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - 'release/**'
+      - 'releases/**'
+      - 'master'
+      - 'dev'
 
 jobs:
   tests:
@@ -27,26 +32,6 @@ jobs:
           path: |
             ./**/build/reports
             ./**/build/test-results
-
-  dorny_report:
-    name: Prepare Dorny Test Report
-    needs: tests
-    runs-on: ubuntu-latest
-    if: ${{ always() }}
-    steps:
-      - uses: actions/checkout@v3
-      - name: Download Test Artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: test-report
-
-      - name: Publish Dorny Test Report
-        uses: dorny/test-reporter@v1
-        with:
-          name: Dorny JUnit Test Report
-          path: '**/build/test-results/**/*.xml'
-          reporter: java-junit
-          list-tests: 'all'
 
   mikepenz_report:
     name: Prepare Mikepenz Test Report
