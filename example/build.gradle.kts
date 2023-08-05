@@ -21,7 +21,8 @@ buildConfig {
 
 crosscompile {
     bashBuild("native-lib") {
-        tasks.compileJava.dependsOn(this)
+        this.dependsOn(tasks.compileJava)
+        tasks.jar.dependsOn(this)
         workFolder = File(buildDir, "cmake/native-lib")
             .also { it.mkdirs() }
             .path
