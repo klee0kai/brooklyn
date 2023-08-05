@@ -7,6 +7,7 @@ import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.name.ClassId
+import org.jetbrains.kotlin.name.FqName
 import kotlin.math.absoluteValue
 
 fun CodeBuilder.declareClassIndexStructure(jClass: IrClass) = apply {
@@ -63,12 +64,14 @@ fun CodeBuilder.initJniClassImpl(jClass: IrClass) = apply {
             statement(")")
             statement("if(!${clId.indexVariableName}->${property.name}_getter) return -1")
             //setter
-            post("${clId.indexVariableName}->${property.name}_setter = env->GetMethodID(cls, ")
-            str("set${property.name.toString().firstCamelCase()}")
-            post(",")
-            post("\"(${type.cppTypeMirror})V\"")
-            statement(")")
-            statement("if(!${clId.indexVariableName}->${property.name}_setter) return -1")
+            if (property.isVar) {
+                post("${clId.indexVariableName}->${property.name}_setter = env->GetMethodID(cls, ")
+                str("set${property.name.toString().firstCamelCase()}")
+                post(",")
+                post("\"(${type.cppTypeMirror})V\"")
+                statement(")")
+                statement("if(!${clId.indexVariableName}->${property.name}_setter) return -1")
+            }
         }
         (jClass.constructors + jClass.functions).forEach { func ->
             post("${clId.indexVariableName}->${func.cppNameMirror} = env->GetMethodID(cls, ")
@@ -104,6 +107,8 @@ fun CodeBuilder.deinitJniClassImpl(jClass: IrClass) = apply {
         statement("${clId.indexVariableName} = NULL")
         statement("return 0")
         line("}")
+
+
     })
 }
 
@@ -139,6 +144,16 @@ val IrType.cppTypeMirror
         isLong() -> "J"
         isFloat() -> "F"
         isDouble() -> "D"
+        isClassType(IdSignatureValues._boolean) -> "Ljava/lang/Boolean;"
+        isClassType(IdSignatureValues._char) -> "Ljava/lang/Character;"
+        isClassType(IdSignatureValues._byte) -> "Ljava/lang/Byte;"
+        isClassType(IdSignatureValues._short) -> "Ljava/lang/Short;"
+        isClassType(IdSignatureValues._int) -> "Ljava/lang/Integer;"
+        isClassType(IdSignatureValues._long) -> "Ljava/lang/Long;"
+        isClassType(IdSignatureValues._float) -> "Ljava/lang/Float;"
+        isClassType(IdSignatureValues._double) -> "Ljava/lang/Double;"
+        isClassType(IdSignatureValues.number) -> "Ljava/lang/Number;"
+        isClassType(IdSignatureValues.charSequence) -> "Ljava/lang/CharSequence;"
         isString() || isNullableString() -> "Ljava/lang/String;"
         isAny() || isNullableAny() -> "Ljava/lang/Object;"
         isArray() || isNullableArray() -> "[" + ""
@@ -148,3 +163,13 @@ val IrType.cppTypeMirror
 
     }
 
+private fun IrType.isClassType(signature: IdSignature.CommonSignature, nullable: Boolean? = null): Boolean {
+    if (this !is IrSimpleType) return false
+    if (nullable != null && this.isMarkedNullable() != nullable) return false
+    return signature == classifier.signature ||
+            classifier.owner.let { it is IrClass && it.hasFqNameEqualToSignature(signature) }
+}
+
+private fun IrClass.hasFqNameEqualToSignature(signature: IdSignature.CommonSignature): Boolean =
+    name.asString() == signature.shortName &&
+            hasEqualFqName(FqName("${signature.packageFqName}.${signature.declarationFqName}"))
