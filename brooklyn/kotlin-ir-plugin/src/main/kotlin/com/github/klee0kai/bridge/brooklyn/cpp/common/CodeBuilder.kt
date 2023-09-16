@@ -1,4 +1,4 @@
-package com.github.klee0kai.bridge.brooklyn.cpp
+package com.github.klee0kai.bridge.brooklyn.cpp.common
 
 import com.github.klee0kai.bridge.brooklyn.poet.Poet
 import com.github.klee0kai.bridge.brooklyn.poet.PoetDelegate

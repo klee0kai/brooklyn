@@ -1,7 +1,8 @@
 package com.github.klee0kai.bridge.brooklyn.codegen
 
 import com.github.klee0kai.bridge.brooklyn.cmake.cmakeLib
-import com.github.klee0kai.bridge.brooklyn.cpp.*
+import com.github.klee0kai.bridge.brooklyn.cpp.common.*
+import com.github.klee0kai.bridge.brooklyn.cpp.mapper.*
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
@@ -32,6 +33,7 @@ class BrooklynIrGenerationExtension(
         gen.getOrCreate(fileName = CommonNaming.brooklynHeader)
             .allJniHeaders()
             .include(CommonNaming.mapperHeader)
+            .include(CommonNaming.modelHeader)
 
         gen.getOrCreate(fileName = CommonNaming.brooklynInternalHeader)
             .allJniHeaders()
@@ -50,6 +52,11 @@ class BrooklynIrGenerationExtension(
                 .declareClassIndexStructure(declaration)
                 .initJniClassImpl(declaration)
                 .deinitJniClassImpl(declaration)
+
+            gen.getOrCreate(clId.modelHeaderFile, headerInitBlock)
+
+            gen.getOrCreate(clId.modelCppFile, cppInitBlock)
+
         }
 
         gen.getOrCreate(CommonNaming.mapperHeader, headerInitBlock)
@@ -63,6 +70,10 @@ class BrooklynIrGenerationExtension(
             .initAllFromJvmImpl()
             .deinitAllImpl(headerCreator.pojoJniClasses.mapNotNull { it.classId })
 
+
+        gen.getOrCreate(CommonNaming.modelHeader)
+
+        gen.getOrCreate(CommonNaming.modelCpp)
 
         gen.genAll()
 

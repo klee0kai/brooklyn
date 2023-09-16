@@ -1,5 +1,6 @@
-package com.github.klee0kai.bridge.brooklyn.cpp
+package com.github.klee0kai.bridge.brooklyn.cpp.mapper
 
+import com.github.klee0kai.bridge.brooklyn.cpp.common.*
 import com.github.klee0kai.bridge.brooklyn.poet.Poet
 import org.jetbrains.kotlin.backend.jvm.fullValueParameterList
 import org.jetbrains.kotlin.ir.declarations.IrClass
@@ -50,7 +51,7 @@ fun CodeBuilder.initJniClassImpl(jClass: IrClass) = apply {
             post("${clId.indexVariableName}->${field.name} = env->GetFieldID(cls, ")
             str(field.name.toString())
             post(",")
-            str(field.type.cppTypeMirror)
+            str(field.type.cppJniTypeMirror)
             statement(")")
             statement("if(!${clId.indexVariableName}->${field.name}) return -1")
         }
@@ -60,7 +61,7 @@ fun CodeBuilder.initJniClassImpl(jClass: IrClass) = apply {
             post("${clId.indexVariableName}->${property.name}_getter = env->GetMethodID(cls, ")
             str("get${property.name.toString().firstCamelCase()}")
             post(", ")
-            str("()${type.cppTypeMirror}")
+            str("()${type.cppJniTypeMirror}")
             statement(")")
             statement("if(!${clId.indexVariableName}->${property.name}_getter) return -1")
             //setter
@@ -68,7 +69,7 @@ fun CodeBuilder.initJniClassImpl(jClass: IrClass) = apply {
                 post("${clId.indexVariableName}->${property.name}_setter = env->GetMethodID(cls, ")
                 str("set${property.name.toString().firstCamelCase()}")
                 post(",")
-                post("\"(${type.cppTypeMirror})V\"")
+                post("\"(${type.cppJniTypeMirror})V\"")
                 statement(")")
                 statement("if(!${clId.indexVariableName}->${property.name}_setter) return -1")
             }
@@ -77,8 +78,8 @@ fun CodeBuilder.initJniClassImpl(jClass: IrClass) = apply {
             post("${clId.indexVariableName}->${func.cppNameMirror} = env->GetMethodID(cls, ")
             str(func.name.toString())
             post(", ")
-            val argTypes = func.fullValueParameterList.joinToString("") { it.type.cppTypeMirror }
-            val returnType = if (func.isConstructor) "V" else func.returnType.cppTypeMirror
+            val argTypes = func.fullValueParameterList.joinToString("") { it.type.cppJniTypeMirror }
+            val returnType = if (func.isConstructor) "V" else func.returnType.cppJniTypeMirror
             post("\"(${argTypes})${returnType}\"")
             statement(")")
             statement("if(!${clId.indexVariableName}->${func.cppNameMirror}) return -1")
@@ -134,7 +135,7 @@ val IrFunction.isConstructor
 
 
 // https://docs.oracle.com/javase/8/docs/technotes/guides/jni/spec/types.html
-val IrType.cppTypeMirror
+val IrType.cppJniTypeMirror
     get() = when {
         isBoolean() -> "Z"
         isByte() -> "B"

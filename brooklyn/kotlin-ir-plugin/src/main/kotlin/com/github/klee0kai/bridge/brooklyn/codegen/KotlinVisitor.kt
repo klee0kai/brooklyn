@@ -21,6 +21,7 @@ class KotlinVisitor : IrElementVisitorVoid {
         super.visitClass(declaration)
         val isJniPojo = declaration.annotations
             .any { it.annotationClass.classId == JniPojo::class.java.classId }
+
         when {
             isJniPojo -> pojoJniClasses.add(declaration)
         }

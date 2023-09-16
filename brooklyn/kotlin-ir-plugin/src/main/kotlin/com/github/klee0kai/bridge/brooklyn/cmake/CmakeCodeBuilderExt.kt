@@ -1,8 +1,8 @@
 package com.github.klee0kai.bridge.brooklyn.cmake
 
-import com.github.klee0kai.bridge.brooklyn.cpp.CodeBuilder
-import com.github.klee0kai.bridge.brooklyn.cpp.line
-import com.github.klee0kai.bridge.brooklyn.cpp.lines
+import com.github.klee0kai.bridge.brooklyn.cpp.common.CodeBuilder
+import com.github.klee0kai.bridge.brooklyn.cpp.common.line
+import com.github.klee0kai.bridge.brooklyn.cpp.common.lines
 
 fun CodeBuilder.cmakeLib(
     libName: String,

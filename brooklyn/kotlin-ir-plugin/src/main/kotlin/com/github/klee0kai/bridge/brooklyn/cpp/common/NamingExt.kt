@@ -1,4 +1,4 @@
-package com.github.klee0kai.bridge.brooklyn.cpp
+package com.github.klee0kai.bridge.brooklyn.cpp.common
 
 import org.jetbrains.kotlin.name.ClassId
 import java.io.File
@@ -6,8 +6,13 @@ import java.io.File
 object CommonNaming {
     const val brooklynHeader = "brooklyn.h"
     const val brooklynInternalHeader = "lib/brooklyn_internal.h"
+
     const val mapperHeader = "mappers/mapper.h"
     const val mapperCpp = "mappers/mapper.cpp"
+
+    const val modelHeader = "model/model.h"
+    const val modelCpp = "model/model.h"
+
     const val findBrooklynCmake = "FindBrooklynBridge.cmake"
 }
 
@@ -17,8 +22,11 @@ val ClassId.mapperHeaderFile
 val ClassId.mapperCppFile
     get() = File("mappers", "${cppFilePrefix}_mapper.cpp")
 
-val ClassId.structuresHeaderFile
-    get() = File("${cppFilePrefix}.header")
+val ClassId.modelHeaderFile
+    get() = File("model", "${cppFilePrefix}_model.h")
+
+val ClassId.modelCppFile
+    get() = File("model", "${cppFilePrefix}_model.cpp")
 
 fun String.camelCase() = buildString {
     var specSymbol = false
