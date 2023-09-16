@@ -3,6 +3,7 @@ package com.github.klee0kai.bridge.brooklyn.codegen
 import com.github.klee0kai.bridge.brooklyn.cmake.cmakeLib
 import com.github.klee0kai.bridge.brooklyn.cpp.common.*
 import com.github.klee0kai.bridge.brooklyn.cpp.mapper.*
+import com.github.klee0kai.bridge.brooklyn.cpp.model.declareClassModelStructure
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
@@ -54,8 +55,8 @@ class BrooklynIrGenerationExtension(
                 .deinitJniClassImpl(declaration)
 
             gen.getOrCreate(clId.modelHeaderFile, headerInitBlock)
+                .declareClassModelStructure(declaration)
 
-            gen.getOrCreate(clId.modelCppFile, cppInitBlock)
 
         }
 
@@ -72,8 +73,7 @@ class BrooklynIrGenerationExtension(
 
 
         gen.getOrCreate(CommonNaming.modelHeader)
-
-        gen.getOrCreate(CommonNaming.modelCpp)
+            .apply { headerCreator.pojoJniClasses.forEach { include(it.classId!!.modelHeaderFile.path) } }
 
         gen.genAll()
 

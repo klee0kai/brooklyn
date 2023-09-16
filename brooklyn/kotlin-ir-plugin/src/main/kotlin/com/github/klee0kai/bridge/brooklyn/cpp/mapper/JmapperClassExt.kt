@@ -164,7 +164,7 @@ val IrType.cppJniTypeMirror
 
     }
 
-private fun IrType.isClassType(signature: IdSignature.CommonSignature, nullable: Boolean? = null): Boolean {
+fun IrType.isClassType(signature: IdSignature.CommonSignature, nullable: Boolean? = null): Boolean {
     if (this !is IrSimpleType) return false
     if (nullable != null && this.isMarkedNullable() != nullable) return false
     return signature == classifier.signature ||

@@ -11,7 +11,6 @@ object CommonNaming {
     const val mapperCpp = "mappers/mapper.cpp"
 
     const val modelHeader = "model/model.h"
-    const val modelCpp = "model/model.h"
 
     const val findBrooklynCmake = "FindBrooklynBridge.cmake"
 }
@@ -24,9 +23,6 @@ val ClassId.mapperCppFile
 
 val ClassId.modelHeaderFile
     get() = File("model", "${cppFilePrefix}_model.h")
-
-val ClassId.modelCppFile
-    get() = File("model", "${cppFilePrefix}_model.cpp")
 
 fun String.camelCase() = buildString {
     var specSymbol = false

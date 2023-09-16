@@ -5,16 +5,16 @@ import com.github.klee0kai.bridge.brooklyn.JniPojo
 
 @JniPojo
 data class NullableTypePojo(
-    val unit: Unit?,
-    val boolean: Boolean?,
-    val char: Char?,
-    val byte: Byte?,
-    val short: Short?,
-    val int: Int?,
-    val long: Long?,
-    val float: Float?,
-    val double: Double?,
-    val number: Number?,
-    val string: String?,
-    val charSequence: CharSequence?,
+    val unitField: Unit?,
+    val booleanField: Boolean?,
+    val charField: Char?,
+    val byteField: Byte?,
+    val shortField: Short?,
+    val intField: Int?,
+    val longField: Long?,
+    val floatField: Float?,
+    val doubleField: Double?,
+    val numberField: Number?,
+    val stringField: String?,
+    val charSequenceField: CharSequence?,
 )

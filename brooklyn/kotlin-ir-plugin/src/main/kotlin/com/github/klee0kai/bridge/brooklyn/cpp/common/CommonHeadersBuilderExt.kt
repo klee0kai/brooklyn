@@ -7,4 +7,6 @@ fun <T: PoetDelegate> T.allJniHeaders() = apply {
     include("<string>")
     include("<ostream>")
     include("<list>")
+    include("<vector>")
+    include("<memory>")
 }
