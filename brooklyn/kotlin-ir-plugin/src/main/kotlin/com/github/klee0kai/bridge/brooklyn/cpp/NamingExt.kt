@@ -3,6 +3,13 @@ package com.github.klee0kai.bridge.brooklyn.cpp
 import org.jetbrains.kotlin.name.ClassId
 import java.io.File
 
+object CommonNaming {
+    const val brooklynHeader = "brooklyn.h"
+    const val brooklynInternalHeader = "lib/brooklyn_internal.h"
+    const val mapperHeader = "mappers/mapper.h"
+    const val mapperCpp = "mappers/mapper.cpp"
+    const val findBrooklynCmake = "FindBrooklynBridge.cmake"
+}
 
 val ClassId.mapperHeaderFile
     get() = File("mappers", "${cppFilePrefix}_mapper.h")

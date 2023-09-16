@@ -1,6 +1,6 @@
 #include <jni.h>
 #include <string>
-#include "mappers/mapper.h"
+#include "brooklyn.h"
 
 extern "C" JNIEXPORT jint JNICALL
 Java_com_klee0kai_example_engine_SimpleJniEngine_initLib(

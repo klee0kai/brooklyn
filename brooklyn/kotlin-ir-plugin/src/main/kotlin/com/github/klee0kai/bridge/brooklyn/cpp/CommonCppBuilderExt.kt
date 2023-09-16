@@ -11,7 +11,7 @@ fun CodeBuilder.defHeaders(doubleImportCheck: Boolean = false) = apply {
             line("#define $unicHeaderName")
         }
 
-        include("brooklyn.h")
+        include(CommonNaming.brooklynInternalHeader)
         lines(2)
     }
 

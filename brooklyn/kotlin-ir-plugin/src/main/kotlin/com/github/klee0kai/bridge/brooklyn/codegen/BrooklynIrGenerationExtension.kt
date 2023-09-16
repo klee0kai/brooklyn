@@ -26,8 +26,15 @@ class BrooklynIrGenerationExtension(
     }
 
     override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
+        File(outDirFile).deleteRecursively()
+
         val gen = CppBuildersCollection(File(outDirFile))
-        gen.createCommonHeaders()
+        gen.getOrCreate(fileName = CommonNaming.brooklynHeader)
+            .allJniHeaders()
+            .include(CommonNaming.mapperHeader)
+
+        gen.getOrCreate(fileName = CommonNaming.brooklynInternalHeader)
+            .allJniHeaders()
 
         val headerCreator = KotlinVisitor()
         moduleFragment.files.forEach { it.acceptVoid(headerCreator) }
@@ -38,7 +45,6 @@ class BrooklynIrGenerationExtension(
                 .initJniClassApi(declaration)
                 .deinitJniClassApi(declaration)
 
-
             gen.getOrCreate(clId.mapperCppFile, cppInitBlock)
                 .header { include(clId.mapperHeaderFile.path) }
                 .declareClassIndexStructure(declaration)
@@ -46,13 +52,13 @@ class BrooklynIrGenerationExtension(
                 .deinitJniClassImpl(declaration)
         }
 
-        gen.getOrCreate("mappers/mapper.h", headerInitBlock)
+        gen.getOrCreate(CommonNaming.mapperHeader, headerInitBlock)
             .initAllApi()
             .initAllFromJvmApi()
             .deinitAllApi()
 
 
-        gen.getOrCreate("mappers/mapper.cpp", cppInitBlock)
+        gen.getOrCreate(CommonNaming.mapperCpp, cppInitBlock)
             .initAllImpl(headerCreator.pojoJniClasses.mapNotNull { it.classId })
             .initAllFromJvmImpl()
             .deinitAllImpl(headerCreator.pojoJniClasses.mapNotNull { it.classId })
@@ -61,7 +67,7 @@ class BrooklynIrGenerationExtension(
         gen.genAll()
 
 
-        CodeBuilder(File(outDirFile, "FindBrooklynBridge.cmake"))
+        CodeBuilder(File(outDirFile, CommonNaming.findBrooklynCmake))
             .cmakeLib(
                 libName = "brooklyn",
                 rootDir = outDirFile,
@@ -73,9 +79,5 @@ class BrooklynIrGenerationExtension(
 
     }
 
-    private fun CppBuildersCollection.createCommonHeaders() {
-        getOrCreate(fileName = "brooklyn.h")
-            .allJniHeaders()
-    }
 
 }
