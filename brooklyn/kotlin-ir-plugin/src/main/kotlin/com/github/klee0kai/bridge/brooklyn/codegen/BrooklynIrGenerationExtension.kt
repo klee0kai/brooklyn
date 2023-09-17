@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.util.classId
 import org.jetbrains.kotlin.ir.visitors.acceptVoid
 import java.io.File
+import java.lang.ref.WeakReference
 
 class BrooklynIrGenerationExtension(
     private val messageCollector: MessageCollector,
@@ -28,6 +29,7 @@ class BrooklynIrGenerationExtension(
     }
 
     override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
+        pluginContextRef = WeakReference(pluginContext)
         File(outDirFile).deleteRecursively()
 
         val gen = CppBuildersCollection(File(outDirFile))
@@ -47,6 +49,7 @@ class BrooklynIrGenerationExtension(
             gen.getOrCreate(clId.mapperHeaderFile, headerInitBlock)
                 .initJniClassApi(declaration)
                 .deinitJniClassApi(declaration)
+                .mapJniClassApi(declaration)
 
             gen.getOrCreate(clId.mapperCppFile, cppInitBlock)
                 .header { include(clId.mapperHeaderFile.path) }
@@ -88,6 +91,10 @@ class BrooklynIrGenerationExtension(
             )
             .gen(sym = "#")
 
+    }
+
+    companion object {
+        var pluginContextRef: WeakReference<IrPluginContext>? = null
     }
 
 
