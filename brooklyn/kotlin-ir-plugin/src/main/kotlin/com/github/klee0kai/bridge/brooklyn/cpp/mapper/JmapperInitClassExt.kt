@@ -4,7 +4,9 @@ import com.github.klee0kai.bridge.brooklyn.cpp.common.*
 import org.jetbrains.kotlin.backend.jvm.fullValueParameterList
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrFunction
-import org.jetbrains.kotlin.ir.types.*
+import org.jetbrains.kotlin.ir.types.IrSimpleType
+import org.jetbrains.kotlin.ir.types.IrType
+import org.jetbrains.kotlin.ir.types.isMarkedNullable
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
@@ -49,20 +51,23 @@ fun CodeBuilder.initJniClassImpl(jClass: IrClass) = apply {
         statement("${clId.indexVariableName} = std::make_shared<${clId.indexStructName}>()")
         statement("jclass cls = env->FindClass(\"$clPathName\")")
         jClass.fields.forEach { field ->
+            val jniTypeCode = field.type.jniType()?.jniTypeCode ?: return@forEach
             post("${clId.indexVariableName}->${field.name} = env->GetFieldID(cls, ")
             str(field.name.toString())
             post(",")
-            str(field.type.cppJniTypeMirror)
+            str(jniTypeCode)
             statement(")")
             statement("if(!${clId.indexVariableName}->${field.name}) return -1")
         }
         jClass.properties.forEach { property ->
             val type = property.getter!!.returnType
+            val jniTypeCode = type.jniType()?.jniTypeCode ?: return@forEach
+
             //getter
             post("${clId.indexVariableName}->${property.name}_getter = env->GetMethodID(cls, ")
             str("get${property.name.toString().firstCamelCase()}")
             post(", ")
-            str("()${type.cppJniTypeMirror}")
+            str("()${jniTypeCode}")
             statement(")")
             statement("if(!${clId.indexVariableName}->${property.name}_getter) return -1")
             //setter
@@ -70,17 +75,23 @@ fun CodeBuilder.initJniClassImpl(jClass: IrClass) = apply {
                 post("${clId.indexVariableName}->${property.name}_setter = env->GetMethodID(cls, ")
                 str("set${property.name.toString().firstCamelCase()}")
                 post(",")
-                post("\"(${type.cppJniTypeMirror})V\"")
+                post("\"(${jniTypeCode})V\"")
                 statement(")")
                 statement("if(!${clId.indexVariableName}->${property.name}_setter) return -1")
             }
         }
         (jClass.constructors + jClass.functions).forEach { func ->
+            val argTypes = runCatching {
+                func.fullValueParameterList.joinToString("") { it.type.jniType()!!.jniTypeCode }
+            }.getOrNull() ?: return@forEach
+            val returnType = runCatching {
+                if (func.isConstructor) "V" else func.returnType.jniType()!!.jniTypeCode
+            }.getOrNull() ?: return@forEach
+
+
             post("${clId.indexVariableName}->${func.cppNameMirror} = env->GetMethodID(cls, ")
             str(func.name.toString())
             post(", ")
-            val argTypes = func.fullValueParameterList.joinToString("") { it.type.cppJniTypeMirror }
-            val returnType = if (func.isConstructor) "V" else func.returnType.cppJniTypeMirror
             post("\"(${argTypes})${returnType}\"")
             statement(")")
             statement("if(!${clId.indexVariableName}->${func.cppNameMirror}) return -1")
@@ -130,37 +141,6 @@ val IrFunction.cppNameMirror
 
 val IrFunction.isConstructor
     get() = name.toString() == "<init>"
-
-
-@Deprecated("use findJniTypeMirror")
-val IrType.cppJniTypeMirror
-    get() = when {
-        isBoolean() -> "Z"
-        isByte() -> "B"
-        isChar() -> "C"
-        isShort() -> "S"
-        isInt() -> "I"
-        isLong() -> "J"
-        isFloat() -> "F"
-        isDouble() -> "D"
-        isClassType(IdSignatureValues._boolean) -> "Ljava/lang/Boolean;"
-        isClassType(IdSignatureValues._char) -> "Ljava/lang/Character;"
-        isClassType(IdSignatureValues._byte) -> "Ljava/lang/Byte;"
-        isClassType(IdSignatureValues._short) -> "Ljava/lang/Short;"
-        isClassType(IdSignatureValues._int) -> "Ljava/lang/Integer;"
-        isClassType(IdSignatureValues._long) -> "Ljava/lang/Long;"
-        isClassType(IdSignatureValues._float) -> "Ljava/lang/Float;"
-        isClassType(IdSignatureValues._double) -> "Ljava/lang/Double;"
-        isClassType(IdSignatureValues.number) -> "Ljava/lang/Number;"
-        isClassType(IdSignatureValues.charSequence) -> "Ljava/lang/CharSequence;"
-        isString() || isNullableString() -> "Ljava/lang/String;"
-        isAny() || isNullableAny() -> "Ljava/lang/Object;"
-        isArray() || isNullableArray() -> "[" + ""
-        else -> {
-            "L${classFqName.toString().snakeCase("/")};"
-        }
-
-    }
 
 fun IrType.isClassType(signature: IdSignature.CommonSignature, nullable: Boolean? = null): Boolean {
     if (this !is IrSimpleType) return false

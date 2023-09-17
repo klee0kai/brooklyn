@@ -32,6 +32,14 @@ class BrooklynIrGenerationExtension(
         pluginContextRef = WeakReference(pluginContext)
         File(outDirFile).deleteRecursively()
 
+        val headerCreator = KotlinVisitor()
+        moduleFragment.files.forEach { it.acceptVoid(headerCreator) }
+
+        headerCreator.pojoJniClasses.forEach {
+            allCppTypeMirrors.addSupportedPojoClass(it)
+        }
+
+
         val gen = CppBuildersCollection(File(outDirFile))
         gen.getOrCreate(fileName = CommonNaming.brooklynHeader)
             .allJniHeaders()
@@ -40,9 +48,6 @@ class BrooklynIrGenerationExtension(
 
         gen.getOrCreate(fileName = CommonNaming.brooklynInternalHeader)
             .allJniHeaders()
-
-        val headerCreator = KotlinVisitor()
-        moduleFragment.files.forEach { it.acceptVoid(headerCreator) }
 
         headerCreator.pojoJniClasses.forEach { declaration ->
             val clId = declaration.classId!!

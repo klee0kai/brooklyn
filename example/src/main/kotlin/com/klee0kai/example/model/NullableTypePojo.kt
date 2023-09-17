@@ -1,9 +1,7 @@
 package com.klee0kai.example.model
 
-import com.github.klee0kai.bridge.brooklyn.JniPojo
 
-
-@JniPojo
+//@JniPojo
 data class NullableTypePojo(
     val unitField: Unit?,
     val booleanField: Boolean?,

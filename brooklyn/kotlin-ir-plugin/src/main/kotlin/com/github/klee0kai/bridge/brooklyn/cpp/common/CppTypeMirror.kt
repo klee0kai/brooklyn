@@ -3,6 +3,8 @@ package com.github.klee0kai.bridge.brooklyn.cpp.common
 import com.github.klee0kai.bridge.brooklyn.poet.Poet
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.types.*
+import org.jetbrains.kotlin.ir.util.classId
+import org.jetbrains.kotlin.ir.util.kotlinFqName
 
 fun interface MapJvmVariable {
     fun invoke(variable: String, env: String, jvmObj: String, fieldOrMethodId: String): Poet
@@ -23,19 +25,19 @@ class CppTypeMirror(
     val mapToJvmSetMethod: MapJvmVariable,
 )
 
-fun IrType.findJniTypeMirror(): CppTypeMirror? {
+fun IrType.jniType(): CppTypeMirror? {
     val type = allCppTypeMirrors.firstOrNull { it.checkIrType(this) }
     if (type != null) return type
     val typeCl = getClass() ?: return null
     return allCppTypeMirrors.firstOrNull { it.checkIrClass(typeCl, isNullable()) }
 }
 
-fun IrClass.findJniTypeMirror(nullable: Boolean = true): CppTypeMirror? =
+fun IrClass.jniType(nullable: Boolean = true): CppTypeMirror? =
     allCppTypeMirrors.firstOrNull { it.checkIrClass(this, nullable) }
 
 
 // https://docs.oracle.com/javase/8/docs/technotes/guides/jni/spec/types.html
-val allCppTypeMirrors = listOf(
+val allCppTypeMirrors: MutableList<CppTypeMirror> = mutableListOf(
     CppTypeMirror(
         jniTypeStr = "jboolean",
         jniTypeCode = "Z",
@@ -136,6 +138,26 @@ val allCppTypeMirrors = listOf(
     )
 
 
+fun MutableList<CppTypeMirror>.addSupportedPojoClass(clazz: IrClass) {
+    val classId = clazz.classId!!
+    val cppModelMirror = "${classId.packageFqName}${classId.shortClassName}".camelCase().firstCamelCase()
+    add(
+        CppTypeMirror(
+            jniTypeStr = "jobject",
+            jniTypeCode = "L${clazz.kotlinFqName.toString().snakeCase("/")};",
+            cppTypeMirrorStr = cppModelMirror,
+            checkIrClass = { cl, _ -> cl.classId == clazz.classId },
+            mapFromJvmField = simpleTodo,
+            mapFromJvmStaticField = simpleTodo,
+            mapFromJvmGetMethod = simpleTodo,
+            mapFromJvmGetStaticMethod = simpleTodo,
+            mapToJvmField = simpleTodo,
+            mapToJvmSetMethod = simpleTodo,
+        ),
+        )
+}
+
+
 private fun simpleGetMethodCall(name: String): MapJvmVariable {
     return MapJvmVariable { variable: String, env: String, jvmObj: String, methodId: String ->
         Poet().apply {
@@ -154,3 +176,8 @@ private fun simpleSetMethodCall(
         }
     }
 }
+
+
+@Deprecated("TODO")
+private val simpleTodo get() = MapJvmVariable { variable, env, jvmObj, fieldOrMethodId -> TODO() }
+
