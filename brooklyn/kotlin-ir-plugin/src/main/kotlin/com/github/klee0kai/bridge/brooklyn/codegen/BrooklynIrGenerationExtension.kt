@@ -47,6 +47,7 @@ class BrooklynIrGenerationExtension(
         headerCreator.pojoJniClasses.forEach { declaration ->
             val clId = declaration.classId!!
             gen.getOrCreate(clId.mapperHeaderFile, headerInitBlock)
+                .header { include(declaration.classId!!.modelHeaderFile.path) }
                 .initJniClassApi(declaration)
                 .deinitJniClassApi(declaration)
                 .mapJniClassApi(declaration)
@@ -56,6 +57,7 @@ class BrooklynIrGenerationExtension(
                 .declareClassIndexStructure(declaration)
                 .initJniClassImpl(declaration)
                 .deinitJniClassImpl(declaration)
+                .mapJniClassImpl(declaration)
 
             gen.getOrCreate(clId.modelHeaderFile, headerInitBlock)
                 .declareClassModelStructure(declaration)

@@ -63,3 +63,5 @@ fun IrClass.cppTypeMirror(nullable: Boolean = false) = when (kotlinFqName.toStri
         "${classId!!.packageFqName}${classId!!.shortClassName}".camelCase().firstCamelCase()
     }
 }
+
+fun IrClass.cppMappingNameSpace() = "${cppTypeMirror()}_mapping"
