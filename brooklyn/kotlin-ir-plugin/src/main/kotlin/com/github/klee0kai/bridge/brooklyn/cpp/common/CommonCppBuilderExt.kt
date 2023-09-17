@@ -22,7 +22,7 @@ fun CodeBuilder.defHeaders(doubleImportCheck: Boolean = false) = apply {
 
 fun CodeBuilder.namespaces(vararg namespaces: String) = apply {
     namespaces.forEach { namespace ->
-        body {
+        variables {
             line("namespace $namespace {")
         }
         footer {

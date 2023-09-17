@@ -2,7 +2,6 @@ package com.github.klee0kai.bridge.brooklyn.cpp.model
 
 import com.github.klee0kai.bridge.brooklyn.cpp.common.*
 import com.github.klee0kai.bridge.brooklyn.cpp.mapper.isClassType
-import com.github.klee0kai.bridge.brooklyn.poet.Poet
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.classId
@@ -11,7 +10,8 @@ import org.jetbrains.kotlin.ir.util.kotlinFqName
 import org.jetbrains.kotlin.ir.util.properties
 
 fun CodeBuilder.declareClassModelStructure(jClass: IrClass) = apply {
-    variables.post(Poet().apply {
+    variables {
+
         lines(1)
         line("struct ${jClass.cppTypeMirror()} {")
         jClass.fields.forEach { field ->
@@ -27,11 +27,11 @@ fun CodeBuilder.declareClassModelStructure(jClass: IrClass) = apply {
         }
         line("};")
 
-
-    })
+    }
 }
 
 
+@Deprecated("use findJniTypeMirror")
 fun IrType.cppTypeMirror() = when {
     isBoolean() -> "int"
     isByte() -> "int"
@@ -55,6 +55,7 @@ fun IrType.cppTypeMirror() = when {
 
 }
 
+@Deprecated("use findJniTypeMirror")
 fun IrClass.cppTypeMirror(nullable: Boolean = false) = when (kotlinFqName.toString()) {
     "java.lang.String" -> "std::shared_ptr<std::string>"
     "kotlin.String" -> "std::shared_ptr<std::string>"

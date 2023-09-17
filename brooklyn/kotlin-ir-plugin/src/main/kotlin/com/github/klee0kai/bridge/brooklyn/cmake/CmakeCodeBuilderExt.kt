@@ -28,5 +28,7 @@ fun CodeBuilder.cmakeLib(
 
     lines(1)
     line("set_target_properties(${libName} PROPERTIES INTERFACE_INCLUDE_DIRECTORIES $rootDir)")
+    line("set_target_properties(${libName} PROPERTIES POSITION_INDEPENDENT_CODE ON)")
+
     line("target_include_directories(${libName} PUBLIC  \${JNI_INCLUDE_DIRS}\n\t $rootDir )")
 }

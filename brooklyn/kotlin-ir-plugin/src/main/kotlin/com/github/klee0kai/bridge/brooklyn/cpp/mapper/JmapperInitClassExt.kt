@@ -134,7 +134,7 @@ val IrFunction.isConstructor
     get() = name.toString() == "<init>"
 
 
-// https://docs.oracle.com/javase/8/docs/technotes/guides/jni/spec/types.html
+@Deprecated("use findJniTypeMirror")
 val IrType.cppJniTypeMirror
     get() = when {
         isBoolean() -> "Z"

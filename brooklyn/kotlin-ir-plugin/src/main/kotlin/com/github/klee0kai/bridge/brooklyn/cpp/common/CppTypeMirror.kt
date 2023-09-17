@@ -4,6 +4,9 @@ import com.github.klee0kai.bridge.brooklyn.poet.Poet
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.types.*
 
+fun interface MapJvmVariable {
+    fun invoke(variable: String, env: String, jvmObj: String, fieldOrMethodId: String): Poet
+}
 
 class CppTypeMirror(
     val jniTypeStr: String,
@@ -11,16 +14,27 @@ class CppTypeMirror(
     val cppTypeMirrorStr: String,
 
     val checkIrType: (IrType) -> Boolean = { false },
-    val checkIrClass: (IrClass) -> Boolean = { false },
-    val mapFromJvmField: Poet.(variable: String, env: String, jvmObj: String, fieldId: String) -> Unit,
-    val mapFromJvmStaticField: Poet.(variable: String, env: String, jvmObj: String, fieldId: String) -> Unit,
-    val mapFromJvmGetMethod: Poet.(variable: String, env: String, jvmObj: String, methodId: String) -> Unit,
-    val mapFromJvmGetStaticMethod: Poet.(variable: String, env: String, jvmObj: String, methodId: String) -> Unit,
-    val mapToJvmField: Poet.(variable: String, env: String, jvmObj: String, fieldId: String) -> Unit,
-    val mapToJvmSetMethod: Poet.(variable: String, env: String, jvmObj: String, methodId: String) -> Unit,
+    val checkIrClass: (IrClass, nullable: Boolean) -> Boolean = { _, _ -> false },
+    val mapFromJvmField: MapJvmVariable,
+    val mapFromJvmStaticField: MapJvmVariable,
+    val mapFromJvmGetMethod: MapJvmVariable,
+    val mapFromJvmGetStaticMethod: MapJvmVariable,
+    val mapToJvmField: MapJvmVariable,
+    val mapToJvmSetMethod: MapJvmVariable,
 )
 
+fun IrType.findJniTypeMirror(): CppTypeMirror? {
+    val type = allCppTypeMirrors.firstOrNull { it.checkIrType(this) }
+    if (type != null) return type
+    val typeCl = getClass() ?: return null
+    return allCppTypeMirrors.firstOrNull { it.checkIrClass(typeCl, isNullable()) }
+}
 
+fun IrClass.findJniTypeMirror(nullable: Boolean = true): CppTypeMirror? =
+    allCppTypeMirrors.firstOrNull { it.checkIrClass(this, nullable) }
+
+
+// https://docs.oracle.com/javase/8/docs/technotes/guides/jni/spec/types.html
 val allCppTypeMirrors = listOf(
     CppTypeMirror(
         jniTypeStr = "jboolean",
@@ -119,20 +133,24 @@ val allCppTypeMirrors = listOf(
         mapToJvmSetMethod = simpleSetMethodCall("CallDoubleMethod", variableCast = "jdouble"),
     ),
 
-)
+    )
 
 
-private fun simpleGetMethodCall(name: String): Poet.(variable: String, env: String, jvmObj: String, methodId: String) -> Unit {
-    return { variable: String, env: String, jvmObj: String, methodId: String ->
-        statement("$variable = ${env}->${name}($jvmObj, $methodId)")
+private fun simpleGetMethodCall(name: String): MapJvmVariable {
+    return MapJvmVariable { variable: String, env: String, jvmObj: String, methodId: String ->
+        Poet().apply {
+            statement("$variable = ${env}->${name}($jvmObj, $methodId)")
+        }
     }
 }
 
 private fun simpleSetMethodCall(
     name: String,
     variableCast: String
-): Poet.(variable: String, env: String, jvmObj: String, methodId: String) -> Unit {
-    return { variable: String, env: String, jvmObj: String, methodId: String ->
-        statement("${env}->${name}($jvmObj, $methodId, ($variableCast) $variable)")
+): MapJvmVariable {
+    return MapJvmVariable { variable: String, env: String, jvmObj: String, methodId: String ->
+        Poet().apply {
+            statement("${env}->${name}($jvmObj, $methodId, ($variableCast) $variable)")
+        }
     }
 }

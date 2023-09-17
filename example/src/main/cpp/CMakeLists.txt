@@ -15,13 +15,37 @@ endif ()
 
 add_library(native_lib
         SHARED
-        native-lib.cpp)
+        native-lib.cpp
+)
 
 target_link_libraries(
         native_lib
         brooklyn
         ${JNI_LIBRARIES}
 )
+
+
+
+add_executable(
+        term
+        native-lib.cpp
+        term.cpp
+)
+
+
+target_link_libraries(term
+        brooklyn
+        ${JNI_LIBRARIES}
+)
+
+target_include_directories(
+        term
+        PUBLIC
+        ${JNI_INCLUDE_DIRS}
+
+        ./../../../build/generated/sources/headers/java/main
+)
+
 
 include_directories(${JNI_INCLUDE_DIRS})
 
