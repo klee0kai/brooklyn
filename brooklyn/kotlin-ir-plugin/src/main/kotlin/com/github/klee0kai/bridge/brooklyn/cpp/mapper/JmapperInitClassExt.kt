@@ -1,7 +1,6 @@
 package com.github.klee0kai.bridge.brooklyn.cpp.mapper
 
 import com.github.klee0kai.bridge.brooklyn.cpp.common.*
-import com.github.klee0kai.bridge.brooklyn.poet.Poet
 import org.jetbrains.kotlin.backend.jvm.fullValueParameterList
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrFunction
@@ -12,10 +11,10 @@ import org.jetbrains.kotlin.name.FqName
 import kotlin.math.absoluteValue
 
 fun CodeBuilder.declareClassIndexStructure(jClass: IrClass) = apply {
-    variables.post(Poet().apply {
+    variables {
         val clId = jClass.classId!!
         lines(1)
-        line("static struct ${clId.indexStructName} {")
+        line("struct ${clId.indexStructName} {")
         jClass.fields.forEach { field ->
             statement("\tjfieldID ${field.name} = NULL")
         }
@@ -26,26 +25,28 @@ fun CodeBuilder.declareClassIndexStructure(jClass: IrClass) = apply {
         (jClass.constructors + jClass.functions).forEach { func ->
             statement("\tjmethodID ${func.cppNameMirror} = NULL")
         }
-        statement("} *${clId.indexVariableName} = NULL")
-    })
+        statement("}")
+
+        statement("static std::shared_ptr<${clId.indexStructName}> ${clId.indexVariableName} = {}")
+    }
 }
 
 fun CodeBuilder.initJniClassApi(jClass: IrClass) = apply {
-    body.post(Poet().apply {
+    body {
         val clId = jClass.classId!!
         lines(1)
         statement("int ${clId.initIndexFuncName}(JNIEnv *env)")
-    })
+    }
 }
 
 fun CodeBuilder.initJniClassImpl(jClass: IrClass) = apply {
-    body.post(Poet().apply {
+    body {
         lines(1)
         val clId = jClass.classId!!
         val clPathName = "${clId.packageFqName}/${clId.shortClassName}".snakeCase("/")
         line("int ${clId.initIndexFuncName}(JNIEnv *env) {")
         statement("if (${clId.indexVariableName}) return 0")
-        statement("${clId.indexVariableName} = new ${clId.indexStructName} {}")
+        statement("${clId.indexVariableName} = std::make_shared<${clId.indexStructName}>()")
         statement("jclass cls = env->FindClass(\"$clPathName\")")
         jClass.fields.forEach { field ->
             post("${clId.indexVariableName}->${field.name} = env->GetFieldID(cls, ")
@@ -87,30 +88,27 @@ fun CodeBuilder.initJniClassImpl(jClass: IrClass) = apply {
 
         statement("return 0")
         line("}")
-    })
+    }
 }
 
 fun CodeBuilder.deinitJniClassApi(jClass: IrClass) = apply {
-    body.post(Poet().apply {
+    body {
         val clId = jClass.classId!!
         lines(1)
         statement("int ${clId.deinitIndexFuncName}()")
-    })
+    }
 }
 
 
 fun CodeBuilder.deinitJniClassImpl(jClass: IrClass) = apply {
-    body.post(Poet().apply {
+    body {
         val clId = jClass.classId!!
         lines(1)
         line("int ${clId.deinitIndexFuncName}() {")
-        statement("if (${clId.indexVariableName}) delete ${clId.indexVariableName}")
-        statement("${clId.indexVariableName} = NULL")
+        statement("${clId.indexVariableName}.reset()")
         statement("return 0")
         line("}")
-
-
-    })
+    }
 }
 
 
