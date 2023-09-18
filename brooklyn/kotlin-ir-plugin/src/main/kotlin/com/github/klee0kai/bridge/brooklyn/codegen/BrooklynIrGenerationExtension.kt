@@ -4,6 +4,8 @@ import com.github.klee0kai.bridge.brooklyn.cmake.cmakeLib
 import com.github.klee0kai.bridge.brooklyn.cpp.common.*
 import com.github.klee0kai.bridge.brooklyn.cpp.mapper.*
 import com.github.klee0kai.bridge.brooklyn.cpp.model.declareClassModelStructure
+import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.addSupportedPojoClass
+import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.allCppTypeMirrors
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
