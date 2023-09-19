@@ -47,7 +47,7 @@ fun IrClass.jniType(nullable: Boolean = true): CppTypeMirror? =
 val allCppTypeMirrors: MutableList<CppTypeMirror> = mutableListOf(
     *primitiveTypeMirrors(),
     stringTypeMirror(),
-//    stringNullableTypeMirror(),
+    stringNullableTypeMirror(),
 
     )
 
