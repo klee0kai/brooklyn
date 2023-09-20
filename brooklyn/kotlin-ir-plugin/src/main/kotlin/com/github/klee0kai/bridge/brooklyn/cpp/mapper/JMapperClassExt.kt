@@ -64,10 +64,10 @@ private fun Poet.mapFromJvmImpl(jClass: IrClass) = apply {
 
     jClass.fields.forEach { field ->
         val fieldTypeMirror = field.type.jniType() ?: return@forEach
-        post(
-            fieldTypeMirror.mapFromJvmField.invoke(
-                variable = "${cppObjectName}->${field.name}",
-                env = "env",
+
+        statement(
+            fieldTypeMirror.insertToField.invoke(
+                variable = fieldTypeMirror.transformToJni.invoke("${cppObjectName}->${field.name}"),
                 jvmObj = jvmObjectName,
                 fieldOrMethodId = "${indexClVariable}->${field.name}"
             )
@@ -76,16 +76,12 @@ private fun Poet.mapFromJvmImpl(jClass: IrClass) = apply {
 
     jClass.properties.forEach { property ->
         val propertyTypeMirror = property.getter?.returnType?.jniType() ?: return@forEach
-        post(
-            propertyTypeMirror.mapFromJvmGetMethod.invoke(
-                variable = "${cppObjectName}->${property.name}",
-                env = "env",
-                jvmObj = jvmObjectName,
-                fieldOrMethodId = "${indexClVariable}->${property.name}_getter"
-            )
+
+        val transformToJni = propertyTypeMirror.transformToJni.invoke("${cppObjectName}->${property.name}")
+        statement(
+            "env->CallVoidMethod(${jvmObjectName}, ${indexClVariable}->${property.name}_getter, ${transformToJni})"
         )
     }
-
 
     statement("return $cppObjectName")
     line("}")

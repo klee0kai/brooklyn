@@ -6,7 +6,7 @@ class Poet(
 ) : PoetDelegate {
 
     private val poets = mutableListOf<Any?>()
-
+    val metas = mutableMapOf<String, Any>()
 
     init {
         if (code != null) poets.add(code)

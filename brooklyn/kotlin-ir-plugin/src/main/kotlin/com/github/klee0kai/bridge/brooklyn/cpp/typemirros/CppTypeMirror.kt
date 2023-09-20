@@ -13,8 +13,39 @@ import org.jetbrains.kotlin.ir.util.kotlinFqName
 
 internal var unicFieldIndex = 1
 
-fun interface MapJvmVariable {
-    fun invoke(variable: String, env: String, jvmObj: String, fieldOrMethodId: String): Poet
+fun interface ExtractJniType {
+    /**
+     *  extract jstring from field or method
+     */
+    fun invoke(variable: String, jvmObj: String, fieldOrMethodId: String): String
+}
+
+fun interface InsertJniType {
+    /**
+     * jstring to field
+     */
+    fun invoke(variable: String, jvmObj: String, fieldOrMethodId: String): String
+}
+
+fun interface TransformJniType {
+    /**
+     * str::string -> jstring
+     * or
+     * jstring -> str::string
+     */
+    fun invoke(variable: String): String
+}
+
+interface TransformJniTypeLong {
+    /**
+     * jstring -> str::string
+     */
+    fun transform(jniVariable: String, cppVariable: String): Poet
+
+    /**
+     * release const chart * after transform jstring -> str::string
+     */
+    fun release(transform: Poet): Poet
 }
 
 class CppTypeMirror(
@@ -24,19 +55,27 @@ class CppTypeMirror(
 
     val checkIrType: (IrType) -> Boolean = { false },
     val checkIrClass: (IrClass, nullable: Boolean) -> Boolean = { _, _ -> false },
-    val mapFromJvmField: MapJvmVariable,
-    val mapFromJvmStaticField: MapJvmVariable,
-    val mapFromJvmGetMethod: MapJvmVariable,
-    val mapFromJvmGetStaticMethod: MapJvmVariable,
-    val mapToJvmField: MapJvmVariable,
-    val mapToJvmSetMethod: MapJvmVariable,
+    val extractFromField: ExtractJniType = todoExtract,
+    val extractFromStaticField: ExtractJniType = todoExtract,
+    val extractFromMethod: ExtractJniType = todoExtract,
+    val extractFromStaticMethod: ExtractJniType = todoExtract,
+
+    val transformToJni: TransformJniType = todoCreate,
+
+    val insertToField: InsertJniType = todoInsert,
+    val insertToStaticField: InsertJniType = todoInsert,
+    
+
+    val transformToCppShort: TransformJniType? = null,
+    val transformToCppLong: TransformJniTypeLong? = null,
 )
 
 fun IrType.jniType(): CppTypeMirror? {
-    val type = allCppTypeMirrors.firstOrNull { it.checkIrType(this) }
-    if (type != null) return type
-    val typeCl = getClass() ?: return null
-    return allCppTypeMirrors.firstOrNull { it.checkIrClass(typeCl, isNullable()) }
+    val typeCl = getClass()
+    return allCppTypeMirrors.firstOrNull { typeMirror ->
+        typeMirror.checkIrType(this)
+                || typeCl?.let { typeMirror.checkIrClass(typeCl, isNullable()) } == true
+    }
 }
 
 fun IrClass.jniType(nullable: Boolean = true): CppTypeMirror? =
@@ -51,6 +90,15 @@ val allCppTypeMirrors: MutableList<CppTypeMirror> = mutableListOf(
 
     )
 
+@Deprecated("todo")
+private val todoExtract get() = ExtractJniType { _, _, _ -> TODO() }
+
+@Deprecated("todo")
+private val todoInsert get() = InsertJniType { _, _, _ -> TODO() }
+
+@Deprecated("todo")
+private val todoCreate get() = TransformJniType { TODO() }
+
 
 fun MutableList<CppTypeMirror>.addSupportedPojoClass(clazz: IrClass) {
     val classId = clazz.classId!!
@@ -61,16 +109,10 @@ fun MutableList<CppTypeMirror>.addSupportedPojoClass(clazz: IrClass) {
             jniTypeCode = "L${clazz.kotlinFqName.toString().snakeCase("/")};",
             cppTypeMirrorStr = cppModelMirror,
             checkIrClass = { cl, _ -> cl.classId == clazz.classId },
-            mapFromJvmField = simpleTodo,
-            mapFromJvmStaticField = simpleTodo,
-            mapFromJvmGetMethod = simpleTodo,
-            mapFromJvmGetStaticMethod = simpleTodo,
-            mapToJvmField = simpleTodo,
-            mapToJvmSetMethod = simpleTodo,
-        ),
+
+            ),
     )
 }
 
-@Deprecated("TODO")
-internal val simpleTodo get() = MapJvmVariable { _, _, _, _ -> TODO() }
+
 
