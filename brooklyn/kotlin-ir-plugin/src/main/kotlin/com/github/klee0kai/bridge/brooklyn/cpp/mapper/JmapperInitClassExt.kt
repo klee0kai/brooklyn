@@ -18,6 +18,7 @@ fun CodeBuilder.declareClassIndexStructure(jClass: IrClass) = apply {
         val clId = jClass.classId!!
         lines(1)
         line("struct ${clId.indexStructName} {")
+        statement("jclass cls")
         jClass.fields.forEach { field ->
             statement("\tjfieldID ${field.name} = NULL")
         }
@@ -50,10 +51,10 @@ fun CodeBuilder.initJniClassImpl(jClass: IrClass) = apply {
         line("int ${clId.initIndexFuncName}(JNIEnv *env) {")
         statement("if (${clId.indexVariableName}) return 0")
         statement("${clId.indexVariableName} = std::make_shared<${clId.indexStructName}>()")
-        statement("jclass cls = env->FindClass(\"$clPathName\")")
+        statement("${clId.indexVariableName}->cls = env->FindClass(\"$clPathName\")")
         jClass.fields.forEach { field ->
             val jniTypeCode = field.type.jniType()?.jniTypeCode ?: return@forEach
-            post("${clId.indexVariableName}->${field.name} = env->GetFieldID(cls, ")
+            post("${clId.indexVariableName}->${field.name} = env->GetFieldID(${clId.indexVariableName}->cls, ")
             str(field.name.toString())
             post(",")
             str(jniTypeCode)
@@ -65,7 +66,7 @@ fun CodeBuilder.initJniClassImpl(jClass: IrClass) = apply {
             val jniTypeCode = type.jniType()?.jniTypeCode ?: return@forEach
 
             //getter
-            post("${clId.indexVariableName}->${property.name}_getter = env->GetMethodID(cls, ")
+            post("${clId.indexVariableName}->${property.name}_getter = env->GetMethodID(${clId.indexVariableName}->cls, ")
             str("get${property.name.toString().firstCamelCase()}")
             post(", ")
             str("()${jniTypeCode}")
@@ -73,7 +74,7 @@ fun CodeBuilder.initJniClassImpl(jClass: IrClass) = apply {
             statement("if(!${clId.indexVariableName}->${property.name}_getter) return -1")
             //setter
             if (property.isVar) {
-                post("${clId.indexVariableName}->${property.name}_setter = env->GetMethodID(cls, ")
+                post("${clId.indexVariableName}->${property.name}_setter = env->GetMethodID(${clId.indexVariableName}->cls, ")
                 str("set${property.name.toString().firstCamelCase()}")
                 post(",")
                 post("\"(${jniTypeCode})V\"")
@@ -90,7 +91,7 @@ fun CodeBuilder.initJniClassImpl(jClass: IrClass) = apply {
             }.getOrNull() ?: return@forEach
 
 
-            post("${clId.indexVariableName}->${func.cppNameMirror} = env->GetMethodID(cls, ")
+            post("${clId.indexVariableName}->${func.cppNameMirror} = env->GetMethodID(${clId.indexVariableName}->cls, ")
             str(func.name.toString())
             post(", ")
             post("\"(${argTypes})${returnType}\"")
@@ -122,7 +123,6 @@ fun CodeBuilder.deinitJniClassImpl(jClass: IrClass) = apply {
         line("}")
     }
 }
-
 
 val ClassId.initIndexFuncName
     get() = "init_${packageFqName}${shortClassName}".camelCase()

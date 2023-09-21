@@ -12,12 +12,13 @@ import org.jetbrains.kotlin.ir.util.classId
 import org.jetbrains.kotlin.ir.util.kotlinFqName
 
 internal var unicFieldIndex = 1
+    get() = field++
 
 fun interface ExtractJniType {
     /**
      *  extract jstring from field or method
      */
-    fun invoke(variable: String, jvmObj: String, fieldOrMethodId: String): String
+    fun invoke(jvmObj: String, fieldOrMethodId: String): String
 }
 
 fun interface InsertJniType {
@@ -64,7 +65,7 @@ class CppTypeMirror(
 
     val insertToField: InsertJniType = todoInsert,
     val insertToStaticField: InsertJniType = todoInsert,
-    
+
 
     val transformToCppShort: TransformJniType? = null,
     val transformToCppLong: TransformJniTypeLong? = null,
@@ -91,7 +92,7 @@ val allCppTypeMirrors: MutableList<CppTypeMirror> = mutableListOf(
     )
 
 @Deprecated("todo")
-private val todoExtract get() = ExtractJniType { _, _, _ -> TODO() }
+private val todoExtract get() = ExtractJniType { _, _ -> TODO() }
 
 @Deprecated("todo")
 private val todoInsert get() = InsertJniType { _, _, _ -> TODO() }

@@ -127,7 +127,7 @@ fun castType(type: String) = TransformJniType { variable ->
 }
 
 
-fun extractJniType(method: String) = ExtractJniType { variable, jvmObj, fieldOrMethodId ->
+fun extractJniType(method: String) = ExtractJniType { jvmObj, fieldOrMethodId ->
     "env->${method}($jvmObj, $fieldOrMethodId)"
 }
 

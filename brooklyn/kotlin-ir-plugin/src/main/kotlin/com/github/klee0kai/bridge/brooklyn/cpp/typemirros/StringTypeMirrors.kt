@@ -52,14 +52,14 @@ internal fun stringNullableTypeMirror() =
     )
 
 
-fun extractJniString(method: String) = ExtractJniType { variable, jvmObj, fieldOrMethodId ->
+fun extractJniString(method: String) = ExtractJniType { jvmObj, fieldOrMethodId ->
     " ( jstring )  env->${method}($jvmObj, $fieldOrMethodId)"
 }
 
 
 fun jStringToCppStringTransform(ptr: Boolean = false) = object : TransformJniTypeLong {
     override fun transform(jniVariable: String, cppVariable: String) = Poet().apply {
-        val tempCppVariable = "tempStr${unicFieldIndex++}"
+        val tempCppVariable = "tempStr${unicFieldIndex}"
         metas[JStringTransformMeta::class.qualifiedName!!] = JStringTransformMeta(
             jniVariable = jniVariable,
             tempCppVariable = tempCppVariable
@@ -74,7 +74,7 @@ fun jStringToCppStringTransform(ptr: Boolean = false) = object : TransformJniTyp
     }
 
     override fun release(transform: Poet): Poet = Poet().apply {
-        val metas = metas[JStringTransformMeta::class.qualifiedName!!] as JStringTransformMeta
+        val metas = transform.metas[JStringTransformMeta::class.qualifiedName!!] as JStringTransformMeta
         statement("if (${metas.tempCppVariable}) env->ReleaseStringUTFChars( ${metas.jniVariable}, ${metas.tempCppVariable})")
     }
 
