@@ -7,6 +7,7 @@ import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.types.IrSimpleType
 import org.jetbrains.kotlin.ir.types.IrType
+import org.jetbrains.kotlin.ir.types.classFqName
 import org.jetbrains.kotlin.ir.types.isMarkedNullable
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.name.ClassId
@@ -31,9 +32,17 @@ fun CodeBuilder.declareClassIndexStructure(jClass: IrClass) = apply {
         }
         statement("}")
 
-        statement("static std::shared_ptr<${clId.indexStructName}> ${clId.indexVariableName} = {}")
+        statement("extern std::shared_ptr<${clId.indexStructName}> ${clId.indexVariableName}")
     }
 }
+
+fun CodeBuilder.declareClassIndexField(jClass: IrClass) = apply {
+    variables {
+        val clId = jClass.classId!!
+        statement("std::shared_ptr<${clId.indexStructName}> ${clId.indexVariableName} = {}")
+    }
+}
+
 
 fun CodeBuilder.initJniClassApi(jClass: IrClass) = apply {
     body {
@@ -51,7 +60,7 @@ fun CodeBuilder.initJniClassImpl(jClass: IrClass) = apply {
         line("int ${clId.initIndexFuncName}(JNIEnv *env) {")
         statement("if (${clId.indexVariableName}) return 0")
         statement("${clId.indexVariableName} = std::make_shared<${clId.indexStructName}>()")
-        statement("${clId.indexVariableName}->cls = env->FindClass(\"$clPathName\")")
+        statement("${clId.indexVariableName}->cls = (jclass) env->NewGlobalRef( env->FindClass(\"$clPathName\") )")
         jClass.fields.forEach { field ->
             val jniTypeCode = field.type.jniType()?.jniTypeCode ?: return@forEach
             post("${clId.indexVariableName}->${field.name} = env->GetFieldID(${clId.indexVariableName}->cls, ")
@@ -108,7 +117,7 @@ fun CodeBuilder.deinitJniClassApi(jClass: IrClass) = apply {
     body {
         val clId = jClass.classId!!
         lines(1)
-        statement("int ${clId.deinitIndexFuncName}()")
+        statement("int ${clId.deinitIndexFuncName}(JNIEnv *env)")
     }
 }
 
@@ -117,7 +126,8 @@ fun CodeBuilder.deinitJniClassImpl(jClass: IrClass) = apply {
     body {
         val clId = jClass.classId!!
         lines(1)
-        line("int ${clId.deinitIndexFuncName}() {")
+        line("int ${clId.deinitIndexFuncName}(JNIEnv *env) {")
+        statement("if (${clId.indexVariableName}) env->DeleteGlobalRef(${clId.indexVariableName}->cls)")
         statement("${clId.indexVariableName}.reset()")
         statement("return 0")
         line("}")
@@ -138,7 +148,7 @@ val ClassId.indexVariableName
     get() = "${packageFqName}${shortClassName}Index".camelCase()
 
 val IrFunction.cppNameMirror
-    get() = "$name${fullValueParameterList.map { it.type to it.isVararg }.hashCode().absoluteValue}".camelCase()
+    get() = "$name${fullValueParameterList.map { it.type.classFqName to it.isVararg }.hashCode().absoluteValue}".camelCase()
 
 val IrFunction.isConstructor
     get() = name.toString() == "<init>"

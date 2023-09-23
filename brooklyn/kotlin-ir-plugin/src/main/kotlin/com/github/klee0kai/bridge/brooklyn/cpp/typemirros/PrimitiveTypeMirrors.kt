@@ -123,7 +123,7 @@ internal fun primitiveTypeMirrors() = arrayOf(
     )
 
 fun castType(type: String) = TransformJniType { variable ->
-    "( $type ) $variable"
+    "$type($variable)"
 }
 
 

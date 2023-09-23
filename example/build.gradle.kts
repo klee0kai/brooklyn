@@ -28,7 +28,7 @@ crosscompile {
             .path
         val libsDir = File(buildDir, "libs")
         val cmakeFile = file("src/main/cpp/CMakeLists.txt")
-        sh("cmake install", "-B", workFolder, "-S", cmakeFile.parent)
+        sh("cmake install", "-B", workFolder, "-S", cmakeFile.parent, "-DCMAKE_BUILD_TYPE=Debug")
         sh("make all")
 
         doLast {

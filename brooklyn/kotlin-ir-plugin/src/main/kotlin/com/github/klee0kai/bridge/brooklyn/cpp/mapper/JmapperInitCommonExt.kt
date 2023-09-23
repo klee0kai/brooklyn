@@ -52,17 +52,17 @@ fun CodeBuilder.initAllFromJvmImpl() = apply {
 
 fun CodeBuilder.deinitAllApi() = apply {
     body {
-        statement("int deinit()")
+        statement("int deinit(JNIEnv *env)")
     }
 }
 
 
 fun CodeBuilder.deinitAllImpl(classes: List<ClassId>) = apply {
     body {
-        line("int deinit() {")
+        line("int deinit(JNIEnv *env) {")
         statement("int initResult = 0")
         classes.forEach { clId ->
-            statement("initResult = ${clId.deinitIndexFuncName}()")
+            statement("initResult = ${clId.deinitIndexFuncName}(env)")
             statement("if (initResult) return initResult")
         }
         statement("return initResult")

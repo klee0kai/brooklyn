@@ -88,8 +88,7 @@ val allCppTypeMirrors: MutableList<CppTypeMirror> = mutableListOf(
     *primitiveTypeMirrors(),
     stringTypeMirror(),
     stringNullableTypeMirror(),
-
-    )
+)
 
 @Deprecated("todo")
 private val todoExtract get() = ExtractJniType { _, _ -> TODO() }
