@@ -4,7 +4,6 @@ import com.github.klee0kai.bridge.brooklyn.cpp.common.CodeBuilder
 import com.github.klee0kai.bridge.brooklyn.cpp.common.line
 import com.github.klee0kai.bridge.brooklyn.cpp.common.lines
 import com.github.klee0kai.bridge.brooklyn.cpp.common.statement
-import com.github.klee0kai.bridge.brooklyn.cpp.model.cppMappingNameSpace
 import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.TransformJniTypeLong
 import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.jniType
 import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.unicFieldIndex
@@ -19,10 +18,6 @@ import org.jetbrains.kotlin.ir.util.properties
 fun CodeBuilder.mapJniClassApi(jClass: IrClass) = apply {
     body {
         val typeMirror = jClass.jniType()?.cppTypeMirrorStr ?: return@body
-        val nameSpace = jClass.cppMappingNameSpace()
-
-        lines(1)
-        line("namespace $nameSpace {")
 
         lines(1)
         statement("std::shared_ptr<$typeMirror> mapFromJvm(JNIEnv *env, jobject j$typeMirror)")
@@ -35,24 +30,13 @@ fun CodeBuilder.mapJniClassApi(jClass: IrClass) = apply {
 
         lines(1)
         statement("jobjectArray mapArrayToJvm(JNIEnv *env, std::vector<$typeMirror> j$typeMirror)")
-
-        lines(1)
-        line("}// namespace $nameSpace")
     }
 }
 
 fun CodeBuilder.mapJniClassImpl(jClass: IrClass) = apply {
     body {
-        val nameSpace = jClass.cppMappingNameSpace()
-
-        lines(1)
-        line("namespace $nameSpace {")
-
         mapFromJvmImpl(jClass)
         mapToJvmImpl(jClass)
-
-        lines(1)
-        line("}// namespace $nameSpace")
     }
 }
 

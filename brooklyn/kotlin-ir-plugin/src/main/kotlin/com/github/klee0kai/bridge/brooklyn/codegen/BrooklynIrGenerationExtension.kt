@@ -3,6 +3,7 @@ package com.github.klee0kai.bridge.brooklyn.codegen
 import com.github.klee0kai.bridge.brooklyn.cmake.cmakeLib
 import com.github.klee0kai.bridge.brooklyn.cpp.common.*
 import com.github.klee0kai.bridge.brooklyn.cpp.mapper.*
+import com.github.klee0kai.bridge.brooklyn.cpp.model.cppMappingNameSpace
 import com.github.klee0kai.bridge.brooklyn.cpp.model.declareClassModelStructure
 import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.addSupportedPojoClass
 import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.allCppTypeMirrors
@@ -55,6 +56,7 @@ class BrooklynIrGenerationExtension(
             val clId = declaration.classId!!
             gen.getOrCreate(clId.mapperHeaderFile, headerInitBlock)
                 .header { include(declaration.classId!!.modelHeaderFile.path) }
+                .namespaces(declaration.cppMappingNameSpace())
                 .declareClassIndexStructure(declaration)
                 .initJniClassApi(declaration)
                 .deinitJniClassApi(declaration)
@@ -62,6 +64,7 @@ class BrooklynIrGenerationExtension(
 
             gen.getOrCreate(clId.mapperCppFile, cppInitBlock)
                 .header { include(clId.mapperHeaderFile.path) }
+                .namespaces(declaration.cppMappingNameSpace())
                 .declareClassIndexField(declaration)
                 .initJniClassImpl(declaration)
                 .deinitJniClassImpl(declaration)
@@ -69,7 +72,6 @@ class BrooklynIrGenerationExtension(
 
             gen.getOrCreate(clId.modelHeaderFile, headerInitBlock)
                 .declareClassModelStructure(declaration)
-
 
         }
 
@@ -81,9 +83,9 @@ class BrooklynIrGenerationExtension(
 
 
         gen.getOrCreate(CommonNaming.mapperCpp, cppInitBlock)
-            .initAllImpl(headerCreator.pojoJniClasses.mapNotNull { it.classId })
+            .initAllImpl(headerCreator.pojoJniClasses)
             .initAllFromJvmImpl()
-            .deinitAllImpl(headerCreator.pojoJniClasses.mapNotNull { it.classId })
+            .deinitAllImpl(headerCreator.pojoJniClasses)
 
 
         gen.getOrCreate(CommonNaming.modelHeader)

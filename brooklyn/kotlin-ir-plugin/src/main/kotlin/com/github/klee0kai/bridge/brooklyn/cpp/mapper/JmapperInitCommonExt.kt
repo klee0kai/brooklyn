@@ -1,7 +1,9 @@
 package com.github.klee0kai.bridge.brooklyn.cpp.mapper
 
 import com.github.klee0kai.bridge.brooklyn.cpp.common.*
-import org.jetbrains.kotlin.name.ClassId
+import com.github.klee0kai.bridge.brooklyn.cpp.model.cppMappingNameSpace
+import org.jetbrains.kotlin.ir.declarations.IrClass
+import org.jetbrains.kotlin.ir.util.classId
 
 
 fun CodeBuilder.initAllApi() = apply {
@@ -12,11 +14,11 @@ fun CodeBuilder.initAllApi() = apply {
 
 
 fun CodeBuilder.initAllImpl(
-    classes: List<ClassId>
+    classes: List<IrClass>
 ) = apply {
     header {
-        classes.forEach { clId ->
-            include(clId.mapperHeaderFile.path)
+        classes.forEach { irClass ->
+            include(irClass.classId!!.mapperHeaderFile.path)
         }
     }
 
@@ -24,7 +26,7 @@ fun CodeBuilder.initAllImpl(
         line("int init(JNIEnv *env) {")
         statement("int initResult = 0")
         classes.forEach { clId ->
-            statement("initResult = ${clId.initIndexFuncName}(env)")
+            statement("initResult = ${clId.cppMappingNameSpace()}::init(env)")
             statement("if (initResult) return initResult")
         }
         statement("return initResult")
@@ -57,12 +59,12 @@ fun CodeBuilder.deinitAllApi() = apply {
 }
 
 
-fun CodeBuilder.deinitAllImpl(classes: List<ClassId>) = apply {
+fun CodeBuilder.deinitAllImpl(classes: List<IrClass>) = apply {
     body {
         line("int deinit(JNIEnv *env) {")
         statement("int initResult = 0")
-        classes.forEach { clId ->
-            statement("initResult = ${clId.deinitIndexFuncName}(env)")
+        classes.forEach { irClass ->
+            statement("initResult = ${irClass.cppMappingNameSpace()}::deinit(env)")
             statement("if (initResult) return initResult")
         }
         statement("return initResult")
