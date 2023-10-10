@@ -66,9 +66,7 @@ class CppTypeMirror(
     val insertToField: InsertJniType = todoInsert,
     val insertToStaticField: InsertJniType = todoInsert,
 
-
-    val transformToCppShort: TransformJniType? = null,
-    val transformToCppLong: TransformJniTypeLong? = null,
+    val transformToCppShort: TransformJniType = todoCreate,
 )
 
 fun IrType.jniType(): CppTypeMirror? {

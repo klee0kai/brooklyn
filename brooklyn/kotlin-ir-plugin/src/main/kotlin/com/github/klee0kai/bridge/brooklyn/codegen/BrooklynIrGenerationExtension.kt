@@ -21,12 +21,12 @@ class BrooklynIrGenerationExtension(
     private val outDirFile: String
 ) : IrGenerationExtension {
 
-    private val headerInitBlock: CodeBuilder.() -> Unit = {
+    private val mapperHeaderInitBlock: CodeBuilder.() -> Unit = {
         defHeaders(doubleImportCheck = true)
         namespaces("brooklyn", "mapper")
     }
 
-    private val cppInitBlock: CodeBuilder.() -> Unit = {
+    private val mapperCppInitBlock: CodeBuilder.() -> Unit = {
         defHeaders()
         namespaces("brooklyn", "mapper")
     }
@@ -52,17 +52,31 @@ class BrooklynIrGenerationExtension(
         gen.getOrCreate(fileName = CommonNaming.brooklynInternalHeader)
             .allJniHeaders()
 
+        gen.getOrCreate(CommonNaming.commonClassesMapperHeader, mapperHeaderInitBlock)
+            .mapFromJStringApi()
+            .mapToJStringApi()
+
+
+        gen.getOrCreate(CommonNaming.commonClassesMapperCpp, mapperCppInitBlock)
+            .mapJStringImpl()
+            .mapToJStringImpl()
+
+
+
         headerCreator.pojoJniClasses.forEach { declaration ->
             val clId = declaration.classId!!
-            gen.getOrCreate(clId.mapperHeaderFile, headerInitBlock)
-                .header { include(declaration.classId!!.modelHeaderFile.path) }
+            gen.getOrCreate(clId.mapperHeaderFile, mapperHeaderInitBlock)
+                .header {
+                    include(declaration.classId!!.modelHeaderFile.path)
+                    include(CommonNaming.commonClassesMapperHeader)
+                }
                 .namespaces(declaration.cppMappingNameSpace())
                 .declareClassIndexStructure(declaration)
                 .initJniClassApi(declaration)
                 .deinitJniClassApi(declaration)
                 .mapJniClassApi(declaration)
 
-            gen.getOrCreate(clId.mapperCppFile, cppInitBlock)
+            gen.getOrCreate(clId.mapperCppFile, mapperCppInitBlock)
                 .header { include(clId.mapperHeaderFile.path) }
                 .namespaces(declaration.cppMappingNameSpace())
                 .declareClassIndexField(declaration)
@@ -70,19 +84,18 @@ class BrooklynIrGenerationExtension(
                 .deinitJniClassImpl(declaration)
                 .mapJniClassImpl(declaration)
 
-            gen.getOrCreate(clId.modelHeaderFile, headerInitBlock)
+            gen.getOrCreate(clId.modelHeaderFile, mapperHeaderInitBlock)
                 .declareClassModelStructure(declaration)
-
         }
 
-        gen.getOrCreate(CommonNaming.mapperHeader, headerInitBlock)
+        gen.getOrCreate(CommonNaming.mapperHeader, mapperHeaderInitBlock)
             .header { headerCreator.pojoJniClasses.forEach { include(it.classId!!.mapperHeaderFile.path) } }
             .initAllApi()
             .initAllFromJvmApi()
             .deinitAllApi()
 
 
-        gen.getOrCreate(CommonNaming.mapperCpp, cppInitBlock)
+        gen.getOrCreate(CommonNaming.mapperCpp, mapperCppInitBlock)
             .initAllImpl(headerCreator.pojoJniClasses)
             .initAllFromJvmImpl()
             .deinitAllImpl(headerCreator.pojoJniClasses)

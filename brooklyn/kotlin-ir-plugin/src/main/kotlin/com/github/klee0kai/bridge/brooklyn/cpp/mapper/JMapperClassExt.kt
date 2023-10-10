@@ -6,7 +6,6 @@ import com.github.klee0kai.bridge.brooklyn.cpp.common.lines
 import com.github.klee0kai.bridge.brooklyn.cpp.common.statement
 import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.TransformJniTypeLong
 import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.jniType
-import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.unicFieldIndex
 import com.github.klee0kai.bridge.brooklyn.poet.Poet
 import org.jetbrains.kotlin.backend.jvm.fullValueParameterList
 import org.jetbrains.kotlin.ir.declarations.IrClass
@@ -60,17 +59,9 @@ private fun Poet.mapFromJvmImpl(jClass: IrClass) = apply {
             jvmObj = jvmObjectName,
             fieldOrMethodId = "${indexClVariable}->${field.name}"
         )
-        if (fieldTypeMirror.transformToCppShort != null) {
-            post(" $cppObjectName->${field.name} = ")
-            statement(fieldTypeMirror.transformToCppShort.invoke(extractFromField))
-        } else if (fieldTypeMirror.transformToCppLong != null) {
-            val jvmObjectTempVariable = "jvmObjTemp${unicFieldIndex}"
-            statement("${fieldTypeMirror.jniTypeStr} $jvmObjectTempVariable = $extractFromField")
-            post(fieldTypeMirror.transformToCppLong.transform(
-                jniVariable = jvmObjectTempVariable,
-                cppVariable = " $cppObjectName->${field.name} "
-            ).also { longTransforms.add(fieldTypeMirror.transformToCppLong to it) })
-        }
+
+        post(" $cppObjectName->${field.name} = ")
+        statement(fieldTypeMirror.transformToCppShort.invoke(extractFromField))
     }
 
     jClass.properties.forEach { property ->
@@ -80,17 +71,9 @@ private fun Poet.mapFromJvmImpl(jClass: IrClass) = apply {
             jvmObj = jvmObjectName,
             fieldOrMethodId = "${indexClVariable}->${property.name}_getter"
         )
-        if (propertyTypeMirror.transformToCppShort != null) {
-            post(" $cppObjectName->${property.name} = ")
-            statement(propertyTypeMirror.transformToCppShort.invoke(extractFromProperty))
-        } else if (propertyTypeMirror.transformToCppLong != null) {
-            val jvmObjectTempVariable = "jvmObjTemp${unicFieldIndex}"
-            statement("${propertyTypeMirror.jniTypeStr} $jvmObjectTempVariable = $extractFromProperty")
-            post(propertyTypeMirror.transformToCppLong.transform(
-                jniVariable = jvmObjectTempVariable,
-                cppVariable = " $cppObjectName->${property.name} "
-            ).also { longTransforms.add(propertyTypeMirror.transformToCppLong to it) })
-        }
+        post(" $cppObjectName->${property.name} = ")
+        statement(propertyTypeMirror.transformToCppShort.invoke(extractFromProperty))
+
     }
 
     longTransforms.forEach {
