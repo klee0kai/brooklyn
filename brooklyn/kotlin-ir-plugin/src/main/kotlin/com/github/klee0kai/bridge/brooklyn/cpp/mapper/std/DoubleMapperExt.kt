@@ -22,7 +22,7 @@ fun Poet.mapDoubleFromJava(isImpl: Boolean = false) = apply {
         return@apply
     }
     line("$declare {")
-    line("return jValue ? std::make_shared<double>( double(env->CallFloatMethod(jValue, doubleIndex->fromJvm ))) ")
+    line("return jValue ? std::make_shared<double>( double(env->CallDoubleMethod(jValue, doubleIndex->fromJvm ))) ")
     statement(": std::shared_ptr<double>()")
     line("}")
 }
