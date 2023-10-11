@@ -40,6 +40,7 @@ fun CodeBuilder.initStdTypes(isImpl: Boolean = false) = apply {
         charIndexInit()
         shortIndexInit()
         byteIndexInit()
+        statement("return 0")
         line("}")
     }
 }
@@ -54,13 +55,13 @@ fun CodeBuilder.deinitStdTypes(isImpl: Boolean = false) = apply {
         lines(1)
         line("$declare {")
         resetIndexStructure("booleanIndex")
-//        resetIndexStructure("integerIndex")
-//        resetIndexStructure("longIndex")
-//        resetIndexStructure("floatIndex")
-//        resetIndexStructure("doubleIndex")
-//        resetIndexStructure("charIndex")
-//        resetIndexStructure("shortIndex")
-//        resetIndexStructure("byteIndex")
+        resetIndexStructure("integerIndex")
+        resetIndexStructure("longIndex")
+        resetIndexStructure("floatIndex")
+        resetIndexStructure("doubleIndex")
+        resetIndexStructure("charIndex")
+        resetIndexStructure("shortIndex")
+        resetIndexStructure("byteIndex")
         statement("return 0")
         line("}")
     }
