@@ -6,7 +6,7 @@ import com.github.klee0kai.bridge.brooklyn.poet.Poet
 
 fun Poet.integerIndexInit() = apply {
     statement("if (integerIndex) return 0")
-    statement("integerIndex = std::make_shared<IntegerIndex>()")
+    statement("integerIndex = std::make_shared<SimpleIndexStructure>()")
     statement("integerIndex->cls = (jclass) env->NewGlobalRef( env->FindClass(\"java.lang.Integer\") )")
     statement("integerIndex->toJvm = env->GetMethodID(integerIndex->cls, \"<init>\",\"(I)V\" ) ")
     statement("if (!integerIndex->toJvm) return -1")

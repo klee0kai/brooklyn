@@ -1,6 +1,9 @@
 package com.github.klee0kai.bridge.brooklyn.cpp.mapper.std
 
-import com.github.klee0kai.bridge.brooklyn.cpp.common.*
+import com.github.klee0kai.bridge.brooklyn.cpp.common.CodeBuilder
+import com.github.klee0kai.bridge.brooklyn.cpp.common.line
+import com.github.klee0kai.bridge.brooklyn.cpp.common.lines
+import com.github.klee0kai.bridge.brooklyn.cpp.common.statement
 import com.github.klee0kai.bridge.brooklyn.poet.Poet
 
 fun CodeBuilder.initStdTypes(isImpl: Boolean = false) = apply {
@@ -10,6 +13,12 @@ fun CodeBuilder.initStdTypes(isImpl: Boolean = false) = apply {
         return@apply
     }
     variables {
+        line("struct SimpleIndexStructure {")
+        statement("jclass cls")
+        statement("\tjmethodID toJvm = NULL")
+        statement("\tjmethodID fromJvm = NULL")
+        statement("}")
+
         stdTypeIndexStructure("booleanIndex")
         stdTypeIndexStructure("integerIndex")
         stdTypeIndexStructure("longIndex")
@@ -58,12 +67,7 @@ fun CodeBuilder.stdTypeMappers(isImpl: Boolean = false) = apply {
 
 
 private fun Poet.stdTypeIndexStructure(name: String) {
-    line("struct ${name.firstCamelCase()} {")
-    statement("jclass cls")
-    statement("\tjmethodID toJvm = NULL")
-    statement("\tjmethodID fromJvm = NULL")
-    statement("}")
-    statement("static std::shared_ptr<${name.firstCamelCase()}> $name = {}")
+    statement("static std::shared_ptr<SimpleIndexStructure> $name = {}")
 }
 
 private fun Poet.resetIndexStructure(name: String) {

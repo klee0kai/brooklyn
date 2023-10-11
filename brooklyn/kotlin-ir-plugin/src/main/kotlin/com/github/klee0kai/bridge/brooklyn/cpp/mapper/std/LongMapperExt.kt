@@ -6,7 +6,7 @@ import com.github.klee0kai.bridge.brooklyn.poet.Poet
 
 fun Poet.longIndexInit() = apply {
     statement("if (longIndex) return 0")
-    statement("longIndex = std::make_shared<LongIndex>()")
+    statement("longIndex = std::make_shared<SimpleIndexStructure>()")
     statement("longIndex->cls = (jclass) env->NewGlobalRef( env->FindClass(\"java.lang.Long\") )")
     statement("longIndex->toJvm = env->GetMethodID(longIndex->cls, \"<init>\",\"(J)V\" ) ")
     statement("if (!longIndex->toJvm) return -1")
