@@ -3,7 +3,6 @@ package com.github.klee0kai.bridge.brooklyn.cpp.typemirros
 import com.github.klee0kai.bridge.brooklyn.cpp.common.camelCase
 import com.github.klee0kai.bridge.brooklyn.cpp.common.firstCamelCase
 import com.github.klee0kai.bridge.brooklyn.cpp.common.snakeCase
-import com.github.klee0kai.bridge.brooklyn.poet.Poet
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.getClass
@@ -35,18 +34,6 @@ fun interface TransformJniType {
      * jstring -> str::string
      */
     fun invoke(variable: String): String
-}
-
-interface TransformJniTypeLong {
-    /**
-     * jstring -> str::string
-     */
-    fun transform(jniVariable: String, cppVariable: String): Poet
-
-    /**
-     * release const chart * after transform jstring -> str::string
-     */
-    fun release(transform: Poet): Poet
 }
 
 class CppTypeMirror(

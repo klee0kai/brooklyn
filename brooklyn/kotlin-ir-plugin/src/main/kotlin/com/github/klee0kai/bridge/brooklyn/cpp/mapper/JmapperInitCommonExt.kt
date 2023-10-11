@@ -25,6 +25,8 @@ fun CodeBuilder.initAllImpl(
     body {
         line("int init(JNIEnv *env) {")
         statement("int initResult = 0")
+        statement("initResult = initStdTypes(env)")
+        statement("if (initResult) return initResult")
         classes.forEach { clId ->
             statement("initResult = ${clId.cppMappingNameSpace()}::init(env)")
             statement("if (initResult) return initResult")
@@ -63,6 +65,8 @@ fun CodeBuilder.deinitAllImpl(classes: List<IrClass>) = apply {
     body {
         line("int deinit(JNIEnv *env) {")
         statement("int initResult = 0")
+        statement("initResult = deinitStdTypes(env)")
+        statement("if (initResult) return initResult")
         classes.forEach { irClass ->
             statement("initResult = ${irClass.cppMappingNameSpace()}::deinit(env)")
             statement("if (initResult) return initResult")

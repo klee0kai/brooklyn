@@ -1,4 +1,4 @@
-package com.github.klee0kai.bridge.brooklyn.cpp.mapper
+package com.github.klee0kai.bridge.brooklyn.cpp.mapper.std
 
 import com.github.klee0kai.bridge.brooklyn.cpp.common.CodeBuilder
 import com.github.klee0kai.bridge.brooklyn.cpp.common.line

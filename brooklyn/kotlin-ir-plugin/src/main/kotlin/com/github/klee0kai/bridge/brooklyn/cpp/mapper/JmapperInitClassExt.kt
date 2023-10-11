@@ -44,9 +44,8 @@ fun CodeBuilder.declareClassIndexField(jClass: IrClass) = apply {
 }
 
 
-fun CodeBuilder.initJniClassApi(jClass: IrClass) = apply {
+fun CodeBuilder.initJniClassApi() = apply {
     body {
-        val clId = jClass.classId!!
         lines(1)
         statement("int init(JNIEnv *env)")
     }
@@ -113,9 +112,8 @@ fun CodeBuilder.initJniClassImpl(jClass: IrClass) = apply {
     }
 }
 
-fun CodeBuilder.deinitJniClassApi(jClass: IrClass) = apply {
+fun CodeBuilder.deinitJniClassApi() = apply {
     body {
-        val clId = jClass.classId!!
         lines(1)
         statement("int deinit(JNIEnv *env)")
     }
@@ -145,7 +143,9 @@ val ClassId.indexVariableName
     get() = "${packageFqName}${shortClassName}Index".camelCase()
 
 val IrFunction.cppNameMirror
-    get() = "$name${fullValueParameterList.map { it.type.classFqName to it.isVararg }.hashCode().absoluteValue}".camelCase()
+    get() = "$name${
+        fullValueParameterList.map { it.type.classFqName to it.isVararg }.hashCode().absoluteValue
+    }".camelCase()
 
 val IrFunction.isConstructor
     get() = name.toString() == "<init>"

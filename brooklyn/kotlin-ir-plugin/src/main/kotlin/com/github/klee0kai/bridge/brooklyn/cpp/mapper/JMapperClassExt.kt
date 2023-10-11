@@ -4,7 +4,6 @@ import com.github.klee0kai.bridge.brooklyn.cpp.common.CodeBuilder
 import com.github.klee0kai.bridge.brooklyn.cpp.common.line
 import com.github.klee0kai.bridge.brooklyn.cpp.common.lines
 import com.github.klee0kai.bridge.brooklyn.cpp.common.statement
-import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.TransformJniTypeLong
 import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.jniType
 import com.github.klee0kai.bridge.brooklyn.poet.Poet
 import org.jetbrains.kotlin.backend.jvm.fullValueParameterList
@@ -50,8 +49,6 @@ private fun Poet.mapFromJvmImpl(jClass: IrClass) = apply {
     line("{")
     line("std::shared_ptr<$typeMirror> $cppObjectName = std::make_shared<$typeMirror>();")
 
-    val longTransforms = mutableListOf<Pair<TransformJniTypeLong, Poet>>()
-
     jClass.fields.forEach { field ->
         val fieldTypeMirror = field.type.jniType() ?: return@forEach
 
@@ -74,10 +71,6 @@ private fun Poet.mapFromJvmImpl(jClass: IrClass) = apply {
         post(" $cppObjectName->${property.name} = ")
         statement(propertyTypeMirror.transformToCppShort.invoke(extractFromProperty))
 
-    }
-
-    longTransforms.forEach {
-        post(it.first.release(it.second))
     }
 
     statement("return $cppObjectName")

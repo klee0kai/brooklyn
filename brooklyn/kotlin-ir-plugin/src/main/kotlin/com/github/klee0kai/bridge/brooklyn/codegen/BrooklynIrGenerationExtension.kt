@@ -3,6 +3,7 @@ package com.github.klee0kai.bridge.brooklyn.codegen
 import com.github.klee0kai.bridge.brooklyn.cmake.cmakeLib
 import com.github.klee0kai.bridge.brooklyn.cpp.common.*
 import com.github.klee0kai.bridge.brooklyn.cpp.mapper.*
+import com.github.klee0kai.bridge.brooklyn.cpp.mapper.std.*
 import com.github.klee0kai.bridge.brooklyn.cpp.model.cppMappingNameSpace
 import com.github.klee0kai.bridge.brooklyn.cpp.model.declareClassModelStructure
 import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.addSupportedPojoClass
@@ -38,6 +39,7 @@ class BrooklynIrGenerationExtension(
         val headerCreator = KotlinVisitor()
         moduleFragment.files.forEach { it.acceptVoid(headerCreator) }
 
+
         headerCreator.pojoJniClasses.forEach {
             allCppTypeMirrors.addSupportedPojoClass(it)
         }
@@ -53,27 +55,33 @@ class BrooklynIrGenerationExtension(
             .allJniHeaders()
 
         gen.getOrCreate(CommonNaming.commonClassesMapperHeader, mapperHeaderInitBlock)
+            .initStdTypes()
+            .deinitStdTypes()
+            .mapFromJava()
+            .mapToJava()
             .mapFromJStringApi()
             .mapToJStringApi()
 
 
         gen.getOrCreate(CommonNaming.commonClassesMapperCpp, mapperCppInitBlock)
+            .initStdTypes(isImpl = true)
+            .deinitStdTypes(isImpl = true)
+            .mapFromJava(isImpl = true)
+            .mapToJava(isImpl = true)
             .mapJStringImpl()
             .mapToJStringImpl()
-
-
 
         headerCreator.pojoJniClasses.forEach { declaration ->
             val clId = declaration.classId!!
             gen.getOrCreate(clId.mapperHeaderFile, mapperHeaderInitBlock)
                 .header {
-                    include(declaration.classId!!.modelHeaderFile.path)
                     include(CommonNaming.commonClassesMapperHeader)
+                    include(declaration.classId!!.modelHeaderFile.path)
                 }
                 .namespaces(declaration.cppMappingNameSpace())
                 .declareClassIndexStructure(declaration)
-                .initJniClassApi(declaration)
-                .deinitJniClassApi(declaration)
+                .initJniClassApi()
+                .deinitJniClassApi()
                 .mapJniClassApi(declaration)
 
             gen.getOrCreate(clId.mapperCppFile, mapperCppInitBlock)
@@ -89,7 +97,10 @@ class BrooklynIrGenerationExtension(
         }
 
         gen.getOrCreate(CommonNaming.mapperHeader, mapperHeaderInitBlock)
-            .header { headerCreator.pojoJniClasses.forEach { include(it.classId!!.mapperHeaderFile.path) } }
+            .header {
+                include(CommonNaming.commonClassesMapperHeader)
+                headerCreator.pojoJniClasses.forEach { include(it.classId!!.mapperHeaderFile.path) }
+            }
             .initAllApi()
             .initAllFromJvmApi()
             .deinitAllApi()
