@@ -35,6 +35,6 @@ fun Poet.mapFloatToJava(isImpl: Boolean = false) = apply {
         return@apply
     }
     line("$declare {")
-    statement("return valuePtr ? env->NewObject(longIndex->cls, floatIndex->toJvm, jfloat( *valuePtr ) ) : NULL")
+    statement("return valuePtr ? env->NewObject(floatIndex->cls, floatIndex->toJvm, jfloat( *valuePtr ) ) : NULL")
     line("}")
 }

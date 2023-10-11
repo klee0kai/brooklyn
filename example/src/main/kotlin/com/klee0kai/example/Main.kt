@@ -5,7 +5,7 @@ import com.klee0kai.reflection.ReflectionAnalyzer
 
 fun main(arg: Array<String>) {
     val simple = Simple()
-    val un: Float? = 0f
+    val un: Double? = 0.0
     ReflectionAnalyzer.analyze(un)
 
 //    println("init ${SimpleJniEngine.initLib()}")
