@@ -39,12 +39,14 @@ fun CodeBuilder.deinitStdTypes(isImpl: Boolean = false) = apply {
 fun CodeBuilder.mapFromJava(isImpl: Boolean = false) = apply {
     body {
         mapBooleanFromJava(isImpl)
+        mapFromJString(isImpl)
     }
 }
 
 fun CodeBuilder.mapToJava(isImpl: Boolean = false) = apply {
     body {
         mapBooleanToJava(isImpl)
+        mapToJString(isImpl)
     }
 }
 

@@ -3,7 +3,10 @@ package com.github.klee0kai.bridge.brooklyn.codegen
 import com.github.klee0kai.bridge.brooklyn.cmake.cmakeLib
 import com.github.klee0kai.bridge.brooklyn.cpp.common.*
 import com.github.klee0kai.bridge.brooklyn.cpp.mapper.*
-import com.github.klee0kai.bridge.brooklyn.cpp.mapper.std.*
+import com.github.klee0kai.bridge.brooklyn.cpp.mapper.std.deinitStdTypes
+import com.github.klee0kai.bridge.brooklyn.cpp.mapper.std.initStdTypes
+import com.github.klee0kai.bridge.brooklyn.cpp.mapper.std.mapFromJava
+import com.github.klee0kai.bridge.brooklyn.cpp.mapper.std.mapToJava
 import com.github.klee0kai.bridge.brooklyn.cpp.model.cppMappingNameSpace
 import com.github.klee0kai.bridge.brooklyn.cpp.model.declareClassModelStructure
 import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.addSupportedPojoClass
@@ -59,8 +62,6 @@ class BrooklynIrGenerationExtension(
             .deinitStdTypes()
             .mapFromJava()
             .mapToJava()
-            .mapFromJStringApi()
-            .mapToJStringApi()
 
 
         gen.getOrCreate(CommonNaming.commonClassesMapperCpp, mapperCppInitBlock)
@@ -68,8 +69,6 @@ class BrooklynIrGenerationExtension(
             .deinitStdTypes(isImpl = true)
             .mapFromJava(isImpl = true)
             .mapToJava(isImpl = true)
-            .mapJStringImpl()
-            .mapToJStringImpl()
 
         headerCreator.pojoJniClasses.forEach { declaration ->
             val clId = declaration.classId!!
