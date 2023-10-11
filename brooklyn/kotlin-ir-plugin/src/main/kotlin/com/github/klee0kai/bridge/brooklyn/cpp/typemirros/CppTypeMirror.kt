@@ -34,24 +34,25 @@ fun interface TransformJniType {
 }
 
 class CppTypeMirror(
-    val jniTypeStr: String,
+    val jniTypeStr: String="jobject",
     val jniTypeCode: String,
     val cppTypeMirrorStr: String,
 
     val checkIrType: (IrType) -> Boolean = { false },
     val checkIrClass: (IrClass, nullable: Boolean) -> Boolean = { _, _ -> false },
-    val extractFromField: ExtractJniType = todoExtract,
-    val extractFromStaticField: ExtractJniType = todoExtract,
-    val extractFromMethod: ExtractJniType = todoExtract,
-    val extractFromStaticMethod: ExtractJniType = todoExtract,
 
     val transformToJni: TransformJniType = todoCreate,
+    val transformToCpp: TransformJniType = todoCreate,
 
-    val insertToField: InsertJniType = todoInsert,
-    val insertToStaticField: InsertJniType = todoInsert,
+    val extractFromField: ExtractJniType = extractJniType("GetObjectField"),
+    val extractFromStaticField: ExtractJniType = extractJniType("GetStaticObjectField"),
+    val extractFromMethod: ExtractJniType = extractJniType("CallObjectMethod"),
+    val extractFromStaticMethod: ExtractJniType = extractJniType("CallStaticObjectMethod"),
 
-    val transformToCppShort: TransformJniType = todoCreate,
-)
+    val insertToField: InsertJniType = insertJniType("SetObjectField"),
+    val insertToStaticField: InsertJniType = insertJniType("SetStaticObjectField"),
+
+    )
 
 fun IrType.jniType(): CppTypeMirror? {
     val typeCl = getClass()
@@ -68,18 +69,22 @@ fun IrClass.jniType(nullable: Boolean = true): CppTypeMirror? =
 // https://docs.oracle.com/javase/8/docs/technotes/guides/jni/spec/types.html
 val allCppTypeMirrors: MutableList<CppTypeMirror> = mutableListOf(
     *primitiveTypeMirrors(),
+    *boxedTypeMirrors(),
     stringTypeMirror(),
     stringNullableTypeMirror(),
 )
 
 @Deprecated("todo")
-private val todoExtract get() = ExtractJniType { _, _ -> TODO() }
-
-@Deprecated("todo")
-private val todoInsert get() = InsertJniType { _, _, _ -> TODO() }
-
-@Deprecated("todo")
 private val todoCreate get() = TransformJniType { TODO() }
+
+
+fun extractJniType(method: String) = ExtractJniType { jvmObj, fieldOrMethodId ->
+    "env->${method}($jvmObj, $fieldOrMethodId)"
+}
+
+fun insertJniType(method: String) = InsertJniType { variable, jvmObj, fieldOrMethodId ->
+    "env->${method}($jvmObj, $fieldOrMethodId, $variable )"
+}
 
 
 fun MutableList<CppTypeMirror>.addSupportedPojoClass(clazz: IrClass) {

@@ -9,7 +9,7 @@ internal fun primitiveTypeMirrors() = arrayOf(
         cppTypeMirrorStr = "int",
         checkIrType = { it.isBoolean() },
         transformToJni = { variable -> "$variable ? 1 : 0 " },
-        transformToCppShort = castType("int"),
+        transformToCpp = castType("int"),
         extractFromField = extractJniType("GetBooleanField"),
         extractFromStaticField = extractJniType("GetStaticBooleanField"),
         extractFromMethod = extractJniType("CallBooleanMethod"),
@@ -23,7 +23,7 @@ internal fun primitiveTypeMirrors() = arrayOf(
         cppTypeMirrorStr = "int",
         checkIrType = { it.isByte() },
         transformToJni = castType("jbyte"),
-        transformToCppShort = castType("int"),
+        transformToCpp = castType("int"),
         extractFromField = extractJniType("GetByteField"),
         extractFromStaticField = extractJniType("GetStaticByteField"),
         extractFromMethod = extractJniType("CallByteMethod"),
@@ -37,7 +37,7 @@ internal fun primitiveTypeMirrors() = arrayOf(
         cppTypeMirrorStr = "char",
         checkIrType = { it.isChar() },
         transformToJni = castType("jchar"),
-        transformToCppShort = castType("char"),
+        transformToCpp = castType("char"),
         extractFromField = extractJniType("GetCharField"),
         extractFromStaticField = extractJniType("GetStaticCharField"),
         extractFromMethod = extractJniType("CallCharMethod"),
@@ -51,7 +51,7 @@ internal fun primitiveTypeMirrors() = arrayOf(
         cppTypeMirrorStr = "int",
         checkIrType = { it.isShort() },
         transformToJni = castType("jshort"),
-        transformToCppShort = castType("int"),
+        transformToCpp = castType("int"),
         extractFromField = extractJniType("GetShortField"),
         extractFromStaticField = extractJniType("GetStaticShortField"),
         extractFromMethod = extractJniType("CallShortMethod"),
@@ -65,7 +65,7 @@ internal fun primitiveTypeMirrors() = arrayOf(
         cppTypeMirrorStr = "int",
         checkIrType = { it.isInt() },
         transformToJni = castType("jint"),
-        transformToCppShort = castType("int"),
+        transformToCpp = castType("int"),
         extractFromField = extractJniType("GetIntField"),
         extractFromStaticField = extractJniType("GetStaticIntField"),
         extractFromMethod = extractJniType("CallIntMethod"),
@@ -79,7 +79,7 @@ internal fun primitiveTypeMirrors() = arrayOf(
         cppTypeMirrorStr = "int64_t",
         checkIrType = { it.isLong() },
         transformToJni = castType("jlong"),
-        transformToCppShort = castType("int64_t"),
+        transformToCpp = castType("int64_t"),
         extractFromField = extractJniType("GetLongField"),
         extractFromStaticField = extractJniType("GetStaticLongField"),
         extractFromMethod = extractJniType("CallLongMethod"),
@@ -94,7 +94,7 @@ internal fun primitiveTypeMirrors() = arrayOf(
         cppTypeMirrorStr = "float",
         checkIrType = { it.isFloat() },
         transformToJni = castType("jfloat"),
-        transformToCppShort = castType("float"),
+        transformToCpp = castType("float"),
         extractFromField = extractJniType("GetFloatField"),
         extractFromStaticField = extractJniType("GetStaticFloatField"),
         extractFromMethod = extractJniType("CallFloatMethod"),
@@ -109,7 +109,7 @@ internal fun primitiveTypeMirrors() = arrayOf(
         cppTypeMirrorStr = "double",
         checkIrType = { it.isDouble() },
         transformToJni = castType("jdouble"),
-        transformToCppShort = castType("double"),
+        transformToCpp = castType("double"),
         extractFromField = extractJniType("GetDoubleField"),
         extractFromStaticField = extractJniType("GetStaticDoubleField"),
         extractFromMethod = extractJniType("CallDoubleMethod"),
@@ -127,11 +127,4 @@ fun castType(type: String) = TransformJniType { variable ->
 }
 
 
-fun extractJniType(method: String) = ExtractJniType { jvmObj, fieldOrMethodId ->
-    "env->${method}($jvmObj, $fieldOrMethodId)"
-}
-
-fun insertJniType(method: String) = InsertJniType { variable, jvmObj, fieldOrMethodId ->
-    "env->${method}($jvmObj, $fieldOrMethodId, $variable )"
-}
 

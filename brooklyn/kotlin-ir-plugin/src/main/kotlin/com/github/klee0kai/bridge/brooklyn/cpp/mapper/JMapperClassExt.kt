@@ -58,7 +58,7 @@ private fun Poet.mapFromJvmImpl(jClass: IrClass) = apply {
         )
 
         post(" $cppObjectName->${field.name} = ")
-        statement(fieldTypeMirror.transformToCppShort.invoke(extractFromField))
+        statement(fieldTypeMirror.transformToCpp.invoke(extractFromField))
     }
 
     jClass.properties.forEach { property ->
@@ -69,7 +69,7 @@ private fun Poet.mapFromJvmImpl(jClass: IrClass) = apply {
             fieldOrMethodId = "${indexClVariable}->${property.name}_getter"
         )
         post(" $cppObjectName->${property.name} = ")
-        statement(propertyTypeMirror.transformToCppShort.invoke(extractFromProperty))
+        statement(propertyTypeMirror.transformToCpp.invoke(extractFromProperty))
 
     }
 

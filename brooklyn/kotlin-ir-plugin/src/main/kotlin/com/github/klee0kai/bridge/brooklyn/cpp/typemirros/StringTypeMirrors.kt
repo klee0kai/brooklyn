@@ -10,17 +10,16 @@ internal fun stringTypeMirror() =
         checkIrClass = { it, nullable ->
             !nullable && it.kotlinFqName.toString() in listOf(
                 "java.lang.String",
-                "kotlin.String"
+                "kotlin.String",
+                "kotlin.CharSequence",
             )
         },
         transformToJni = { variable -> "brooklyn::mapper::mapToJString(env, std::make_shared<std::string>( $variable ) )" },
+        transformToCpp = { variable -> "*brooklyn::mapper::mapJString(env, ${variable}) " },
         extractFromField = extractJniString("GetObjectField"),
         extractFromStaticField = extractJniString("GetStaticObjectField"),
         extractFromMethod = extractJniString("CallObjectMethod"),
         extractFromStaticMethod = extractJniString("CallStaticObjectMethod"),
-        insertToField = insertJniType("SetObjectField"),
-        insertToStaticField = insertJniType("SetStaticObjectField"),
-        transformToCppShort = { variable -> "*brooklyn::mapper::mapJString(env, ${variable}) " },
     )
 
 internal fun stringNullableTypeMirror() =
@@ -31,7 +30,8 @@ internal fun stringNullableTypeMirror() =
         checkIrClass = { it, _ ->
             it.kotlinFqName.toString() in listOf(
                 "java.lang.String",
-                "kotlin.String"
+                "kotlin.String",
+                "kotlin.CharSequence",
             )
         },
         transformToJni = { variable -> "brooklyn::mapper::mapToJString(env, $variable ) " },
@@ -41,7 +41,7 @@ internal fun stringNullableTypeMirror() =
         extractFromStaticMethod = extractJniString("CallStaticObjectMethod"),
         insertToField = insertJniType("SetObjectField"),
         insertToStaticField = insertJniType("SetStaticObjectField"),
-        transformToCppShort = { variable -> "brooklyn::mapper::mapJString(env, ${variable}) " },
+        transformToCpp = { variable -> "brooklyn::mapper::mapJString(env, ${variable}) " },
     )
 
 
