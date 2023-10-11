@@ -29,7 +29,7 @@ fun Poet.mapBooleanFromJava(isImpl: Boolean = false) = apply {
 
 
 fun Poet.mapBooleanToJava(isImpl: Boolean = false) = apply {
-    val declare = "jobject mapToJBoolean(JNIEnv *env, std::shared_ptr<int> cppBoolean) "
+    val declare = "jobject mapToJBoolean(JNIEnv *env, const std::shared_ptr<int>& cppBoolean) "
     if (!isImpl) {
         statement(declare)
         return@apply

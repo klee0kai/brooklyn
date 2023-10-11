@@ -12,6 +12,7 @@ fun CodeBuilder.initStdTypes(isImpl: Boolean = false) = apply {
     variables {
         stdTypeIndexStructure("booleanIndex")
         stdTypeIndexStructure("integerIndex")
+        stdTypeIndexStructure("longIndex")
     }
 
     body {
@@ -19,6 +20,7 @@ fun CodeBuilder.initStdTypes(isImpl: Boolean = false) = apply {
         line("${declare}{")
         booleanIndexInit()
         integerIndexInit()
+        longIndexInit()
         line("}")
     }
 }
@@ -45,6 +47,9 @@ fun CodeBuilder.stdTypeMappers(isImpl: Boolean = false) = apply {
 
         mapIntegerFromJava(isImpl)
         mapIntegerToJava(isImpl)
+
+        mapLongFromJava(isImpl)
+        mapLongToJava(isImpl)
 
         mapFromJString(isImpl)
         mapToJString(isImpl)

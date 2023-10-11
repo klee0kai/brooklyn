@@ -29,13 +29,13 @@ fun Poet.mapIntegerFromJava(isImpl: Boolean = false) = apply {
 
 
 fun Poet.mapIntegerToJava(isImpl: Boolean = false) = apply {
-    val declare = "jobject mapToJInteger(JNIEnv *env, std::shared_ptr<int> cppInt) "
+    val declare = "jobject mapToJInteger(JNIEnv *env, const std::shared_ptr<int>& cppInt) "
     if (!isImpl) {
         statement(declare)
         return@apply
     }
     line("$declare {")
-    statement("return cppInt ? env->NewObject(booleanIndex->cls,integerIndex->toJvm, jint( *cppInt ) ) : NULL")
+    statement("return cppInt ? env->NewObject(integerIndex->cls,integerIndex->toJvm, jint( *cppInt ) ) : NULL")
 
     line("}")
 }
