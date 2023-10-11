@@ -3,6 +3,10 @@ package com.github.klee0kai.bridge.brooklyn.codegen
 import com.github.klee0kai.bridge.brooklyn.cmake.cmakeLib
 import com.github.klee0kai.bridge.brooklyn.cpp.common.*
 import com.github.klee0kai.bridge.brooklyn.cpp.mapper.*
+import com.github.klee0kai.bridge.brooklyn.cpp.mapper.std.deinitStdTypes
+import com.github.klee0kai.bridge.brooklyn.cpp.mapper.std.initStdTypes
+import com.github.klee0kai.bridge.brooklyn.cpp.mapper.std.stdTypeMappers
+import com.github.klee0kai.bridge.brooklyn.cpp.model.cppMappingNameSpace
 import com.github.klee0kai.bridge.brooklyn.cpp.model.declareClassModelStructure
 import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.addSupportedPojoClass
 import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.allCppTypeMirrors
@@ -20,12 +24,12 @@ class BrooklynIrGenerationExtension(
     private val outDirFile: String
 ) : IrGenerationExtension {
 
-    private val headerInitBlock: CodeBuilder.() -> Unit = {
+    private val mapperHeaderInitBlock: CodeBuilder.() -> Unit = {
         defHeaders(doubleImportCheck = true)
         namespaces("brooklyn", "mapper")
     }
 
-    private val cppInitBlock: CodeBuilder.() -> Unit = {
+    private val mapperCppInitBlock: CodeBuilder.() -> Unit = {
         defHeaders()
         namespaces("brooklyn", "mapper")
     }
@@ -36,6 +40,7 @@ class BrooklynIrGenerationExtension(
 
         val headerCreator = KotlinVisitor()
         moduleFragment.files.forEach { it.acceptVoid(headerCreator) }
+
 
         headerCreator.pojoJniClasses.forEach {
             allCppTypeMirrors.addSupportedPojoClass(it)
@@ -51,39 +56,56 @@ class BrooklynIrGenerationExtension(
         gen.getOrCreate(fileName = CommonNaming.brooklynInternalHeader)
             .allJniHeaders()
 
+        gen.getOrCreate(CommonNaming.commonClassesMapperHeader, mapperHeaderInitBlock)
+            .initStdTypes()
+            .deinitStdTypes()
+            .stdTypeMappers()
+
+
+        gen.getOrCreate(CommonNaming.commonClassesMapperCpp, mapperCppInitBlock)
+            .initStdTypes(isImpl = true)
+            .deinitStdTypes(isImpl = true)
+            .stdTypeMappers(isImpl = true)
+
         headerCreator.pojoJniClasses.forEach { declaration ->
             val clId = declaration.classId!!
-            gen.getOrCreate(clId.mapperHeaderFile, headerInitBlock)
-                .header { include(declaration.classId!!.modelHeaderFile.path) }
+            gen.getOrCreate(clId.mapperHeaderFile, mapperHeaderInitBlock)
+                .header {
+                    include(CommonNaming.commonClassesMapperHeader)
+                    include(declaration.classId!!.modelHeaderFile.path)
+                }
+                .namespaces(declaration.cppMappingNameSpace())
                 .declareClassIndexStructure(declaration)
-                .initJniClassApi(declaration)
-                .deinitJniClassApi(declaration)
+                .initJniClassApi()
+                .deinitJniClassApi()
                 .mapJniClassApi(declaration)
 
-            gen.getOrCreate(clId.mapperCppFile, cppInitBlock)
+            gen.getOrCreate(clId.mapperCppFile, mapperCppInitBlock)
                 .header { include(clId.mapperHeaderFile.path) }
+                .namespaces(declaration.cppMappingNameSpace())
                 .declareClassIndexField(declaration)
                 .initJniClassImpl(declaration)
                 .deinitJniClassImpl(declaration)
                 .mapJniClassImpl(declaration)
 
-            gen.getOrCreate(clId.modelHeaderFile, headerInitBlock)
+            gen.getOrCreate(clId.modelHeaderFile, mapperHeaderInitBlock)
                 .declareClassModelStructure(declaration)
-
-
         }
 
-        gen.getOrCreate(CommonNaming.mapperHeader, headerInitBlock)
-            .header { headerCreator.pojoJniClasses.forEach { include(it.classId!!.mapperHeaderFile.path) } }
+        gen.getOrCreate(CommonNaming.mapperHeader, mapperHeaderInitBlock)
+            .header {
+                include(CommonNaming.commonClassesMapperHeader)
+                headerCreator.pojoJniClasses.forEach { include(it.classId!!.mapperHeaderFile.path) }
+            }
             .initAllApi()
             .initAllFromJvmApi()
             .deinitAllApi()
 
 
-        gen.getOrCreate(CommonNaming.mapperCpp, cppInitBlock)
-            .initAllImpl(headerCreator.pojoJniClasses.mapNotNull { it.classId })
+        gen.getOrCreate(CommonNaming.mapperCpp, mapperCppInitBlock)
+            .initAllImpl(headerCreator.pojoJniClasses)
             .initAllFromJvmImpl()
-            .deinitAllImpl(headerCreator.pojoJniClasses.mapNotNull { it.classId })
+            .deinitAllImpl(headerCreator.pojoJniClasses)
 
 
         gen.getOrCreate(CommonNaming.modelHeader)

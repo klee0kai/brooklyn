@@ -1,13 +1,6 @@
 package com.github.klee0kai.bridge.brooklyn.cpp.typemirros
 
-import com.github.klee0kai.bridge.brooklyn.cpp.common.statement
-import com.github.klee0kai.bridge.brooklyn.poet.Poet
 import org.jetbrains.kotlin.ir.util.kotlinFqName
-
-private class JStringTransformMeta(
-    val jniVariable: String,
-    val tempCppVariable: String
-)
 
 internal fun stringTypeMirror() =
     CppTypeMirror(
@@ -17,17 +10,16 @@ internal fun stringTypeMirror() =
         checkIrClass = { it, nullable ->
             !nullable && it.kotlinFqName.toString() in listOf(
                 "java.lang.String",
-                "kotlin.String"
+                "kotlin.String",
+                "kotlin.CharSequence",
             )
         },
-        transformToJni = { variable -> "env->NewStringUTF(${variable}.c_str())" },
+        transformToJni = { variable -> "brooklyn::mapper::mapToJString(env, std::make_shared<std::string>( $variable ) )" },
+        transformToCpp = { variable -> "*brooklyn::mapper::mapJString(env, ${variable}) " },
         extractFromField = extractJniString("GetObjectField"),
         extractFromStaticField = extractJniString("GetStaticObjectField"),
         extractFromMethod = extractJniString("CallObjectMethod"),
         extractFromStaticMethod = extractJniString("CallStaticObjectMethod"),
-        insertToField = insertJniType("SetObjectField"),
-        insertToStaticField = insertJniType("SetStaticObjectField"),
-        transformToCppLong = jStringToCppStringTransform(ptr = false)
     )
 
 internal fun stringNullableTypeMirror() =
@@ -38,17 +30,18 @@ internal fun stringNullableTypeMirror() =
         checkIrClass = { it, _ ->
             it.kotlinFqName.toString() in listOf(
                 "java.lang.String",
-                "kotlin.String"
+                "kotlin.String",
+                "kotlin.CharSequence",
             )
         },
-        transformToJni = { variable -> "env->NewStringUTF(${variable}->c_str())" },
+        transformToJni = { variable -> "brooklyn::mapper::mapToJString(env, $variable ) " },
         extractFromField = extractJniString("GetObjectField"),
         extractFromStaticField = extractJniString("GetStaticObjectField"),
         extractFromMethod = extractJniString("CallObjectMethod"),
         extractFromStaticMethod = extractJniString("CallStaticObjectMethod"),
         insertToField = insertJniType("SetObjectField"),
         insertToStaticField = insertJniType("SetStaticObjectField"),
-        transformToCppLong = jStringToCppStringTransform(ptr = true)
+        transformToCpp = { variable -> "brooklyn::mapper::mapJString(env, ${variable}) " },
     )
 
 
@@ -56,26 +49,3 @@ fun extractJniString(method: String) = ExtractJniType { jvmObj, fieldOrMethodId 
     " ( jstring )  env->${method}($jvmObj, $fieldOrMethodId)"
 }
 
-
-fun jStringToCppStringTransform(ptr: Boolean = false) = object : TransformJniTypeLong {
-    override fun transform(jniVariable: String, cppVariable: String) = Poet().apply {
-        val tempCppVariable = "tempStr${unicFieldIndex}"
-        metas[JStringTransformMeta::class.qualifiedName!!] = JStringTransformMeta(
-            jniVariable = jniVariable,
-            tempCppVariable = tempCppVariable
-        )
-
-        statement("const char *$tempCppVariable = env->GetStringUTFChars(${jniVariable}, NULL)")
-        if (ptr) {
-            statement("$cppVariable = $tempCppVariable ? std::make_shared<std::string>( $tempCppVariable ) : std::shared_ptr<std::string>() ")
-        } else {
-            statement("$cppVariable = $tempCppVariable ?: \"\" ")
-        }
-    }
-
-    override fun release(transform: Poet): Poet = Poet().apply {
-        val metas = transform.metas[JStringTransformMeta::class.qualifiedName!!] as JStringTransformMeta
-        statement("if (${metas.tempCppVariable}) env->ReleaseStringUTFChars( ${metas.jniVariable}, ${metas.tempCppVariable})")
-    }
-
-}

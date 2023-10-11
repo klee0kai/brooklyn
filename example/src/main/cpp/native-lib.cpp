@@ -27,7 +27,7 @@ Java_com_klee0kai_example_engine_SimpleJniEngine_deinitLib(
 
 
 extern "C" JNIEXPORT jobject JNICALL
-Java_com_klee0kai_example_engine_SimpleJniEngine_copy(
+Java_com_klee0kai_example_engine_SimpleJniEngine_copySimple(
         JNIEnv *env,
         jclass /* class */,
         jobject jvmSimple
@@ -39,5 +39,20 @@ Java_com_klee0kai_example_engine_SimpleJniEngine_copy(
     simple->address = simple->address.append("from c++");
 
     auto jvmSimple2 = ComKlee0kaiExampleModelSimple_mapping::mapToJvm(env, simple);
+    return jvmSimple2;
+}
+
+
+
+extern "C" JNIEXPORT jobject JNICALL
+Java_com_klee0kai_example_engine_SimpleJniEngine_copyNullableType(
+        JNIEnv *env,
+        jclass /* class */,
+        jobject jvmNullableType
+) {
+    auto cppObject = ComKlee0kaiExampleModelNullableTypePojo_mapping::mapFromJvm(env, jvmNullableType);
+
+
+    auto jvmSimple2 = ComKlee0kaiExampleModelNullableTypePojo_mapping::mapToJvm(env, cppObject);
     return jvmSimple2;
 }

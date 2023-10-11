@@ -3,16 +3,12 @@ package com.github.klee0kai.bridge.brooklyn.cpp.typemirros
 import com.github.klee0kai.bridge.brooklyn.cpp.common.camelCase
 import com.github.klee0kai.bridge.brooklyn.cpp.common.firstCamelCase
 import com.github.klee0kai.bridge.brooklyn.cpp.common.snakeCase
-import com.github.klee0kai.bridge.brooklyn.poet.Poet
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.getClass
 import org.jetbrains.kotlin.ir.types.isNullable
 import org.jetbrains.kotlin.ir.util.classId
 import org.jetbrains.kotlin.ir.util.kotlinFqName
-
-internal var unicFieldIndex = 1
-    get() = field++
 
 fun interface ExtractJniType {
     /**
@@ -37,39 +33,26 @@ fun interface TransformJniType {
     fun invoke(variable: String): String
 }
 
-interface TransformJniTypeLong {
-    /**
-     * jstring -> str::string
-     */
-    fun transform(jniVariable: String, cppVariable: String): Poet
-
-    /**
-     * release const chart * after transform jstring -> str::string
-     */
-    fun release(transform: Poet): Poet
-}
-
 class CppTypeMirror(
-    val jniTypeStr: String,
+    val jniTypeStr: String="jobject",
     val jniTypeCode: String,
     val cppTypeMirrorStr: String,
 
     val checkIrType: (IrType) -> Boolean = { false },
     val checkIrClass: (IrClass, nullable: Boolean) -> Boolean = { _, _ -> false },
-    val extractFromField: ExtractJniType = todoExtract,
-    val extractFromStaticField: ExtractJniType = todoExtract,
-    val extractFromMethod: ExtractJniType = todoExtract,
-    val extractFromStaticMethod: ExtractJniType = todoExtract,
 
     val transformToJni: TransformJniType = todoCreate,
+    val transformToCpp: TransformJniType = todoCreate,
 
-    val insertToField: InsertJniType = todoInsert,
-    val insertToStaticField: InsertJniType = todoInsert,
+    val extractFromField: ExtractJniType = extractJniType("GetObjectField"),
+    val extractFromStaticField: ExtractJniType = extractJniType("GetStaticObjectField"),
+    val extractFromMethod: ExtractJniType = extractJniType("CallObjectMethod"),
+    val extractFromStaticMethod: ExtractJniType = extractJniType("CallStaticObjectMethod"),
 
+    val insertToField: InsertJniType = insertJniType("SetObjectField"),
+    val insertToStaticField: InsertJniType = insertJniType("SetStaticObjectField"),
 
-    val transformToCppShort: TransformJniType? = null,
-    val transformToCppLong: TransformJniTypeLong? = null,
-)
+    )
 
 fun IrType.jniType(): CppTypeMirror? {
     val typeCl = getClass()
@@ -86,18 +69,22 @@ fun IrClass.jniType(nullable: Boolean = true): CppTypeMirror? =
 // https://docs.oracle.com/javase/8/docs/technotes/guides/jni/spec/types.html
 val allCppTypeMirrors: MutableList<CppTypeMirror> = mutableListOf(
     *primitiveTypeMirrors(),
+    *boxedTypeMirrors(),
     stringTypeMirror(),
     stringNullableTypeMirror(),
 )
 
 @Deprecated("todo")
-private val todoExtract get() = ExtractJniType { _, _ -> TODO() }
-
-@Deprecated("todo")
-private val todoInsert get() = InsertJniType { _, _, _ -> TODO() }
-
-@Deprecated("todo")
 private val todoCreate get() = TransformJniType { TODO() }
+
+
+fun extractJniType(method: String) = ExtractJniType { jvmObj, fieldOrMethodId ->
+    "env->${method}($jvmObj, $fieldOrMethodId)"
+}
+
+fun insertJniType(method: String) = InsertJniType { variable, jvmObj, fieldOrMethodId ->
+    "env->${method}($jvmObj, $fieldOrMethodId, $variable )"
+}
 
 
 fun MutableList<CppTypeMirror>.addSupportedPojoClass(clazz: IrClass) {

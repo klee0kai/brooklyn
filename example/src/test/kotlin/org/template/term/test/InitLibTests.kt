@@ -1,7 +1,6 @@
 package org.template.term.test
 
 import com.klee0kai.example.engine.SimpleJniEngine
-import com.klee0kai.example.model.Simple
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
@@ -16,15 +15,15 @@ class InitLibTests {
     }
 
     @Test
-    fun testCopy() {
+    fun deinitTest() {
+        //Given
         SimpleJniEngine.initLib()
 
-        val simple = Simple(2, "name", "address")
-        val simple2 = SimpleJniEngine.copy(simple)
+        //when
+        val initResult = SimpleJniEngine.deinitLib()
 
-        assertEquals(3, simple2.age)
-        assertEquals("namefrom c++", simple2.name)
-        assertEquals("addressfrom c++", simple2.address)
+        //then
+        assertEquals(0, initResult, "Init should return 0, if deinit is correct")
     }
 
 }

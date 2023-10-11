@@ -10,6 +10,9 @@ object CommonNaming {
     const val mapperHeader = "mappers/mapper.h"
     const val mapperCpp = "mappers/mapper.cpp"
 
+    const val commonClassesMapperHeader = "mappers/common_mapper.h"
+    const val commonClassesMapperCpp = "mappers/common_mapper.cpp"
+
     const val modelHeader = "model/model.h"
 
     const val findBrooklynCmake = "FindBrooklynBridge.cmake"

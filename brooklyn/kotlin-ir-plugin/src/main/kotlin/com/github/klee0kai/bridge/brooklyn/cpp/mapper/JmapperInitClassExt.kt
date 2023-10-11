@@ -44,11 +44,10 @@ fun CodeBuilder.declareClassIndexField(jClass: IrClass) = apply {
 }
 
 
-fun CodeBuilder.initJniClassApi(jClass: IrClass) = apply {
+fun CodeBuilder.initJniClassApi() = apply {
     body {
-        val clId = jClass.classId!!
         lines(1)
-        statement("int ${clId.initIndexFuncName}(JNIEnv *env)")
+        statement("int init(JNIEnv *env)")
     }
 }
 
@@ -57,7 +56,7 @@ fun CodeBuilder.initJniClassImpl(jClass: IrClass) = apply {
         lines(1)
         val clId = jClass.classId!!
         val clPathName = "${clId.packageFqName}/${clId.shortClassName}".snakeCase("/")
-        line("int ${clId.initIndexFuncName}(JNIEnv *env) {")
+        line("int init(JNIEnv *env) {")
         statement("if (${clId.indexVariableName}) return 0")
         statement("${clId.indexVariableName} = std::make_shared<${clId.indexStructName}>()")
         statement("${clId.indexVariableName}->cls = (jclass) env->NewGlobalRef( env->FindClass(\"$clPathName\") )")
@@ -113,11 +112,10 @@ fun CodeBuilder.initJniClassImpl(jClass: IrClass) = apply {
     }
 }
 
-fun CodeBuilder.deinitJniClassApi(jClass: IrClass) = apply {
+fun CodeBuilder.deinitJniClassApi() = apply {
     body {
-        val clId = jClass.classId!!
         lines(1)
-        statement("int ${clId.deinitIndexFuncName}(JNIEnv *env)")
+        statement("int deinit(JNIEnv *env)")
     }
 }
 
@@ -126,16 +124,13 @@ fun CodeBuilder.deinitJniClassImpl(jClass: IrClass) = apply {
     body {
         val clId = jClass.classId!!
         lines(1)
-        line("int ${clId.deinitIndexFuncName}(JNIEnv *env) {")
+        line("int deinit(JNIEnv *env) {")
         statement("if (${clId.indexVariableName}) env->DeleteGlobalRef(${clId.indexVariableName}->cls)")
         statement("${clId.indexVariableName}.reset()")
         statement("return 0")
         line("}")
     }
 }
-
-val ClassId.initIndexFuncName
-    get() = "init_${packageFqName}${shortClassName}".camelCase()
 
 val ClassId.deinitIndexFuncName
     get() = "deinit_${packageFqName}${shortClassName}".camelCase()
@@ -148,7 +143,9 @@ val ClassId.indexVariableName
     get() = "${packageFqName}${shortClassName}Index".camelCase()
 
 val IrFunction.cppNameMirror
-    get() = "$name${fullValueParameterList.map { it.type.classFqName to it.isVararg }.hashCode().absoluteValue}".camelCase()
+    get() = "$name${
+        fullValueParameterList.map { it.type.classFqName to it.isVararg }.hashCode().absoluteValue
+    }".camelCase()
 
 val IrFunction.isConstructor
     get() = name.toString() == "<init>"

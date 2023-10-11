@@ -21,7 +21,7 @@ fun CodeBuilder.defHeaders(doubleImportCheck: Boolean = false) = apply {
 }
 
 fun CodeBuilder.namespaces(vararg namespaces: String) = apply {
-    namespaces.forEach { namespace ->
+    namespaces.filter { it.isNotEmpty() }.forEach { namespace ->
         variables {
             line("namespace $namespace {")
         }
