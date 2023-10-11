@@ -26,6 +26,7 @@ fun CodeBuilder.initStdTypes(isImpl: Boolean = false) = apply {
         stdTypeIndexStructure("doubleIndex")
         stdTypeIndexStructure("charIndex")
         stdTypeIndexStructure("shortIndex")
+        stdTypeIndexStructure("byteIndex")
     }
 
     body {
@@ -38,6 +39,7 @@ fun CodeBuilder.initStdTypes(isImpl: Boolean = false) = apply {
         doubleIndexInit()
         charIndexInit()
         shortIndexInit()
+        byteIndexInit()
         line("}")
     }
 }
@@ -58,6 +60,7 @@ fun CodeBuilder.deinitStdTypes(isImpl: Boolean = false) = apply {
         resetIndexStructure("doubleIndex")
         resetIndexStructure("charIndex")
         resetIndexStructure("shortIndex")
+        resetIndexStructure("byteIndex")
         statement("return 0")
         line("}")
     }
@@ -86,6 +89,9 @@ fun CodeBuilder.stdTypeMappers(isImpl: Boolean = false) = apply {
 
         mapShortFromJava(isImpl)
         mapShortToJava(isImpl)
+
+        mapByteFromJava(isImpl)
+        mapByteToJava(isImpl)
 
         mapFromJString(isImpl)
         mapToJString(isImpl)
