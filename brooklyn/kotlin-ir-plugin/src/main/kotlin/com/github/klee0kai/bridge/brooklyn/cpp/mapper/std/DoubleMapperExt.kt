@@ -7,7 +7,7 @@ import com.github.klee0kai.bridge.brooklyn.poet.Poet
 fun Poet.doubleIndexInit() = apply {
     statement("if (doubleIndex) return 0")
     statement("doubleIndex = std::make_shared<SimpleIndexStructure>()")
-    statement("doubleIndex->cls = (jclass) env->NewGlobalRef( env->FindClass(\"java.lang.Double\") )")
+    statement("doubleIndex->cls = (jclass) env->NewGlobalRef( env->FindClass(\"java/lang/Double\") )")
     statement("doubleIndex->toJvm = env->GetMethodID(doubleIndex->cls, \"<init>\",\"(D)V\" ) ")
     statement("if (!doubleIndex->toJvm) return -1")
     statement("doubleIndex->fromJvm = env->GetMethodID(doubleIndex->cls, \"doubleValue\",\"()D\") ")

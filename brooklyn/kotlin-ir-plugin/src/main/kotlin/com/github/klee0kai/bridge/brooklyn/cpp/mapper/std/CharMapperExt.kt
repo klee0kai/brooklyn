@@ -7,7 +7,7 @@ import com.github.klee0kai.bridge.brooklyn.poet.Poet
 fun Poet.charIndexInit() = apply {
     statement("if (charIndex) return 0")
     statement("charIndex = std::make_shared<SimpleIndexStructure>()")
-    statement("charIndex->cls = (jclass) env->NewGlobalRef( env->FindClass(\"java.lang.Character\") )")
+    statement("charIndex->cls = (jclass) env->NewGlobalRef( env->FindClass(\"java/lang/Character\") )")
     statement("charIndex->toJvm = env->GetMethodID(charIndex->cls, \"<init>\",\"(C)V\" ) ")
     statement("if (!charIndex->toJvm) return -1")
     statement("charIndex->fromJvm = env->GetMethodID(charIndex->cls, \"charValue\",\"()C\") ")

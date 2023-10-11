@@ -7,7 +7,7 @@ import com.github.klee0kai.bridge.brooklyn.poet.Poet
 fun Poet.floatIndexInit() = apply {
     statement("if (floatIndex) return 0")
     statement("floatIndex = std::make_shared<SimpleIndexStructure>()")
-    statement("floatIndex->cls = (jclass) env->NewGlobalRef( env->FindClass(\"java.lang.Float\") )")
+    statement("floatIndex->cls = (jclass) env->NewGlobalRef( env->FindClass(\"java/lang/Float\") )")
     statement("floatIndex->toJvm = env->GetMethodID(floatIndex->cls, \"<init>\",\"(F)V\" ) ")
     statement("if (!floatIndex->toJvm) return -1")
     statement("floatIndex->fromJvm = env->GetMethodID(floatIndex->cls, \"floatValue\",\"()F\") ")

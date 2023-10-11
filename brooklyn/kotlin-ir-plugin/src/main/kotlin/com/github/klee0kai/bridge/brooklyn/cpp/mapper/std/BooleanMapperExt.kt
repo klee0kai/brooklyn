@@ -7,7 +7,7 @@ import com.github.klee0kai.bridge.brooklyn.poet.Poet
 fun Poet.booleanIndexInit() = apply {
     statement("if (booleanIndex) return 0")
     statement("booleanIndex = std::make_shared<SimpleIndexStructure>()")
-    statement("booleanIndex->cls = (jclass) env->NewGlobalRef( env->FindClass(\"java.lang.Boolean\") )")
+    statement("booleanIndex->cls = (jclass) env->NewGlobalRef( env->FindClass(\"java/lang/Boolean\") )")
     statement("booleanIndex->toJvm = env->GetMethodID(booleanIndex->cls, \"<init>\",\"(Z)V\" ) ")
     statement("if (!booleanIndex->toJvm) return -1")
     statement("booleanIndex->fromJvm = env->GetMethodID(booleanIndex->cls, \"booleanValue\",\"()Z\") ")

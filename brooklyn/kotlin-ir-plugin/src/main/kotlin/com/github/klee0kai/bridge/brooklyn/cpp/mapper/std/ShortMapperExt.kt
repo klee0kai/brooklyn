@@ -7,8 +7,8 @@ import com.github.klee0kai.bridge.brooklyn.poet.Poet
 fun Poet.shortIndexInit() = apply {
     statement("if (shortIndex) return 0")
     statement("shortIndex = std::make_shared<SimpleIndexStructure>()")
-    statement("shortIndex->cls = (jclass) env->NewGlobalRef( env->FindClass(\"java.lang.Short\") )")
-    statement("shortIndex->toJvm = env->GetMethodID(doubleIndex->cls, \"<init>\",\"(S)V\" ) ")
+    statement("shortIndex->cls = (jclass) env->NewGlobalRef( env->FindClass(\"java/lang/Short\") )")
+    statement("shortIndex->toJvm = env->GetMethodID(shortIndex->cls, \"<init>\",\"(S)V\" ) ")
     statement("if (!shortIndex->toJvm) return -1")
     statement("shortIndex->fromJvm = env->GetMethodID(shortIndex->cls, \"shortValue\",\"()S\") ")
     statement("if (!shortIndex->fromJvm) return -1")

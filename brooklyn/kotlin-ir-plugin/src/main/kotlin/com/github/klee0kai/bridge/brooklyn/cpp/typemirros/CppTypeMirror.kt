@@ -10,9 +10,6 @@ import org.jetbrains.kotlin.ir.types.isNullable
 import org.jetbrains.kotlin.ir.util.classId
 import org.jetbrains.kotlin.ir.util.kotlinFqName
 
-internal var unicFieldIndex = 1
-    get() = field++
-
 fun interface ExtractJniType {
     /**
      *  extract jstring from field or method
