@@ -1,6 +1,7 @@
 package com.klee0kai.example.engine
 
 import BrooklynBridge.example.BuildConfig
+import com.klee0kai.example.model.NullableTypePojo
 import com.klee0kai.example.model.Simple
 
 object SimpleJniEngine {
@@ -13,6 +14,8 @@ object SimpleJniEngine {
 
     external fun deinitLib(): Int
 
-    external fun copy(simple: Simple): Simple
+    external fun copySimple(simple: Simple): Simple
+
+    external fun copyNullableType(simple: NullableTypePojo): NullableTypePojo
 
 }
