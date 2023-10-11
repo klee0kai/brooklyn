@@ -22,7 +22,7 @@ fun CodeBuilder.mapFromJString(isImpl: Boolean = false) = apply {
 
 
 fun CodeBuilder.mapToJString(isImpl: Boolean = false) = apply {
-    val declare = "jstring mapToJString(JNIEnv *env, std::shared_ptr<std::string> str) "
+    val declare = "jstring mapToJString(JNIEnv *env, const std::shared_ptr<std::string>& str) "
     if (!isImpl) {
         statement(declare)
         return@apply
