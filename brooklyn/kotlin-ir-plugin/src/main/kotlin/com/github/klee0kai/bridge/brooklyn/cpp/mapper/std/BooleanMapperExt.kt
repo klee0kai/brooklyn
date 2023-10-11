@@ -9,7 +9,9 @@ fun Poet.booleanIndexInit() = apply {
     statement("booleanIndex = std::make_shared<BooleanIndex>()")
     statement("booleanIndex->cls = (jclass) env->NewGlobalRef( env->FindClass(\"java.lang.Boolean\") )")
     statement("booleanIndex->toJvm = env->GetMethodID(booleanIndex->cls, \"<init>\",\"(Z)V\" ) ")
+    statement("if (!booleanIndex->toJvm) return -1")
     statement("booleanIndex->fromJvm = env->GetMethodID(booleanIndex->cls, \"booleanValue\",\"()Z\") ")
+    statement("if (!booleanIndex->fromJvm) return -1")
 }
 
 

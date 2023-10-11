@@ -11,12 +11,14 @@ fun CodeBuilder.initStdTypes(isImpl: Boolean = false) = apply {
     }
     variables {
         stdTypeIndexStructure("booleanIndex")
+        stdTypeIndexStructure("integerIndex")
     }
 
     body {
         lines(1)
         line("${declare}{")
         booleanIndexInit()
+        integerIndexInit()
         line("}")
     }
 }
@@ -36,16 +38,15 @@ fun CodeBuilder.deinitStdTypes(isImpl: Boolean = false) = apply {
 }
 
 
-fun CodeBuilder.mapFromJava(isImpl: Boolean = false) = apply {
+fun CodeBuilder.stdTypeMappers(isImpl: Boolean = false) = apply {
     body {
         mapBooleanFromJava(isImpl)
-        mapFromJString(isImpl)
-    }
-}
-
-fun CodeBuilder.mapToJava(isImpl: Boolean = false) = apply {
-    body {
         mapBooleanToJava(isImpl)
+
+        mapIntegerFromJava(isImpl)
+        mapIntegerToJava(isImpl)
+
+        mapFromJString(isImpl)
         mapToJString(isImpl)
     }
 }
@@ -57,7 +58,7 @@ private fun Poet.stdTypeIndexStructure(name: String) {
     statement("\tjmethodID toJvm = NULL")
     statement("\tjmethodID fromJvm = NULL")
     statement("}")
-    statement("static std::shared_ptr<BooleanIndex> $name = {}")
+    statement("static std::shared_ptr<${name.firstCamelCase()}> $name = {}")
 }
 
 private fun Poet.resetIndexStructure(name: String) {
