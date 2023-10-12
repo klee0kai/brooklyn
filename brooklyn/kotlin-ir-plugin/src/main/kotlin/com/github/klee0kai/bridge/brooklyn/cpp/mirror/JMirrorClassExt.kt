@@ -30,12 +30,16 @@ fun CodeBuilder.declareClassMirror(jClass: IrClass) = apply {
 
         jClass.constructors.forEach { func ->
             val args = func.mirrorFuncArgs(env = true)?.joinToString(", ") ?: return@forEach
+            usedTypes.addAll(func.allUsedTypes())
+
             statement("${clMirror}($args)")
         }
 
         jClass.functions.forEach { func ->
             val args = func.mirrorFuncArgs()?.joinToString(", ") ?: return@forEach
             val returnType = func.returnType.jniType()?.cppPtrTypeMirror ?: "void"
+            usedTypes.addAll(func.allUsedTypes())
+
             statement("$returnType ${func.name}($args)")
         }
 
@@ -155,3 +159,7 @@ fun IrFunction.mirrorFuncArgs(env: Boolean = false) = runCatching {
         "const ${it.type.jniType()!!.cppPtrTypeMirror}& ${it.name}"
     }
 }.getOrNull()
+
+
+fun IrFunction.allUsedTypes(): List<IrType> =
+    listOf(returnType) + fullValueParameterList.map { it.type }

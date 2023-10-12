@@ -1,9 +1,11 @@
 package com.klee0kai.example.engine
 
 import BrooklynBridge.example.BuildConfig
+import com.github.klee0kai.bridge.brooklyn.JniMirror
 import com.klee0kai.example.model.NullableTypePojo
 import com.klee0kai.example.model.Simple
 
+@JniMirror
 object SimpleJniEngine {
 
     init {
