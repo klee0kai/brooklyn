@@ -76,6 +76,7 @@ fun CodeBuilder.implementClassMirror(jClass: IrClass) = apply {
         line("}")
 
         jClass.constructors.forEach { func ->
+            if (func.isExternal) return@forEach
             val args = func.mirrorFuncArgs(env = true)?.joinToString(", ") ?: return@forEach
             line("${clMirror}::${clMirror}($args) {")
             statement("${clMirror}::env = env")
@@ -94,6 +95,7 @@ fun CodeBuilder.implementClassMirror(jClass: IrClass) = apply {
         }
 
         jClass.functions.forEach { func ->
+            if (func.isExternal) return@forEach
             val argsDeclaration = func.mirrorFuncArgs()?.joinToString(", ") ?: return@forEach
             val returnType = func.returnType.jniType()
             val returnTypeStr = func.returnType.jniType()?.cppTypeMirrorStr ?: "void"
@@ -150,6 +152,6 @@ fun CodeBuilder.implementClassMirror(jClass: IrClass) = apply {
 fun IrFunction.mirrorFuncArgs(env: Boolean = false) = runCatching {
     val envArgList = if (env) listOf("JNIEnv *env") else emptyList()
     envArgList + fullValueParameterList.map {
-        "${it.type.jniType()!!.cppPtrTypeMirror} ${it.name}"
+        "const ${it.type.jniType()!!.cppPtrTypeMirror}& ${it.name}"
     }
 }.getOrNull()
