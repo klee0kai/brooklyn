@@ -1,5 +1,7 @@
 package com.github.klee0kai.bridge.brooklyn.cpp.typemirros
 
+import com.github.klee0kai.bridge.brooklyn.cpp.common.CommonNaming.BROOKLYN
+import com.github.klee0kai.bridge.brooklyn.cpp.common.CommonNaming.MAPPER
 import com.github.klee0kai.bridge.brooklyn.cpp.common.camelCase
 import com.github.klee0kai.bridge.brooklyn.cpp.common.firstCamelCase
 import com.github.klee0kai.bridge.brooklyn.cpp.common.snakeCase
@@ -110,8 +112,8 @@ fun MutableList<CppTypeMirror>.addSupportedPojoClass(clazz: IrClass) {
             jniTypeStr = "jobject",
             classId = classId,
             checkIrClass = { cl, nullable -> !nullable && cl.classId == clazz.classId },
-            transformToJni = { variable -> "brooklyn::mapper::${namespace}::mapToJvm(env, std::make_shared<${cppModelMirror}>( $variable ) )" },
-            transformToCpp = { variable -> "*brooklyn::mapper::${namespace}::mapFromJvm(env, $variable ) " },
+            transformToJni = { variable -> "${BROOKLYN}::${MAPPER}::${namespace}::mapToJvm(env, std::make_shared<${cppModelMirror}>( $variable ) )" },
+            transformToCpp = { variable -> "*${BROOKLYN}::${MAPPER}::${namespace}::mapFromJvm(env, $variable ) " },
         )
     )
     add(
@@ -122,8 +124,8 @@ fun MutableList<CppTypeMirror>.addSupportedPojoClass(clazz: IrClass) {
             isPtr = true,
             classId = classId,
             checkIrClass = { cl, _ -> cl.classId == clazz.classId },
-            transformToJni = { variable -> "brooklyn::mapper::${namespace}::mapToJvm(env,  $variable )" },
-            transformToCpp = { variable -> "brooklyn::mapper::${namespace}::mapFromJvm(env, $variable ) " },
+            transformToJni = { variable -> "${BROOKLYN}::${MAPPER}::${namespace}::mapToJvm(env,  $variable )" },
+            transformToCpp = { variable -> "${BROOKLYN}::${MAPPER}::${namespace}::mapFromJvm(env, $variable ) " },
         )
     )
 }

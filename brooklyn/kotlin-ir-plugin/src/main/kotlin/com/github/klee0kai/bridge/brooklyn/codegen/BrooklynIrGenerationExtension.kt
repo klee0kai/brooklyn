@@ -2,10 +2,13 @@ package com.github.klee0kai.bridge.brooklyn.codegen
 
 import com.github.klee0kai.bridge.brooklyn.cmake.cmakeLib
 import com.github.klee0kai.bridge.brooklyn.cpp.common.*
+import com.github.klee0kai.bridge.brooklyn.cpp.common.CommonNaming.BROOKLYN
+import com.github.klee0kai.bridge.brooklyn.cpp.common.CommonNaming.MAPPER
 import com.github.klee0kai.bridge.brooklyn.cpp.mapper.*
 import com.github.klee0kai.bridge.brooklyn.cpp.mapper.std.deinitStdTypes
 import com.github.klee0kai.bridge.brooklyn.cpp.mapper.std.initStdTypes
 import com.github.klee0kai.bridge.brooklyn.cpp.mapper.std.stdTypeMappers
+import com.github.klee0kai.bridge.brooklyn.cpp.mirror.declareClassMirror
 import com.github.klee0kai.bridge.brooklyn.cpp.model.declareClassModelStructure
 import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.addSupportedPojoClass
 import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.allCppTypeMirrors
@@ -24,14 +27,12 @@ class BrooklynIrGenerationExtension(
     private val outDirFile: String
 ) : IrGenerationExtension {
 
-    private val mapperHeaderInitBlock: CodeBuilder.() -> Unit = {
-        defHeaders(doubleImportCheck = true)
-        namespaces("brooklyn", "mapper")
-    }
-
-    private val mapperCppInitBlock: CodeBuilder.() -> Unit = {
-        defHeaders()
-        namespaces("brooklyn", "mapper")
+    private fun headersInitBlock(
+        doubleImportCheck: Boolean = true,
+        vararg namespaces: String
+    ): CodeBuilder.() -> Unit = {
+        defHeaders(doubleImportCheck = doubleImportCheck)
+        namespaces(BROOKLYN, *namespaces)
     }
 
     override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
@@ -56,20 +57,23 @@ class BrooklynIrGenerationExtension(
         gen.getOrCreate(fileName = CommonNaming.brooklynInternalHeader)
             .allJniHeaders()
 
-        gen.getOrCreate(CommonNaming.commonClassesMapperHeader, mapperHeaderInitBlock)
+        gen.getOrCreate(CommonNaming.commonClassesMapperHeader, headersInitBlock(namespaces = arrayOf(MAPPER)))
             .initStdTypes()
             .deinitStdTypes()
             .stdTypeMappers()
 
 
-        gen.getOrCreate(CommonNaming.commonClassesMapperCpp, mapperCppInitBlock)
+        gen.getOrCreate(
+            CommonNaming.commonClassesMapperCpp,
+            headersInitBlock(doubleImportCheck = false, namespaces = arrayOf(MAPPER))
+        )
             .initStdTypes(isImpl = true)
             .deinitStdTypes(isImpl = true)
             .stdTypeMappers(isImpl = true)
 
         headerCreator.pojoJniClasses.forEach { declaration ->
             val clId = declaration.classId!!
-            gen.getOrCreate(clId.mapperHeaderFile, mapperHeaderInitBlock)
+            gen.getOrCreate(clId.mapperHeaderFile, headersInitBlock(namespaces = arrayOf(MAPPER)))
                 .header {
                     include(CommonNaming.commonClassesMapperHeader)
                     include(declaration.classId!!.modelHeaderFile.path)
@@ -80,7 +84,10 @@ class BrooklynIrGenerationExtension(
                 .deinitJniClassApi()
                 .mapJniClassApi(declaration)
 
-            gen.getOrCreate(clId.mapperCppFile, mapperCppInitBlock)
+            gen.getOrCreate(
+                clId.mapperCppFile,
+                headersInitBlock(doubleImportCheck = false, namespaces = arrayOf(MAPPER))
+            )
                 .header { include(clId.mapperHeaderFile.path) }
                 .header { include(CommonNaming.mapperHeader) }
                 .namespaces(declaration.cppMappingNameSpace())
@@ -89,13 +96,13 @@ class BrooklynIrGenerationExtension(
                 .deinitJniClassImpl(declaration)
                 .mapJniClassImpl(declaration)
 
-            gen.getOrCreate(clId.modelHeaderFile, mapperHeaderInitBlock)
+            gen.getOrCreate(clId.modelHeaderFile, headersInitBlock())
                 .declareClassModelStructure(declaration)
         }
 
         headerCreator.mirrorJniClasses.forEach { declaration ->
             val clId = declaration.classId!!
-            gen.getOrCreate(clId.mapperHeaderFile, mapperHeaderInitBlock)
+            gen.getOrCreate(clId.mapperHeaderFile, headersInitBlock(namespaces = arrayOf(MAPPER)))
                 .header {
                     include(CommonNaming.commonClassesMapperHeader)
                 }
@@ -106,7 +113,10 @@ class BrooklynIrGenerationExtension(
 
 
 
-            gen.getOrCreate(clId.mapperCppFile, mapperCppInitBlock)
+            gen.getOrCreate(
+                clId.mapperCppFile,
+                headersInitBlock(doubleImportCheck = false, namespaces = arrayOf(MAPPER))
+            )
                 .header { include(clId.mapperHeaderFile.path) }
                 .header { include(CommonNaming.mapperHeader) }
                 .namespaces(declaration.cppMappingNameSpace())
@@ -114,9 +124,12 @@ class BrooklynIrGenerationExtension(
                 .initJniClassImpl(declaration)
                 .deinitJniClassImpl(declaration)
 
+            gen.getOrCreate(clId.mirrorHeaderFile, headersInitBlock())
+                .declareClassMirror(declaration)
+
         }
 
-        gen.getOrCreate(CommonNaming.mapperHeader, mapperHeaderInitBlock)
+        gen.getOrCreate(CommonNaming.mapperHeader, headersInitBlock(namespaces = arrayOf(MAPPER)))
             .header {
                 include(CommonNaming.commonClassesMapperHeader)
                 headerCreator.pojoJniClasses.forEach { include(it.classId!!.mapperHeaderFile.path) }
@@ -126,7 +139,10 @@ class BrooklynIrGenerationExtension(
             .deinitAllApi()
 
 
-        gen.getOrCreate(CommonNaming.mapperCpp, mapperCppInitBlock)
+        gen.getOrCreate(
+            CommonNaming.mapperCpp,
+            headersInitBlock(doubleImportCheck = false, namespaces = arrayOf(MAPPER))
+        )
             .initAllImpl(headerCreator.pojoJniClasses + headerCreator.mirrorJniClasses)
             .initAllFromJvmImpl()
             .deinitAllImpl(headerCreator.pojoJniClasses + headerCreator.mirrorJniClasses)
@@ -135,12 +151,15 @@ class BrooklynIrGenerationExtension(
         gen.getOrCreate(CommonNaming.modelHeader)
             .header { headerCreator.pojoJniClasses.forEach { include(it.classId!!.modelHeaderFile.path) } }
 
+        gen.getOrCreate(CommonNaming.mirrorHeader)
+            .header { headerCreator.mirrorJniClasses.forEach { include(it.classId!!.mirrorHeaderFile.path) } }
+
         gen.genAll()
 
 
         CodeBuilder(File(outDirFile, CommonNaming.findBrooklynCmake))
             .cmakeLib(
-                libName = "brooklyn",
+                libName = BROOKLYN,
                 rootDir = outDirFile,
                 src = gen.files
                     .filter { it.extension.endsWith("cpp") }

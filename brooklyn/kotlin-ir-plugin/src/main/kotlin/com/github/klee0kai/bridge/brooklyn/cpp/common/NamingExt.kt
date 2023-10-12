@@ -4,6 +4,9 @@ import org.jetbrains.kotlin.name.ClassId
 import java.io.File
 
 object CommonNaming {
+    const val BROOKLYN = "brooklyn"
+    const val MAPPER = "mapper"
+
     const val brooklynHeader = "brooklyn.h"
     const val brooklynInternalHeader = "lib/brooklyn_internal.h"
 
@@ -14,6 +17,7 @@ object CommonNaming {
     const val commonClassesMapperCpp = "mappers/common_mapper.cpp"
 
     const val modelHeader = "model/model.h"
+    const val mirrorHeader = "mirror/mirror.h"
 
     const val findBrooklynCmake = "FindBrooklynBridge.cmake"
 }
@@ -26,6 +30,9 @@ val ClassId.mapperCppFile
 
 val ClassId.modelHeaderFile
     get() = File("model", "${cppFilePrefix}_model.h")
+
+val ClassId.mirrorHeaderFile
+    get() = File("mirror", "${cppFilePrefix}_mirror.h")
 
 fun String.camelCase() = buildString {
     var specSymbol = false
