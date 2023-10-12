@@ -45,7 +45,7 @@ internal fun stringNullableTypeMirror() =
     )
 
 
-fun extractJniString(method: String) = ExtractJniType { jvmObj, fieldOrMethodId ->
-    " ( jstring )  env->${method}($jvmObj, $fieldOrMethodId)"
+fun extractJniString(method: String) = ExtractJniType { jvmObj, fieldOrMethodId, args ->
+    " ( jstring )  env->${method}( ${listOf(jvmObj, fieldOrMethodId, args).joinArgs()} )"
 }
 

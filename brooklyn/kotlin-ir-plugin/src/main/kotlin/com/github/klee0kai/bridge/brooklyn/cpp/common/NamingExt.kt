@@ -33,6 +33,9 @@ val ClassId.modelHeaderFile
 
 val ClassId.mirrorHeaderFile
     get() = File("mirror", "${cppFilePrefix}_mirror.h")
+val ClassId.mirrorCppFile
+    get() = File("mirror", "${cppFilePrefix}_mirror.cpp")
+
 
 fun String.camelCase() = buildString {
     var specSymbol = false

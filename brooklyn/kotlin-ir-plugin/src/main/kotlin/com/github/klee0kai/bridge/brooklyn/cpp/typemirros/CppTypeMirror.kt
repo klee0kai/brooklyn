@@ -17,7 +17,11 @@ fun interface ExtractJniType {
     /**
      *  extract jstring from field or method
      */
-    fun invoke(jvmObj: String, fieldOrMethodId: String): String
+    fun invoke(
+        jvmObj: String,
+        fieldOrMethodId: String,
+        args: String ,
+    ): String
 }
 
 fun interface InsertJniType {
@@ -92,13 +96,15 @@ val allCppTypeMirrors: MutableList<CppTypeMirror> = mutableListOf(
 )
 
 
-fun extractJniType(method: String) = ExtractJniType { jvmObj, fieldOrMethodId ->
-    "env->${method}($jvmObj, $fieldOrMethodId)"
+fun extractJniType(method: String) = ExtractJniType { jvmObj, fieldOrMethodId, args ->
+    "env->${method}( ${listOf(jvmObj, fieldOrMethodId, args).joinArgs()} )"
 }
 
 fun insertJniType(method: String) = InsertJniType { variable, jvmObj, fieldOrMethodId ->
     "env->${method}($jvmObj, $fieldOrMethodId, $variable )"
 }
+
+fun List<String>.joinArgs()= filter { it.isNotBlank() }.joinToString(", ")
 
 
 fun MutableList<CppTypeMirror>.addSupportedPojoClass(clazz: IrClass) {
