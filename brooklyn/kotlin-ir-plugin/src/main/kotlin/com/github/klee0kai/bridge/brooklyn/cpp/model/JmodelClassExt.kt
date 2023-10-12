@@ -1,33 +1,41 @@
 package com.github.klee0kai.bridge.brooklyn.cpp.model
 
-import com.github.klee0kai.bridge.brooklyn.cpp.common.CodeBuilder
-import com.github.klee0kai.bridge.brooklyn.cpp.common.line
-import com.github.klee0kai.bridge.brooklyn.cpp.common.lines
-import com.github.klee0kai.bridge.brooklyn.cpp.common.statement
+import com.github.klee0kai.bridge.brooklyn.cpp.common.*
 import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.jniType
 import org.jetbrains.kotlin.ir.declarations.IrClass
+import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.util.fields
 import org.jetbrains.kotlin.ir.util.properties
 
 fun CodeBuilder.declareClassModelStructure(jClass: IrClass) = apply {
+    val usedTypes = mutableSetOf<IrType>()
     variables {
-
         lines(1)
         line("struct ${jClass.jniType()?.cppTypeMirrorStr ?: return@variables} {")
         jClass.fields.forEach { field ->
-            field.type.jniType()?.cppTypeMirrorStr?.let { cppType ->
+            field.type.jniType()?.cppPtrTypeMirror?.let { cppType ->
                 statement("\t${cppType} ${field.name};")
             }
+            usedTypes.add(field.type)
         }
         jClass.properties.forEach { property ->
             val type = property.getter!!.returnType
-            type.jniType()?.cppTypeMirrorStr?.let { cppType ->
+            type.jniType()?.cppPtrTypeMirror?.let { cppType ->
                 statement("\t${cppType} ${property.name}")
             }
+            usedTypes.add(type)
         }
         line("};")
-
     }
+
+    header {
+        usedTypes.mapNotNull { type ->
+            type.jniType()?.classId
+        }.toSet().forEach { classId ->
+            include(classId.modelHeaderFile.path)
+        }
+    }
+
 }
 
 fun IrClass.cppMappingNameSpace() = "${jniType()?.cppTypeMirrorStr}_mapping"

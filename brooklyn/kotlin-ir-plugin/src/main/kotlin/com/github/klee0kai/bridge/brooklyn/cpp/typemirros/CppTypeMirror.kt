@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.ir.types.getClass
 import org.jetbrains.kotlin.ir.types.isNullable
 import org.jetbrains.kotlin.ir.util.classId
 import org.jetbrains.kotlin.ir.util.kotlinFqName
+import org.jetbrains.kotlin.name.ClassId
 
 fun interface ExtractJniType {
     /**
@@ -34,15 +35,21 @@ fun interface TransformJniType {
 }
 
 class CppTypeMirror(
-    val jniTypeStr: String="jobject",
     val jniTypeCode: String,
     val cppTypeMirrorStr: String,
+    val jniTypeStr: String = "jobject",
 
+    val isPtr: Boolean = false,
+    val irType: IrType? = null,
+    val classId: ClassId? = null,
+
+    @Deprecated("use isPtr/isType/classId")
     val checkIrType: (IrType) -> Boolean = { false },
+    @Deprecated("use isPtr/isType/classId")
     val checkIrClass: (IrClass, nullable: Boolean) -> Boolean = { _, _ -> false },
 
-    val transformToJni: TransformJniType = todoCreate,
-    val transformToCpp: TransformJniType = todoCreate,
+    val transformToJni: TransformJniType,
+    val transformToCpp: TransformJniType,
 
     val extractFromField: ExtractJniType = extractJniType("GetObjectField"),
     val extractFromStaticField: ExtractJniType = extractJniType("GetStaticObjectField"),
@@ -51,8 +58,9 @@ class CppTypeMirror(
 
     val insertToField: InsertJniType = insertJniType("SetObjectField"),
     val insertToStaticField: InsertJniType = insertJniType("SetStaticObjectField"),
-
-    )
+) {
+    val cppPtrTypeMirror get() = if (isPtr) "std::shared_ptr<${cppTypeMirrorStr}>" else cppTypeMirrorStr
+}
 
 fun IrType.jniType(): CppTypeMirror? {
     val typeCl = getClass()
@@ -74,9 +82,6 @@ val allCppTypeMirrors: MutableList<CppTypeMirror> = mutableListOf(
     stringNullableTypeMirror(),
 )
 
-@Deprecated("todo")
-private val todoCreate get() = TransformJniType { TODO() }
-
 
 fun extractJniType(method: String) = ExtractJniType { jvmObj, fieldOrMethodId ->
     "env->${method}($jvmObj, $fieldOrMethodId)"
@@ -90,14 +95,29 @@ fun insertJniType(method: String) = InsertJniType { variable, jvmObj, fieldOrMet
 fun MutableList<CppTypeMirror>.addSupportedPojoClass(clazz: IrClass) {
     val classId = clazz.classId!!
     val cppModelMirror = "${classId.packageFqName}${classId.shortClassName}".camelCase().firstCamelCase()
+    val namespace = "${cppModelMirror}_mapping"
     add(
         CppTypeMirror(
-            jniTypeStr = "jobject",
             jniTypeCode = "L${clazz.kotlinFqName.toString().snakeCase("/")};",
             cppTypeMirrorStr = cppModelMirror,
+            jniTypeStr = "jobject",
+            classId = classId,
+            checkIrClass = { cl, nullable -> !nullable && cl.classId == clazz.classId },
+            transformToJni = { variable -> "brooklyn::mapper::${namespace}::mapToJvm(env, std::make_shared<${cppModelMirror}>( $variable ) )" },
+            transformToCpp = { variable -> "*brooklyn::mapper::${namespace}::mapFromJvm(env, $variable ) " },
+        )
+    )
+    add(
+        CppTypeMirror(
+            jniTypeCode = "L${clazz.kotlinFqName.toString().snakeCase("/")};",
+            cppTypeMirrorStr = cppModelMirror,
+            jniTypeStr = "jobject",
+            isPtr = true,
+            classId = classId,
             checkIrClass = { cl, _ -> cl.classId == clazz.classId },
-
-            ),
+            transformToJni = { variable -> "brooklyn::mapper::${namespace}::mapToJvm(env,  $variable )" },
+            transformToCpp = { variable -> "brooklyn::mapper::${namespace}::mapFromJvm(env, $variable ) " },
+        )
     )
 }
 
