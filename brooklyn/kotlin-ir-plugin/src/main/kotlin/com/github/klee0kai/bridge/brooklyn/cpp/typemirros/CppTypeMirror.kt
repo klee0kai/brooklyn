@@ -103,8 +103,8 @@ fun insertJniType(method: String) = InsertJniType { variable, jvmObj, fieldOrMet
 
 fun MutableList<CppTypeMirror>.addSupportedPojoClass(clazz: IrClass) {
     val classId = clazz.classId!!
-    val cppModelMirror = "${classId.packageFqName}${classId.shortClassName}".camelCase().firstCamelCase()
-    val namespace = "${cppModelMirror}_mapping"
+    val cppModelMirror = clazz.cppModelMirror() ?: return
+    val namespace = clazz.cppMappingNameSpace()
     add(
         CppTypeMirror(
             jniTypeCode = "L${clazz.kotlinFqName.toString().snakeCase("/")};",
