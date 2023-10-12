@@ -21,13 +21,13 @@ fun CodeBuilder.mapJniClassApi(jClass: IrClass) = apply {
         statement("std::shared_ptr<$typeMirror> mapFromJvm(JNIEnv *env, jobject j$typeMirror)")
 
         lines(1)
-        statement("jobject mapToJvm(JNIEnv *env, std::shared_ptr<$typeMirror> j$typeMirror)")
+        statement("jobject mapToJvm(JNIEnv *env, const std::shared_ptr<$typeMirror>& j$typeMirror)")
 
         lines(1)
         statement("std::vector<$typeMirror> mapArrayFromJvm(JNIEnv *env, jobjectArray j$typeMirror)")
 
         lines(1)
-        statement("jobjectArray mapArrayToJvm(JNIEnv *env, std::vector<$typeMirror> j$typeMirror)")
+        statement("jobjectArray mapArrayToJvm(JNIEnv *env, const std::vector<$typeMirror>& j$typeMirror)")
     }
 }
 
@@ -45,8 +45,8 @@ private fun Poet.mapFromJvmImpl(jClass: IrClass) = apply {
     val typeMirror = jClass.jniType()?.cppTypeMirrorStr
 
     lines(1)
-    line("std::shared_ptr<$typeMirror> mapFromJvm(JNIEnv *env, jobject $jvmObjectName )")
-    line("{")
+    line("std::shared_ptr<$typeMirror> mapFromJvm(JNIEnv *env, jobject $jvmObjectName ) {")
+    statement("if (!$jvmObjectName) return  std::shared_ptr<${typeMirror}>() ")
     line("std::shared_ptr<$typeMirror> $cppObjectName = std::make_shared<$typeMirror>();")
 
     jClass.fields.forEach { field ->
@@ -70,7 +70,6 @@ private fun Poet.mapFromJvmImpl(jClass: IrClass) = apply {
         )
         post(" $cppObjectName->${property.name} = ")
         statement(propertyTypeMirror.transformToCpp.invoke(extractFromProperty))
-
     }
 
     statement("return $cppObjectName")
@@ -86,8 +85,8 @@ private fun Poet.mapToJvmImpl(jClass: IrClass) = apply {
     val typeMirror = jClass.jniType()?.cppTypeMirrorStr
 
     lines(1)
-    line("jobject mapToJvm(JNIEnv *env, std::shared_ptr<$typeMirror> $cppObjectName)")
-    line("{")
+    line("jobject mapToJvm(JNIEnv *env, const std::shared_ptr<$typeMirror>& $cppObjectName) {")
+    statement("if (!$cppObjectName) return NULL")
 
     val constructor = jClass.constructors.first()
     if (constructor.fullValueParameterList.isNotEmpty()) {

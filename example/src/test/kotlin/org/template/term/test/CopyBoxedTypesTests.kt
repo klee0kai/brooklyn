@@ -2,7 +2,8 @@ package org.template.term.test
 
 import com.klee0kai.example.engine.SimpleJniEngine
 import com.klee0kai.example.model.NullableTypePojo
-import org.junit.jupiter.api.Assertions.assertEquals
+import com.klee0kai.example.model.Simple
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
 class CopyBoxedTypesTests {
@@ -55,6 +56,8 @@ class CopyBoxedTypesTests {
             floatField = -5.2f,
             doubleField = -6.3,
             stringField = "",
+            simple = Simple(1, "name", "addr"),
+            simpleNullable = Simple(2, "name_nullable", "address_nullable")
         )
         val obj2 = SimpleJniEngine.copyNullableType(obj1)
 
@@ -68,6 +71,8 @@ class CopyBoxedTypesTests {
         assertEquals(-5.2f, obj2.floatField)
         assertEquals(-6.3, obj2.doubleField)
         assertEquals("", obj2.stringField)
+        assertEquals(Simple(1, "name", "addr"), obj2.simple)
+        assertEquals(Simple(2, "name_nullable", "address_nullable"), obj2.simpleNullable)
     }
 
 
@@ -90,6 +95,8 @@ class CopyBoxedTypesTests {
         assertEquals(null, obj2.floatField)
         assertEquals(null, obj2.doubleField)
         assertEquals(null, obj2.stringField)
+        assertNull(obj2.simpleNullable)
+        assertNotNull(obj2.simple)
     }
 
 

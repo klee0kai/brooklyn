@@ -82,6 +82,7 @@ class BrooklynIrGenerationExtension(
 
             gen.getOrCreate(clId.mapperCppFile, mapperCppInitBlock)
                 .header { include(clId.mapperHeaderFile.path) }
+                .header { include(CommonNaming.mapperHeader) }
                 .namespaces(declaration.cppMappingNameSpace())
                 .declareClassIndexField(declaration)
                 .initJniClassImpl(declaration)

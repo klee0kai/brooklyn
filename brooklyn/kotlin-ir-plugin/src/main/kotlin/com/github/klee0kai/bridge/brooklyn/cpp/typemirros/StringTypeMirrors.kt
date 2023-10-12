@@ -4,9 +4,9 @@ import org.jetbrains.kotlin.ir.util.kotlinFqName
 
 internal fun stringTypeMirror() =
     CppTypeMirror(
-        jniTypeStr = "jstring",
         jniTypeCode = "Ljava/lang/String;",
         cppTypeMirrorStr = "std::string",
+        jniTypeStr = "jstring",
         checkIrClass = { it, nullable ->
             !nullable && it.kotlinFqName.toString() in listOf(
                 "java.lang.String",
@@ -24,9 +24,9 @@ internal fun stringTypeMirror() =
 
 internal fun stringNullableTypeMirror() =
     CppTypeMirror(
-        jniTypeStr = "jstring",
         jniTypeCode = "Ljava/lang/String;",
         cppTypeMirrorStr = "std::shared_ptr<std::string>",
+        jniTypeStr = "jstring",
         checkIrClass = { it, _ ->
             it.kotlinFqName.toString() in listOf(
                 "java.lang.String",
@@ -35,13 +35,13 @@ internal fun stringNullableTypeMirror() =
             )
         },
         transformToJni = { variable -> "brooklyn::mapper::mapToJString(env, $variable ) " },
+        transformToCpp = { variable -> "brooklyn::mapper::mapJString(env, ${variable}) " },
         extractFromField = extractJniString("GetObjectField"),
         extractFromStaticField = extractJniString("GetStaticObjectField"),
         extractFromMethod = extractJniString("CallObjectMethod"),
         extractFromStaticMethod = extractJniString("CallStaticObjectMethod"),
         insertToField = insertJniType("SetObjectField"),
         insertToStaticField = insertJniType("SetStaticObjectField"),
-        transformToCpp = { variable -> "brooklyn::mapper::mapJString(env, ${variable}) " },
     )
 
 
