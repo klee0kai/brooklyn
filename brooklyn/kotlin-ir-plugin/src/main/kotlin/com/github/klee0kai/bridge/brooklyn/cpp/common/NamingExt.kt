@@ -35,6 +35,8 @@ val ClassId.mirrorHeaderFile
     get() = File("mirror", "${cppFilePrefix}_mirror.h")
 val ClassId.mirrorCppFile
     get() = File("mirror", "${cppFilePrefix}_mirror.cpp")
+val ClassId.interfaceCppFile
+    get() = File("mirror", "${cppFilePrefix}_interface.cpp")
 
 
 fun String.camelCase() = buildString {

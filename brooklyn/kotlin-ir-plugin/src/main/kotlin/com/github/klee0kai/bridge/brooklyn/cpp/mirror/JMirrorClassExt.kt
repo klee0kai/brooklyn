@@ -13,6 +13,7 @@ import org.jetbrains.kotlin.backend.jvm.fullValueParameterList
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.types.IrType
+import org.jetbrains.kotlin.ir.types.isUnit
 import org.jetbrains.kotlin.ir.util.classId
 import org.jetbrains.kotlin.ir.util.constructors
 import org.jetbrains.kotlin.ir.util.functions
@@ -163,3 +164,11 @@ fun IrFunction.mirrorFuncArgs(env: Boolean = false) = runCatching {
 
 fun IrFunction.allUsedTypes(): List<IrType> =
     listOf(returnType) + fullValueParameterList.map { it.type }
+
+
+fun IrType.jniTypeStr() =
+    when {
+        isUnit() -> "void"
+        else -> jniType()?.jniTypeStr ?: "jobject"
+    }
+

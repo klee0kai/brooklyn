@@ -9,6 +9,7 @@ import com.github.klee0kai.bridge.brooklyn.cpp.mapper.std.deinitStdTypes
 import com.github.klee0kai.bridge.brooklyn.cpp.mapper.std.initStdTypes
 import com.github.klee0kai.bridge.brooklyn.cpp.mapper.std.stdTypeMappers
 import com.github.klee0kai.bridge.brooklyn.cpp.mirror.declareClassMirror
+import com.github.klee0kai.bridge.brooklyn.cpp.mirror.implMirrorInterface
 import com.github.klee0kai.bridge.brooklyn.cpp.mirror.implementClassMirror
 import com.github.klee0kai.bridge.brooklyn.cpp.model.declareClassModelStructure
 import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.addSupportedPojoClass
@@ -135,6 +136,13 @@ class BrooklynIrGenerationExtension(
                     include(clId.mapperHeaderFile.path)
                 }
                 .implementClassMirror(declaration)
+
+            gen.getOrCreate(clId.interfaceCppFile)
+                .header {
+                    include(clId.mirrorHeaderFile.path)
+                    include(clId.mapperHeaderFile.path)
+                }.implMirrorInterface(declaration)
+
 
         }
 

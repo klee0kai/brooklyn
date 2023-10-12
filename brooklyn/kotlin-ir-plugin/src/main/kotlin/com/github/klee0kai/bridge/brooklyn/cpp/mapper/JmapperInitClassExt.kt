@@ -132,15 +132,15 @@ fun CodeBuilder.deinitJniClassImpl(jClass: IrClass) = apply {
     }
 }
 
-val ClassId.deinitIndexFuncName
-    get() = "deinit_${packageFqName}${shortClassName}".camelCase()
 
+val ClassId.fullClassName
+    get() = "${packageFqName}${shortClassName}"
 
 val ClassId.indexStructName
-    get() = "${packageFqName}${shortClassName}IndexStructure".camelCase().firstCamelCase()
+    get() = "${fullClassName}IndexStructure".camelCase().firstCamelCase()
 
 val ClassId.indexVariableName
-    get() = "${packageFqName}${shortClassName}Index".camelCase()
+    get() = "${fullClassName}Index".camelCase()
 
 val IrFunction.cppNameMirror
     get() = "$name${
