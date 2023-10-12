@@ -13,5 +13,5 @@ package com.github.klee0kai.bridge.brooklyn
     ]
 )
 @Retention(value = AnnotationRetention.SOURCE)
-annotation class AvailableFromJni()
+annotation class JniMirror()
 
