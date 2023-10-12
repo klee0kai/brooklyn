@@ -1,5 +1,6 @@
 package com.github.klee0kai.bridge.brooklyn.codegen
 
+import com.github.klee0kai.bridge.brooklyn.JniMirror
 import com.github.klee0kai.bridge.brooklyn.JniPojo
 import org.jetbrains.kotlin.backend.jvm.codegen.AnnotationCodegen.Companion.annotationClass
 import org.jetbrains.kotlin.descriptors.runtime.structure.classId
@@ -14,6 +15,8 @@ import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 class KotlinVisitor : IrElementVisitorVoid {
 
     val pojoJniClasses = mutableListOf<IrClass>()
+    val mirrorJniClasses = mutableListOf<IrClass>()
+
 
     override fun visitElement(element: IrElement) = element.acceptChildrenVoid(this)
 
@@ -21,9 +24,11 @@ class KotlinVisitor : IrElementVisitorVoid {
         super.visitClass(declaration)
         val isJniPojo = declaration.annotations
             .any { it.annotationClass.classId == JniPojo::class.java.classId }
-
+        val isJniMirror = declaration.annotations
+            .any { it.annotationClass.classId == JniMirror::class.java.classId }
         when {
             isJniPojo -> pojoJniClasses.add(declaration)
+            isJniMirror -> mirrorJniClasses.add(declaration)
         }
     }
 

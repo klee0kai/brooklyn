@@ -1,7 +1,7 @@
 package com.github.klee0kai.bridge.brooklyn.cpp.mapper
 
 import com.github.klee0kai.bridge.brooklyn.cpp.common.*
-import com.github.klee0kai.bridge.brooklyn.cpp.model.cppMappingNameSpace
+import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.cppMappingNameSpace
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.util.classId
 

@@ -74,6 +74,13 @@ fun IrClass.jniType(nullable: Boolean = true): CppTypeMirror? =
     allCppTypeMirrors.firstOrNull { it.checkIrClass(this, nullable) }
 
 
+fun IrClass.cppModelMirror() = classId?.let { classId ->
+    "${classId.packageFqName}${classId.shortClassName}".camelCase().firstCamelCase()
+}
+
+fun IrClass.cppMappingNameSpace() = cppModelMirror()?.let { "${it}_mapping" } ?: "mapping"
+
+
 // https://docs.oracle.com/javase/8/docs/technotes/guides/jni/spec/types.html
 val allCppTypeMirrors: MutableList<CppTypeMirror> = mutableListOf(
     *primitiveTypeMirrors(),

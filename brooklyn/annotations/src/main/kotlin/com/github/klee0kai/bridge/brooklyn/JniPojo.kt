@@ -6,5 +6,5 @@ package com.github.klee0kai.bridge.brooklyn
 @MustBeDocumented
 @Target(allowedTargets = [AnnotationTarget.CLASS])
 @Retention(value = AnnotationRetention.SOURCE)
-annotation class JniPojo()
+annotation class JniPojo
 

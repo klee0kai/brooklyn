@@ -6,10 +6,10 @@ import com.github.klee0kai.bridge.brooklyn.cpp.mapper.*
 import com.github.klee0kai.bridge.brooklyn.cpp.mapper.std.deinitStdTypes
 import com.github.klee0kai.bridge.brooklyn.cpp.mapper.std.initStdTypes
 import com.github.klee0kai.bridge.brooklyn.cpp.mapper.std.stdTypeMappers
-import com.github.klee0kai.bridge.brooklyn.cpp.model.cppMappingNameSpace
 import com.github.klee0kai.bridge.brooklyn.cpp.model.declareClassModelStructure
 import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.addSupportedPojoClass
 import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.allCppTypeMirrors
+import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.cppMappingNameSpace
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
@@ -93,6 +93,29 @@ class BrooklynIrGenerationExtension(
                 .declareClassModelStructure(declaration)
         }
 
+        headerCreator.mirrorJniClasses.forEach { declaration ->
+            val clId = declaration.classId!!
+            gen.getOrCreate(clId.mapperHeaderFile, mapperHeaderInitBlock)
+                .header {
+                    include(CommonNaming.commonClassesMapperHeader)
+                }
+                .namespaces(declaration.cppMappingNameSpace())
+                .declareClassIndexStructure(declaration)
+                .initJniClassApi()
+                .deinitJniClassApi()
+
+
+
+            gen.getOrCreate(clId.mapperCppFile, mapperCppInitBlock)
+                .header { include(clId.mapperHeaderFile.path) }
+                .header { include(CommonNaming.mapperHeader) }
+                .namespaces(declaration.cppMappingNameSpace())
+                .declareClassIndexField(declaration)
+                .initJniClassImpl(declaration)
+                .deinitJniClassImpl(declaration)
+
+        }
+
         gen.getOrCreate(CommonNaming.mapperHeader, mapperHeaderInitBlock)
             .header {
                 include(CommonNaming.commonClassesMapperHeader)
@@ -104,9 +127,9 @@ class BrooklynIrGenerationExtension(
 
 
         gen.getOrCreate(CommonNaming.mapperCpp, mapperCppInitBlock)
-            .initAllImpl(headerCreator.pojoJniClasses)
+            .initAllImpl(headerCreator.pojoJniClasses + headerCreator.mirrorJniClasses)
             .initAllFromJvmImpl()
-            .deinitAllImpl(headerCreator.pojoJniClasses)
+            .deinitAllImpl(headerCreator.pojoJniClasses + headerCreator.mirrorJniClasses)
 
 
         gen.getOrCreate(CommonNaming.modelHeader)
