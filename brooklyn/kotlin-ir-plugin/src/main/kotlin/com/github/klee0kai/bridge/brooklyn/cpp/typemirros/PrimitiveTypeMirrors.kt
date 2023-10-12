@@ -4,9 +4,9 @@ import org.jetbrains.kotlin.ir.types.*
 
 internal fun primitiveTypeMirrors() = arrayOf(
     CppTypeMirror(
-        jniTypeStr = "jboolean",
         jniTypeCode = "Z",
         cppTypeMirrorStr = "int",
+        jniTypeStr = "jboolean",
         checkIrType = { it.isBoolean() },
         transformToJni = { variable -> "$variable ? 1 : 0 " },
         transformToCpp = castType("int"),
@@ -18,9 +18,9 @@ internal fun primitiveTypeMirrors() = arrayOf(
         insertToStaticField = insertJniType("SetStaticBooleanField"),
     ),
     CppTypeMirror(
-        jniTypeStr = "jbyte",
         jniTypeCode = "B",
         cppTypeMirrorStr = "int",
+        jniTypeStr = "jbyte",
         checkIrType = { it.isByte() },
         transformToJni = castType("jbyte"),
         transformToCpp = castType("int"),
@@ -32,9 +32,9 @@ internal fun primitiveTypeMirrors() = arrayOf(
         insertToStaticField = insertJniType("SetStaticByteField"),
     ),
     CppTypeMirror(
-        jniTypeStr = "jchar",
         jniTypeCode = "C",
         cppTypeMirrorStr = "char",
+        jniTypeStr = "jchar",
         checkIrType = { it.isChar() },
         transformToJni = castType("jchar"),
         transformToCpp = castType("char"),
@@ -46,9 +46,9 @@ internal fun primitiveTypeMirrors() = arrayOf(
         insertToStaticField = insertJniType("SetStaticCharField"),
     ),
     CppTypeMirror(
-        jniTypeStr = "jshort",
         jniTypeCode = "S",
         cppTypeMirrorStr = "int",
+        jniTypeStr = "jshort",
         checkIrType = { it.isShort() },
         transformToJni = castType("jshort"),
         transformToCpp = castType("int"),
@@ -60,9 +60,9 @@ internal fun primitiveTypeMirrors() = arrayOf(
         insertToStaticField = insertJniType("SetStaticShortField"),
     ),
     CppTypeMirror(
-        jniTypeStr = "jint",
         jniTypeCode = "I",
         cppTypeMirrorStr = "int",
+        jniTypeStr = "jint",
         checkIrType = { it.isInt() },
         transformToJni = castType("jint"),
         transformToCpp = castType("int"),
@@ -74,9 +74,9 @@ internal fun primitiveTypeMirrors() = arrayOf(
         insertToStaticField = insertJniType("SetStaticIntField"),
     ),
     CppTypeMirror(
-        jniTypeStr = "jlong",
         jniTypeCode = "J",
         cppTypeMirrorStr = "int64_t",
+        jniTypeStr = "jlong",
         checkIrType = { it.isLong() },
         transformToJni = castType("jlong"),
         transformToCpp = castType("int64_t"),
@@ -89,9 +89,9 @@ internal fun primitiveTypeMirrors() = arrayOf(
 
         ),
     CppTypeMirror(
-        jniTypeStr = "jfloat",
         jniTypeCode = "F",
         cppTypeMirrorStr = "float",
+        jniTypeStr = "jfloat",
         checkIrType = { it.isFloat() },
         transformToJni = castType("jfloat"),
         transformToCpp = castType("float"),
@@ -104,9 +104,9 @@ internal fun primitiveTypeMirrors() = arrayOf(
 
         ),
     CppTypeMirror(
-        jniTypeStr = "jdouble",
         jniTypeCode = "D",
         cppTypeMirrorStr = "double",
+        jniTypeStr = "jdouble",
         checkIrType = { it.isDouble() },
         transformToJni = castType("jdouble"),
         transformToCpp = castType("double"),
