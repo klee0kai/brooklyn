@@ -143,8 +143,10 @@ class BrooklynIrGenerationExtension(
                 clId.mapperCppFile,
                 headersInitBlock(doubleImportCheck = false, namespaces = arrayOf(MAPPER))
             )
-                .header { include(clId.mapperHeaderFile.path) }
-                .header { include(CommonNaming.mapperHeader) }
+                .header {
+                    include(clId.mapperHeaderFile.path)
+                    include(CommonNaming.mapperHeader)
+                }
                 .namespaces(declaration.cppMappingNameSpace())
                 .declareClassIndexField(declaration)
                 .initJniClassImpl(declaration)
@@ -159,6 +161,7 @@ class BrooklynIrGenerationExtension(
                 .header {
                     include(clId.mirrorHeaderFile.path)
                     include(clId.mapperHeaderFile.path)
+                    include(CommonNaming.envHeader)
                 }
                 .implementClassMirror(declaration)
 

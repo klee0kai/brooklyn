@@ -28,7 +28,7 @@ fun CodeBuilder.declareClassMirror(jClass: IrClass) = apply {
         line("class $clMirror {")
         line("public: ")
 
-        statement("${clMirror}(JNIEnv *env, jobject jvmSelf)")
+        statement("${clMirror}(jobject jvmSelf)")
 
         if (!jClass.isObject) jClass.constructors.forEach { func ->
             val args = func.mirrorFuncArgs(env = true)?.joinToString(", ") ?: return@forEach
@@ -52,7 +52,6 @@ fun CodeBuilder.declareClassMirror(jClass: IrClass) = apply {
 
         line("private: ")
         statement("jobject jvmSelf")
-        statement("JNIEnv *env")
         statement("}")
     }
 
@@ -79,8 +78,8 @@ fun CodeBuilder.implementClassMirror(jClass: IrClass) = apply {
         val indexField = jClass.classId!!.indexVariableName
         lines(1)
 
-        line("${clMirror}::${clMirror}(JNIEnv *env, jobject jvmSelf) {")
-        statement("${clMirror}::env = env")
+        line("${clMirror}::${clMirror}(jobject jvmSelf) {")
+        statement("JNIEnv* env = ${BROOKLYN}::env()")
         statement("${clMirror}::jvmSelf = env->NewGlobalRef(jvmSelf)")
         line("}")
 
@@ -88,12 +87,12 @@ fun CodeBuilder.implementClassMirror(jClass: IrClass) = apply {
             if (func.isExternal) return@forEach
             val args = func.mirrorFuncArgs(env = true)?.joinToString(", ") ?: return@forEach
             line("${clMirror}::${clMirror}($args) {")
-            statement("${clMirror}::env = env")
 
             val arguments = func.fullValueParameterList.joinToString("") { param ->
                 val fieldTypeMirror = param.type.jniType() ?: return@joinToString ""
                 ",\n " + fieldTypeMirror.transformToJni.invoke("${param.name}")
             }
+            statement("JNIEnv* env = ${BROOKLYN}::env()")
             statement(
                 "${clMirror}::jvmSelf = env->NewGlobalRef(env->NewObject( " +
                         "${mappingNamespace}::${indexField}->cls, " +
@@ -115,6 +114,7 @@ fun CodeBuilder.implementClassMirror(jClass: IrClass) = apply {
             when {
                 jClass.isObject && returnType != null -> {
                     line("${returnType.cppPtrTypeMirror} ${clMirror}::${func.name}($argsDeclaration) {")
+                    statement("JNIEnv* env = ${BROOKLYN}::env()")
                     post("return ")
                     statement(
                         returnType.transformToCpp.invoke(
@@ -130,6 +130,7 @@ fun CodeBuilder.implementClassMirror(jClass: IrClass) = apply {
 
                 jClass.isObject -> {
                     line("void ${clMirror}::${func.name}($argsDeclaration) {")
+                    statement("JNIEnv* env = ${BROOKLYN}::env()")
                     statement(
                         "env->CallStaticVoidMethod(${
                             listOf(
@@ -144,6 +145,7 @@ fun CodeBuilder.implementClassMirror(jClass: IrClass) = apply {
 
                 returnType != null -> {
                     line("${returnType.cppPtrTypeMirror} ${clMirror}::${func.name}($argsDeclaration) {")
+                    statement("JNIEnv* env = ${BROOKLYN}::env()")
                     post("return ")
                     statement(
                         returnType.transformToCpp.invoke(
@@ -159,6 +161,7 @@ fun CodeBuilder.implementClassMirror(jClass: IrClass) = apply {
 
                 else -> {
                     line("void ${clMirror}::${func.name}($argsDeclaration) {")
+                    statement("JNIEnv* env = ${BROOKLYN}::env()")
                     statement(
                         "env->CallVoidMethod(${
                             listOf(
@@ -174,9 +177,8 @@ fun CodeBuilder.implementClassMirror(jClass: IrClass) = apply {
         }
 
         line("${clMirror}::~${clMirror}() {")
-        statement("if (env && jvmSelf) env->DeleteGlobalRef(jvmSelf)")
+        statement("if (jvmSelf) ${BROOKLYN}::env()->DeleteGlobalRef(jvmSelf)")
         statement("jvmSelf = NULL")
-        statement("env = NULL")
         line("}")
     }
 
@@ -192,8 +194,7 @@ fun CodeBuilder.implementClassMirror(jClass: IrClass) = apply {
 
 
 fun IrFunction.mirrorFuncArgs(env: Boolean = false) = runCatching {
-    val envArgList = if (env) listOf("JNIEnv *env") else emptyList()
-    envArgList + fullValueParameterList.map {
+    fullValueParameterList.map {
         "const ${it.type.jniType()!!.cppPtrTypeMirror}& ${it.name}"
     }
 }.getOrNull()
