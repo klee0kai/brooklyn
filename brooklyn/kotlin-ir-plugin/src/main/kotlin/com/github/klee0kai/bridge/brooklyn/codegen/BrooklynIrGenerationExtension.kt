@@ -173,7 +173,9 @@ class BrooklynIrGenerationExtension(
                     include(clId.mirrorHeaderFile.path)
                     include(clId.mapperHeaderFile.path)
                     include(CommonNaming.envHeader)
-                }.implMirrorInterface(declaration)
+                    statement("using namespace $BROOKLYN")
+                }
+                .implMirrorInterface(declaration)
 
 
         }

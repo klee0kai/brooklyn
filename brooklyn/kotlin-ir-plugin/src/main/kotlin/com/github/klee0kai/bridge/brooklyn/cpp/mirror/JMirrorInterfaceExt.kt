@@ -1,6 +1,8 @@
 package com.github.klee0kai.bridge.brooklyn.cpp.mirror
 
 import com.github.klee0kai.bridge.brooklyn.cpp.common.*
+import com.github.klee0kai.bridge.brooklyn.cpp.common.CommonNaming.BROOKLYN
+import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.cppModelMirror
 import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.jniType
 import org.jetbrains.kotlin.backend.jvm.fullValueParameterList
 import org.jetbrains.kotlin.ir.declarations.IrClass
@@ -15,6 +17,12 @@ fun CodeBuilder.implMirrorInterface(jClass: IrClass) = apply {
 
     jClass.functions.forEach { func ->
         if (!func.isExternal) return@forEach
+        usedTypes.addAll(func.allUsedTypes())
+
+        val mappedArgs = func.fullValueParameterList.map { arg ->
+            arg.type.jniType()?.transformToCpp?.invoke(arg.name.toString()) ?: "0"
+        }
+        val returnType = func.returnType.jniType()
 
         line("extern \"C\" JNIEXPORT ${func.returnType.jniTypeStr()} JNICALL")
         line(
@@ -35,8 +43,37 @@ fun CodeBuilder.implMirrorInterface(jClass: IrClass) = apply {
             line("${arg.type.jniTypeStr()} ${arg.name}")
         }
         line("){")
+        statement("brooklyn::bindEnv(env)")
 
+        when {
+            jClass.isObject && returnType != null -> {
+                post("return ")
+                statement(
+                    returnType.transformToJni.invoke(
+                        " ${BROOKLYN}::${jClass.cppModelMirror()}::${func.name} ( ${mappedArgs.joinToString(", ")} )"
+                    )
+                )
+            }
 
+            jClass.isObject -> {
+                statement(" ${BROOKLYN}::${jClass.cppModelMirror()}::${func.name} ( ${mappedArgs.joinToString(", ")} )")
+            }
+
+            returnType != null -> {
+                statement("auto mirror = ${BROOKLYN}::${jClass.cppModelMirror()}(jObject)")
+                post("return ")
+                statement(
+                    returnType.transformToJni.invoke(
+                        "mirror.${func.name} ( ${mappedArgs.joinToString(", ")} )"
+                    )
+                )
+            }
+
+            else -> {
+                statement("auto mirror = ${BROOKLYN}::${jClass.cppModelMirror()}(jObject)")
+                statement("mirror.${func.name} ( ${mappedArgs.joinToString(", ")} )")
+            }
+        }
         line("}")
     }
 
@@ -46,6 +83,7 @@ fun CodeBuilder.implMirrorInterface(jClass: IrClass) = apply {
             type.jniType()?.classId
         }.toSet().forEach { classId ->
             include(classId.modelHeaderFile.path)
+            include(classId.mapperHeaderFile.path)
         }
     }
 }

@@ -10,7 +10,7 @@ fun CodeBuilder.envCppVariables() = apply {
     }
     variables {
         statement(
-            " struct EnvBind {\n" +
+            "struct EnvBind {\n" +
                     " int attached = 0;\n" +
                     " JNIEnv *env = NULL;\n" +
                     "}"
