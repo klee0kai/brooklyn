@@ -4,6 +4,7 @@ import com.github.klee0kai.bridge.brooklyn.cmake.cmakeLib
 import com.github.klee0kai.bridge.brooklyn.cpp.common.*
 import com.github.klee0kai.bridge.brooklyn.cpp.common.CommonNaming.BROOKLYN
 import com.github.klee0kai.bridge.brooklyn.cpp.common.CommonNaming.MAPPER
+import com.github.klee0kai.bridge.brooklyn.cpp.env.*
 import com.github.klee0kai.bridge.brooklyn.cpp.mapper.*
 import com.github.klee0kai.bridge.brooklyn.cpp.mapper.std.deinitStdTypes
 import com.github.klee0kai.bridge.brooklyn.cpp.mapper.std.initStdTypes
@@ -55,9 +56,32 @@ class BrooklynIrGenerationExtension(
             .allJniHeaders()
             .include(CommonNaming.mapperHeader)
             .include(CommonNaming.modelHeader)
+            .include(CommonNaming.envHeader)
 
         gen.getOrCreate(fileName = CommonNaming.brooklynInternalHeader)
             .allJniHeaders()
+
+        gen.getOrCreate(CommonNaming.envHeader, headersInitBlock())
+            .initEnv()
+            .deInitEnv()
+            .getEnv()
+            .attachEnv()
+            .detactEnv()
+            .bindEnv()
+
+        gen.getOrCreate(CommonNaming.envCpp, headersInitBlock(doubleImportCheck = false))
+            .header {
+                include("<thread>")
+                include(CommonNaming.envHeader)
+            }
+            .envCppVariables()
+            .initEnv(isImpl = true)
+            .deInitEnv(isImpl = true)
+            .getEnv(isImpl = true)
+            .attachEnv(isImpl = true)
+            .detactEnv(isImpl = true)
+            .bindEnv(isImpl = true)
+
 
         gen.getOrCreate(CommonNaming.commonClassesMapperHeader, headersInitBlock(namespaces = arrayOf(MAPPER)))
             .initStdTypes()
@@ -127,6 +151,7 @@ class BrooklynIrGenerationExtension(
                 .deinitJniClassImpl(declaration)
 
             gen.getOrCreate(clId.mirrorHeaderFile, headersInitBlock())
+                .header { include(CommonNaming.envHeader) }
                 .declareClassMirror(declaration)
 
 
@@ -141,6 +166,7 @@ class BrooklynIrGenerationExtension(
                 .header {
                     include(clId.mirrorHeaderFile.path)
                     include(clId.mapperHeaderFile.path)
+                    include(CommonNaming.envHeader)
                 }.implMirrorInterface(declaration)
 
 

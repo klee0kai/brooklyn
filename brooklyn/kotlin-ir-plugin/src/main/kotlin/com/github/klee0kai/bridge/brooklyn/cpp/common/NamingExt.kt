@@ -19,6 +19,9 @@ object CommonNaming {
     const val modelHeader = "model/model.h"
     const val mirrorHeader = "mirror/mirror.h"
 
+    const val envHeader = "env/env.h"
+    const val envCpp = "env/env.cpp"
+
     const val findBrooklynCmake = "FindBrooklynBridge.cmake"
 }
 
