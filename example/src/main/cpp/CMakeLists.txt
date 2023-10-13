@@ -16,25 +16,32 @@ endif ()
 add_library(native_lib
         SHARED
         native-lib.cpp
+        ${BROOKLYN_SRC}
 )
 
 target_link_libraries(
         native_lib
-        brooklyn
         ${JNI_LIBRARIES}
 )
 
+target_include_directories(
+        native_lib
+        PUBLIC
+        ${JNI_INCLUDE_DIRS}
+        ${BROOKLYN_INCLUDE_DIRS}
+        ./../../../build/generated/sources/headers/java/main
+)
 
 
 add_executable(
         term
         native-lib.cpp
         term.cpp
+        ${BROOKLYN_SRC}
 )
 
 
 target_link_libraries(term
-        brooklyn
         ${JNI_LIBRARIES}
 )
 
@@ -42,7 +49,7 @@ target_include_directories(
         term
         PUBLIC
         ${JNI_INCLUDE_DIRS}
-
+        ${BROOKLYN_INCLUDE_DIRS}
         ./../../../build/generated/sources/headers/java/main
 )
 

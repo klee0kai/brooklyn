@@ -9,9 +9,7 @@ import com.github.klee0kai.bridge.brooklyn.cpp.mapper.*
 import com.github.klee0kai.bridge.brooklyn.cpp.mapper.std.deinitStdTypes
 import com.github.klee0kai.bridge.brooklyn.cpp.mapper.std.initStdTypes
 import com.github.klee0kai.bridge.brooklyn.cpp.mapper.std.stdTypeMappers
-import com.github.klee0kai.bridge.brooklyn.cpp.mirror.declareClassMirror
-import com.github.klee0kai.bridge.brooklyn.cpp.mirror.implMirrorInterface
-import com.github.klee0kai.bridge.brooklyn.cpp.mirror.implementClassMirror
+import com.github.klee0kai.bridge.brooklyn.cpp.mirror.*
 import com.github.klee0kai.bridge.brooklyn.cpp.model.declareClassModelStructure
 import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.addSupportedPojoClass
 import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.allCppTypeMirrors
@@ -56,6 +54,7 @@ class BrooklynIrGenerationExtension(
             .allJniHeaders()
             .include(CommonNaming.mapperHeader)
             .include(CommonNaming.modelHeader)
+            .include(CommonNaming.mirrorHeader)
             .include(CommonNaming.envHeader)
 
         gen.getOrCreate(fileName = CommonNaming.brooklynInternalHeader)
@@ -202,6 +201,16 @@ class BrooklynIrGenerationExtension(
 
         gen.getOrCreate(CommonNaming.mirrorHeader)
             .header { headerCreator.mirrorJniClasses.forEach { include(it.classId!!.mirrorHeaderFile.path) } }
+
+        gen.getOrCreate(CommonNaming.mirrorCpp)
+            .header {
+                include(CommonNaming.mirrorHeader)
+                include(CommonNaming.envHeader)
+                include(CommonNaming.brooklynInternalHeader)
+                statement("using namespace $BROOKLYN")
+            }
+            .initBrooklyn(isImpl = true)
+            .deInitBrooklyn(isImpl = true)
 
         gen.genAll()
 

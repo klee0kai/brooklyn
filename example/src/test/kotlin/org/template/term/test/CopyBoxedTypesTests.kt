@@ -10,9 +10,6 @@ class CopyBoxedTypesTests {
 
     @Test
     fun simpleCopyTest() {
-        // given
-        SimpleJniEngine.initLib()
-
         // when
         val obj1 = NullableTypePojo(
             booleanField = true,
@@ -42,9 +39,6 @@ class CopyBoxedTypesTests {
 
     @Test
     fun simple2CopyTest() {
-        // given
-        SimpleJniEngine.initLib()
-
         // when
         val obj1 = NullableTypePojo(
             booleanField = false,
@@ -78,9 +72,6 @@ class CopyBoxedTypesTests {
 
     @Test
     fun nullCopyTest() {
-        // given
-        SimpleJniEngine.initLib()
-
         // when
         val obj1 = NullableTypePojo()
         val obj2 = SimpleJniEngine.copyNullableType(obj1)

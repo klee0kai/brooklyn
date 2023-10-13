@@ -15,20 +15,19 @@ fun CodeBuilder.cmakeLib(
     line("    message(STATUS \"JNI_LIBRARIES=\${JNI_LIBRARIES}\")")
     line("endif ()")
 
-
-    line("add_library($libName")
-    src.forEach {
-        post("\t")
-        post(it)
-        lines(1)
-    }
+    line("set(BROOKLYN_SRC ")
+    src.forEach { line("\t $it") }
     line(")")
+    line("set(BROOKLYN_INCLUDE_DIRS $rootDir )")
+
+    line("add_library($libName \${BROOKLYN_SRC} )")
+
 
     line("target_link_libraries(${libName} \${JNI_LIBRARIES})")
 
     lines(1)
-    line("set_target_properties(${libName} PROPERTIES INTERFACE_INCLUDE_DIRECTORIES $rootDir)")
+    line("set_target_properties(${libName} PROPERTIES INTERFACE_INCLUDE_DIRECTORIES \${BROOKLYN_INCLUDE_DIRS})")
     line("set_target_properties(${libName} PROPERTIES POSITION_INDEPENDENT_CODE ON)")
 
-    line("target_include_directories(${libName} PUBLIC  \${JNI_INCLUDE_DIRS}\n\t $rootDir )")
+    line("target_include_directories(${libName} PUBLIC  \${JNI_INCLUDE_DIRS}\n\t \${BROOKLYN_INCLUDE_DIRS} )")
 }

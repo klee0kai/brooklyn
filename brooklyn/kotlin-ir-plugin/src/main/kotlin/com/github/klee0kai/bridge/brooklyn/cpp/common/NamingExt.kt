@@ -17,7 +17,9 @@ object CommonNaming {
     const val commonClassesMapperCpp = "mappers/common_mapper.cpp"
 
     const val modelHeader = "model/model.h"
+
     const val mirrorHeader = "mirror/mirror.h"
+    const val mirrorCpp = "mirror/mirror.cpp"
 
     const val envHeader = "env/env.h"
     const val envCpp = "env/env.cpp"
