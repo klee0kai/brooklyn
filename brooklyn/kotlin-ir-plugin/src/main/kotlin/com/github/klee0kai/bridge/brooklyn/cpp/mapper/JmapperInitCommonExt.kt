@@ -36,24 +36,6 @@ fun CodeBuilder.initAllImpl(
     }
 }
 
-fun CodeBuilder.initAllFromJvmApi() = apply {
-    body {
-        statement("int initJvm(JavaVM *pVM)")
-    }
-}
-
-
-fun CodeBuilder.initAllFromJvmImpl() = apply {
-    body {
-        lines(1)
-        line("int initJvm(JavaVM *pVM){")
-        statement("JNIEnv *env = NULL")
-        statement("pVM->GetEnv((void **) &env, JNI_VERSION_1_6)")
-        statement("return init(env)")
-        line("}")
-    }
-}
-
 fun CodeBuilder.deinitAllApi() = apply {
     body {
         statement("int deinit(JNIEnv *env)")

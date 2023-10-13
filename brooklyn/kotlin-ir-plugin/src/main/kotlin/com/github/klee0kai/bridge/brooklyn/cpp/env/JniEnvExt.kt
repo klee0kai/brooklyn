@@ -20,24 +20,38 @@ fun CodeBuilder.envCppVariables() = apply {
     }
 }
 
-fun CodeBuilder.initEnv(isImpl: Boolean = false) = apply {
-    val declare = "int initEnv(JNIEnv *env)"
+fun CodeBuilder.initEnvJvm(isImpl: Boolean = false) = apply {
+    val declare = "int initJvm(JavaVM *pVM)"
     if (!isImpl) {
         statement(declare)
         return@apply
     }
     line("$declare {")
-    statement("return env->GetJavaVM(&g_vm)")
+    statement("JNIEnv *env = NULL")
+    statement("pVM->GetEnv((void **) &env, JNI_VERSION_1_6)")
+    statement("return init(env)")
+    line("}")
+}
+
+fun CodeBuilder.initEnv(isImpl: Boolean = false) = apply {
+    val declare = "int init(JNIEnv *env)"
+    if (!isImpl) {
+        statement(declare)
+        return@apply
+    }
+    line("$declare {")
+    statement("return mapper::init(env) || env->GetJavaVM(&g_vm)")
     line("}")
 }
 
 fun CodeBuilder.deInitEnv(isImpl: Boolean = false) = apply {
-    val declare = "int deInitEnv()"
+    val declare = "int deinit(JNIEnv *env)"
     if (!isImpl) {
         statement(declare)
         return@apply
     }
     line("$declare {")
+    statement("mapper::deinit(env)")
     statement("envs.clear()")
     statement("g_vm = NULL;")
     line("}")

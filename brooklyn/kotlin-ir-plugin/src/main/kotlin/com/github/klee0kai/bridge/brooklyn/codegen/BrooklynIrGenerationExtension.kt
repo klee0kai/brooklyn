@@ -62,6 +62,7 @@ class BrooklynIrGenerationExtension(
             .allJniHeaders()
 
         gen.getOrCreate(CommonNaming.envHeader, headersInitBlock())
+            .initEnvJvm()
             .initEnv()
             .deInitEnv()
             .getEnv()
@@ -73,8 +74,10 @@ class BrooklynIrGenerationExtension(
             .header {
                 include("<thread>")
                 include(CommonNaming.envHeader)
+                include(CommonNaming.mapperHeader)
             }
             .envCppVariables()
+            .initEnvJvm(isImpl = true)
             .initEnv(isImpl = true)
             .deInitEnv(isImpl = true)
             .getEnv(isImpl = true)
@@ -181,7 +184,6 @@ class BrooklynIrGenerationExtension(
                 headerCreator.pojoJniClasses.forEach { include(it.classId!!.mapperHeaderFile.path) }
             }
             .initAllApi()
-            .initAllFromJvmApi()
             .deinitAllApi()
 
 
@@ -190,7 +192,6 @@ class BrooklynIrGenerationExtension(
             headersInitBlock(doubleImportCheck = false, namespaces = arrayOf(MAPPER))
         )
             .initAllImpl(headerCreator.pojoJniClasses + headerCreator.mirrorJniClasses)
-            .initAllFromJvmImpl()
             .deinitAllImpl(headerCreator.pojoJniClasses + headerCreator.mirrorJniClasses)
 
 
