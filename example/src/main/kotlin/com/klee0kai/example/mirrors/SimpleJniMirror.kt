@@ -26,6 +26,10 @@ class SimpleJniMirror {
         someString += strDelta
     }
 
-    external fun incToCpp()
+    external fun incInCpp()
+
+    external fun incInCpp2(): Int
+
+    external fun updateInCpp(delta: Int, strDelta: String): Int
 
 }

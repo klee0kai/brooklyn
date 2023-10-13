@@ -96,7 +96,7 @@ fun CodeBuilder.initJniClassImpl(jClass: IrClass) = apply {
             }.getOrNull() ?: return@forEach
             val returnType = runCatching {
                 if (func.isConstructor) "V" else func.returnType.jniType()!!.jniTypeCode
-            }.getOrNull() ?: return@forEach
+            }.getOrNull() ?: "V"
 
 
             post("${clId.indexVariableName}->${func.cppNameMirror} = env->GetMethodID(${clId.indexVariableName}->cls, ")

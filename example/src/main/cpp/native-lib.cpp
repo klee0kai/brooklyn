@@ -18,6 +18,15 @@ ComKlee0kaiExampleModelNullableTypePojo brooklyn::ComKlee0kaiExampleEngineSimple
     return simple;
 }
 
-void ComKlee0kaiExampleMirrorsSimpleJniMirror::incToCpp() {
+void ComKlee0kaiExampleMirrorsSimpleJniMirror::incInCpp() {
     inc();
+}
+
+int ComKlee0kaiExampleMirrorsSimpleJniMirror::incInCpp2() {
+    update(2, "from C++");
+    return 1;
+}
+
+int ComKlee0kaiExampleMirrorsSimpleJniMirror::updateInCpp(const int &delta, const std::string &strDelta) {
+    return 2;
 }
