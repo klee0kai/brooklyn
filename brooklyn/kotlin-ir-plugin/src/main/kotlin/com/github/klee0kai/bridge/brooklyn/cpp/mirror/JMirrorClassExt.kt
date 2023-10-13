@@ -17,6 +17,7 @@ import org.jetbrains.kotlin.ir.types.isUnit
 import org.jetbrains.kotlin.ir.util.classId
 import org.jetbrains.kotlin.ir.util.constructors
 import org.jetbrains.kotlin.ir.util.functions
+import org.jetbrains.kotlin.ir.util.isObject
 
 fun CodeBuilder.declareClassMirror(jClass: IrClass) = apply {
     val usedTypes = mutableSetOf<IrType>()
@@ -29,7 +30,7 @@ fun CodeBuilder.declareClassMirror(jClass: IrClass) = apply {
 
         statement("${clMirror}(JNIEnv *env, jobject jvmSelf)")
 
-        jClass.constructors.forEach { func ->
+        if (!jClass.isObject) jClass.constructors.forEach { func ->
             val args = func.mirrorFuncArgs(env = true)?.joinToString(", ") ?: return@forEach
             usedTypes.addAll(func.allUsedTypes())
 
@@ -41,6 +42,9 @@ fun CodeBuilder.declareClassMirror(jClass: IrClass) = apply {
             val returnType = func.returnType.jniType()?.cppPtrTypeMirror ?: "void"
             usedTypes.addAll(func.allUsedTypes())
 
+            if (jClass.isObject) {
+                post("static ")
+            }
             statement("$returnType ${func.name}($args)")
         }
 
@@ -80,7 +84,7 @@ fun CodeBuilder.implementClassMirror(jClass: IrClass) = apply {
         statement("${clMirror}::jvmSelf = env->NewGlobalRef(jvmSelf)")
         line("}")
 
-        jClass.constructors.forEach { func ->
+        if (!jClass.isObject) jClass.constructors.forEach { func ->
             if (func.isExternal) return@forEach
             val args = func.mirrorFuncArgs(env = true)?.joinToString(", ") ?: return@forEach
             line("${clMirror}::${clMirror}($args) {")
@@ -103,37 +107,70 @@ fun CodeBuilder.implementClassMirror(jClass: IrClass) = apply {
             if (func.isExternal) return@forEach
             val argsDeclaration = func.mirrorFuncArgs()?.joinToString(", ") ?: return@forEach
             val returnType = func.returnType.jniType()
-            val returnTypeStr = func.returnType.jniType()?.cppTypeMirrorStr ?: "void"
             val arguments = func.fullValueParameterList.joinToString(",\n ") { param ->
                 val fieldTypeMirror = param.type.jniType() ?: return@joinToString ""
                 fieldTypeMirror.transformToJni.invoke("${param.name}")
             }
 
-            line("$returnTypeStr ${clMirror}::${func.name}($argsDeclaration) {")
-            if (returnType != null) {
-                post("return ")
-                statement(
-                    returnType.transformToCpp.invoke(
-                        returnType.extractFromMethod.invoke(
-                            "jvmSelf",
-                            "${mappingNamespace}::${indexField}->${func.cppNameMirror} ",
-                            arguments
+            when {
+                jClass.isObject && returnType != null -> {
+                    line("${returnType.cppPtrTypeMirror} ${clMirror}::${func.name}($argsDeclaration) {")
+                    post("return ")
+                    statement(
+                        returnType.transformToCpp.invoke(
+                            returnType.extractFromStaticMethod.invoke(
+                                "${mappingNamespace}::${indexField}->cls",
+                                "${mappingNamespace}::${indexField}->${func.cppNameMirror} ",
+                                arguments
+                            )
                         )
                     )
-                )
-            } else {
-                statement(
-                    "env->CallVoidMethod(${
-                        listOf(
-                            "jvmSelf",
-                            "${mappingNamespace}::${indexField}->${func.cppNameMirror}",
-                            arguments
-                        ).joinArgs()
-                    })"
-                )
-            }
+                    line("}")
+                }
 
-            line("}")
+                jClass.isObject -> {
+                    line("void ${clMirror}::${func.name}($argsDeclaration) {")
+                    statement(
+                        "env->CallStaticVoidMethod(${
+                            listOf(
+                                "${mappingNamespace}::${indexField}->cls",
+                                "${mappingNamespace}::${indexField}->${func.cppNameMirror}",
+                                arguments
+                            ).joinArgs()
+                        })"
+                    )
+                    line("}")
+                }
+
+                returnType != null -> {
+                    line("${returnType.cppPtrTypeMirror} ${clMirror}::${func.name}($argsDeclaration) {")
+                    post("return ")
+                    statement(
+                        returnType.transformToCpp.invoke(
+                            returnType.extractFromMethod.invoke(
+                                "jvmSelf",
+                                "${mappingNamespace}::${indexField}->${func.cppNameMirror} ",
+                                arguments
+                            )
+                        )
+                    )
+                    line("}")
+                }
+
+                else -> {
+                    line("void ${clMirror}::${func.name}($argsDeclaration) {")
+                    statement(
+                        "env->CallVoidMethod(${
+                            listOf(
+                                "jvmSelf",
+                                "${mappingNamespace}::${indexField}->${func.cppNameMirror}",
+                                arguments
+                            ).joinArgs()
+                        })"
+                    )
+                    line("}")
+                }
+            }
         }
 
         line("${clMirror}::~${clMirror}() {")
