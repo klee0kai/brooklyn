@@ -10,8 +10,6 @@ class CopySimpleTests {
 
     @Test
     fun testCopySimple() {
-        SimpleJniEngine.initLib()
-
         val simple = Simple(2, "name", "address")
         val simple2 = SimpleJniEngine.copySimple(simple)
 
@@ -24,8 +22,6 @@ class CopySimpleTests {
 
     @Test
     fun testCopyNestedSimple() {
-        SimpleJniEngine.initLib()
-
         val nested = Simple(2, "name_nested", "address_nested")
         val simple = Simple(2, "name", "address", nested)
         val simple2 = SimpleJniEngine.copySimple(simple)

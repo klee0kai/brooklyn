@@ -54,7 +54,8 @@ private fun Poet.mapFromJvmImpl(jClass: IrClass) = apply {
 
         val extractFromField = fieldTypeMirror.extractFromField.invoke(
             jvmObj = jvmObjectName,
-            fieldOrMethodId = "${indexClVariable}->${field.name}"
+            fieldOrMethodId = "${indexClVariable}->${field.name}",
+            args = "",
         )
 
         post(" $cppObjectName->${field.name} = ")
@@ -66,7 +67,8 @@ private fun Poet.mapFromJvmImpl(jClass: IrClass) = apply {
 
         val extractFromProperty = propertyTypeMirror.extractFromMethod.invoke(
             jvmObj = jvmObjectName,
-            fieldOrMethodId = "${indexClVariable}->${property.name}_getter"
+            fieldOrMethodId = "${indexClVariable}->${property.name}_getter",
+            args = "",
         )
         post(" $cppObjectName->${property.name} = ")
         statement(propertyTypeMirror.transformToCpp.invoke(extractFromProperty))

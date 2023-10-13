@@ -25,7 +25,7 @@ fun CodeBuilder.declareClassModelStructure(jClass: IrClass) = apply {
             }
             usedTypes.add(type)
         }
-        line("};")
+        statement("}")
     }
 
     header {
@@ -38,4 +38,3 @@ fun CodeBuilder.declareClassModelStructure(jClass: IrClass) = apply {
 
 }
 
-fun IrClass.cppMappingNameSpace() = "${jniType()?.cppTypeMirrorStr}_mapping"
