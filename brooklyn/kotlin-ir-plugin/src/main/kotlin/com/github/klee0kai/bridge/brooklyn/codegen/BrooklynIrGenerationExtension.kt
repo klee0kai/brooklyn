@@ -11,6 +11,7 @@ import com.github.klee0kai.bridge.brooklyn.cpp.mapper.std.initStdTypes
 import com.github.klee0kai.bridge.brooklyn.cpp.mapper.std.stdTypeMappers
 import com.github.klee0kai.bridge.brooklyn.cpp.mirror.*
 import com.github.klee0kai.bridge.brooklyn.cpp.model.declareClassModelStructure
+import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.addSupportedMirrorClass
 import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.addSupportedPojoClass
 import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.allCppTypeMirrors
 import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.cppMappingNameSpace
@@ -47,6 +48,9 @@ class BrooklynIrGenerationExtension(
         headerCreator.pojoJniClasses.forEach {
             allCppTypeMirrors.addSupportedPojoClass(it)
         }
+        headerCreator.mirrorJniClasses.forEach {
+            allCppTypeMirrors.addSupportedMirrorClass(it)
+        }
 
 
         val gen = CppBuildersCollection(File(outDirFile))
@@ -54,7 +58,6 @@ class BrooklynIrGenerationExtension(
             .allJniHeaders()
             .include(CommonNaming.mapperHeader)
             .include(CommonNaming.modelHeader)
-            .include(CommonNaming.mirrorHeader)
             .include(CommonNaming.envHeader)
 
         gen.getOrCreate(fileName = CommonNaming.brooklynInternalHeader)
@@ -154,14 +157,14 @@ class BrooklynIrGenerationExtension(
                 .initJniClassImpl(declaration)
                 .deinitJniClassImpl(declaration)
 
-            gen.getOrCreate(clId.mirrorHeaderFile, headersInitBlock())
+            gen.getOrCreate(clId.modelHeaderFile, headersInitBlock())
                 .header { include(CommonNaming.envHeader) }
                 .declareClassMirror(declaration)
 
 
-            gen.getOrCreate(clId.mirrorCppFile, headersInitBlock(doubleImportCheck = false))
+            gen.getOrCreate(clId.modelCppFile, headersInitBlock(doubleImportCheck = false))
                 .header {
-                    include(clId.mirrorHeaderFile.path)
+                    include(clId.modelHeaderFile.path)
                     include(clId.mapperHeaderFile.path)
                     include(CommonNaming.envHeader)
                 }
@@ -169,7 +172,7 @@ class BrooklynIrGenerationExtension(
 
             gen.getOrCreate(clId.interfaceCppFile)
                 .header {
-                    include(clId.mirrorHeaderFile.path)
+                    include(clId.modelHeaderFile.path)
                     include(clId.mapperHeaderFile.path)
                     include(CommonNaming.envHeader)
                     statement("using namespace $BROOKLYN")
@@ -197,14 +200,14 @@ class BrooklynIrGenerationExtension(
 
 
         gen.getOrCreate(CommonNaming.modelHeader)
-            .header { headerCreator.pojoJniClasses.forEach { include(it.classId!!.modelHeaderFile.path) } }
-
-        gen.getOrCreate(CommonNaming.mirrorHeader)
-            .header { headerCreator.mirrorJniClasses.forEach { include(it.classId!!.mirrorHeaderFile.path) } }
-
-        gen.getOrCreate(CommonNaming.mirrorCpp)
             .header {
-                include(CommonNaming.mirrorHeader)
+                headerCreator.pojoJniClasses.forEach { include(it.classId!!.modelHeaderFile.path) }
+                headerCreator.mirrorJniClasses.forEach { include(it.classId!!.modelHeaderFile.path) }
+            }
+
+        gen.getOrCreate(CommonNaming.modelCpp)
+            .header {
+                include(CommonNaming.modelHeader)
                 include(CommonNaming.envHeader)
                 include(CommonNaming.brooklynInternalHeader)
                 statement("using namespace $BROOKLYN")

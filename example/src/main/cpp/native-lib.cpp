@@ -4,6 +4,8 @@
 
 using namespace brooklyn;
 
+std::shared_ptr<ComKlee0kaiExampleMirrorsSimpleJniMirror> simpleMirror = {};
+
 ComKlee0kaiExampleModelSimple
 brooklyn::ComKlee0kaiExampleEngineSimpleJniEngine::copySimple(const brooklyn::ComKlee0kaiExampleModelSimple &simple) {
     auto simple2 = simple;
@@ -16,6 +18,28 @@ brooklyn::ComKlee0kaiExampleEngineSimpleJniEngine::copySimple(const brooklyn::Co
 ComKlee0kaiExampleModelNullableTypePojo brooklyn::ComKlee0kaiExampleEngineSimpleJniEngine::copyNullableType(
         const brooklyn::ComKlee0kaiExampleModelNullableTypePojo &simple) {
     return simple;
+}
+
+ComKlee0kaiExampleMirrorsSimpleJniMirror ComKlee0kaiExampleEngineSimpleJniEngine::createSimpleMirror1() {
+    return ComKlee0kaiExampleMirrorsSimpleJniMirror(41);
+}
+
+ComKlee0kaiExampleMirrorsSimpleJniMirror ComKlee0kaiExampleEngineSimpleJniEngine::createSimpleMirror2() {
+    auto simpleMirror = ComKlee0kaiExampleMirrorsSimpleJniMirror("created from c++");
+    //transfer of possession
+    auto mirror2 = simpleMirror;
+    auto mirror3 = ComKlee0kaiExampleMirrorsSimpleJniMirror(mirror2);
+    return mirror3;
+}
+
+
+void ComKlee0kaiExampleEngineSimpleJniEngine::holdSimpleMirror(
+        const brooklyn::ComKlee0kaiExampleMirrorsSimpleJniMirror &simple) {
+    simpleMirror = std::make_shared<ComKlee0kaiExampleMirrorsSimpleJniMirror>(simple);
+}
+
+void ComKlee0kaiExampleEngineSimpleJniEngine::unHoldSimpleMirror() {
+    simpleMirror.reset();
 }
 
 void ComKlee0kaiExampleMirrorsSimpleJniMirror::incInCpp() {

@@ -47,12 +47,9 @@ fun CodeBuilder.implMirrorInterface(jClass: IrClass) = apply {
 
         when {
             jClass.isObject && returnType != null -> {
-                post("return ")
-                statement(
-                    returnType.transformToJni.invoke(
-                        " ${BROOKLYN}::${jClass.cppModelMirror()}::${func.name} ( ${mappedArgs.joinToString(", ")} )"
-                    )
-                )
+                post("auto jvmResultObj = ")
+                statement(" ${BROOKLYN}::${jClass.cppModelMirror()}::${func.name} ( ${mappedArgs.joinToString(", ")} )")
+                statement("return ${returnType.transformToJni.invoke("jvmResultObj")}")
             }
 
             jClass.isObject -> {
@@ -61,12 +58,8 @@ fun CodeBuilder.implMirrorInterface(jClass: IrClass) = apply {
 
             returnType != null -> {
                 statement("auto mirror = ${BROOKLYN}::${jClass.cppModelMirror()}(jObject)")
-                post("return ")
-                statement(
-                    returnType.transformToJni.invoke(
-                        "mirror.${func.name} ( ${mappedArgs.joinToString(", ")} )"
-                    )
-                )
+                statement("auto jvmResultObj = mirror.${func.name} ( ${mappedArgs.joinToString(", ")} )")
+                statement("return ${returnType.transformToJni.invoke("jvmResultObj")}")
             }
 
             else -> {

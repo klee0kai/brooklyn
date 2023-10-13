@@ -20,7 +20,7 @@ fun interface ExtractJniType {
     fun invoke(
         jvmObj: String,
         fieldOrMethodId: String,
-        args: String ,
+        args: String,
     ): String
 }
 
@@ -104,7 +104,7 @@ fun insertJniType(method: String) = InsertJniType { variable, jvmObj, fieldOrMet
     "env->${method}($jvmObj, $fieldOrMethodId, $variable )"
 }
 
-fun List<String>.joinArgs()= filter { it.isNotBlank() }.joinToString(", ")
+fun List<String>.joinArgs() = filter { it.isNotBlank() }.joinToString(", ")
 
 
 fun MutableList<CppTypeMirror>.addSupportedPojoClass(clazz: IrClass) {
@@ -135,6 +135,35 @@ fun MutableList<CppTypeMirror>.addSupportedPojoClass(clazz: IrClass) {
         )
     )
 }
+
+fun MutableList<CppTypeMirror>.addSupportedMirrorClass(clazz: IrClass) {
+    val classId = clazz.classId!!
+    val cppModelMirror = clazz.cppModelMirror() ?: return
+    add(
+        CppTypeMirror(
+            jniTypeCode = "L${clazz.kotlinFqName.toString().snakeCase("/")};",
+            cppTypeMirrorStr = cppModelMirror,
+            jniTypeStr = "jobject",
+            classId = classId,
+            checkIrClass = { cl, nullable -> !nullable && cl.classId == clazz.classId },
+            transformToJni = { variable -> "${variable}.jvmObject()" },
+            transformToCpp = { variable -> "${BROOKLYN}::${cppModelMirror}( $variable ) " },
+        )
+    )
+    add(
+        CppTypeMirror(
+            jniTypeCode = "L${clazz.kotlinFqName.toString().snakeCase("/")};",
+            cppTypeMirrorStr = cppModelMirror,
+            jniTypeStr = "jobject",
+            isPtr = true,
+            classId = classId,
+            checkIrClass = { cl, _ -> cl.classId == clazz.classId },
+            transformToJni = { variable -> "${variable}->jvmObject()" },
+            transformToCpp = { variable -> "std::make_shared<${BROOKLYN}::${cppModelMirror}>( $variable ) " },
+        )
+    )
+}
+
 
 
 

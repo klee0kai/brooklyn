@@ -17,9 +17,7 @@ object CommonNaming {
     const val commonClassesMapperCpp = "mappers/common_mapper.cpp"
 
     const val modelHeader = "model/model.h"
-
-    const val mirrorHeader = "mirror/mirror.h"
-    const val mirrorCpp = "mirror/mirror.cpp"
+    const val modelCpp = "model/model.cpp"
 
     const val envHeader = "env/env.h"
     const val envCpp = "env/env.cpp"
@@ -34,12 +32,10 @@ val ClassId.mapperCppFile
     get() = File("mappers", "${cppFilePrefix}_mapper.cpp")
 
 val ClassId.modelHeaderFile
-    get() = File("model", "${cppFilePrefix}_model.h")
+    get() = File("model", "${cppFilePrefix}.h")
+val ClassId.modelCppFile
+    get() = File("model", "${cppFilePrefix}.cpp")
 
-val ClassId.mirrorHeaderFile
-    get() = File("mirror", "${cppFilePrefix}_mirror.h")
-val ClassId.mirrorCppFile
-    get() = File("mirror", "${cppFilePrefix}_mirror.cpp")
 val ClassId.interfaceCppFile
     get() = File("mirror", "${cppFilePrefix}_interface.cpp")
 

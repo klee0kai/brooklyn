@@ -2,9 +2,9 @@ package org.template.term.test
 
 import com.klee0kai.example.engine.SimpleJniEngine
 import com.klee0kai.example.mirrors.SimpleJniMirror
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotEquals
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import java.lang.ref.WeakReference
 
 class MirrorTexts {
 
@@ -46,6 +46,47 @@ class MirrorTexts {
         val simple2 = SimpleJniMirror(0)
 
         assertNotEquals(simple1.objId(), simple2.objId())
+    }
+
+    @Test
+    fun createMirrorFromCpp1Tests() {
+        val simpleMirror = SimpleJniEngine.createSimpleMirror1()
+        assertEquals(41, simpleMirror.someInt)
+    }
+
+    @Test
+    fun createMirrorFromCpp2Tests() {
+        val simpleMirror = SimpleJniEngine.createSimpleMirror2()
+
+        assertEquals("created from c++", simpleMirror.someString)
+    }
+
+
+    @Test
+    fun gcCppMirror1Test() {
+        val simpleMirror = WeakReference(SimpleJniEngine.createSimpleMirror1())
+        System.gc()
+        assertNull(simpleMirror.get())
+    }
+
+    @Test
+    fun gcCppMirror2Test() {
+        val simpleMirror = WeakReference(SimpleJniEngine.createSimpleMirror2())
+        System.gc()
+        assertNull(simpleMirror.get())
+    }
+
+    @Test
+    fun holdSimpleMirrorTest() {
+        val simple = WeakReference(SimpleJniMirror(0))
+        SimpleJniEngine.holdSimpleMirror(simple.get()!!)
+
+        System.gc()
+        assertNotNull(simple.get())
+
+        SimpleJniEngine.unHoldSimpleMirror()
+        System.gc()
+        assertNull(simple.get())
     }
 
 }

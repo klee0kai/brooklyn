@@ -29,6 +29,7 @@ fun CodeBuilder.declareClassMirror(jClass: IrClass) = apply {
         line("public: ")
 
         statement("${clMirror}(jobject jvmSelf)")
+        statement("${clMirror}(const ${clMirror}& other)")
 
         if (!jClass.isObject) jClass.constructors.forEach { func ->
             val args = func.mirrorFuncArgs(env = true)?.joinToString(", ") ?: return@forEach
@@ -49,9 +50,11 @@ fun CodeBuilder.declareClassMirror(jClass: IrClass) = apply {
         }
 
         statement("~${clMirror}()")
-
+        line("jobject jvmObject() { return jvmSelf; }")
         line("private: ")
         statement("jobject jvmSelf")
+        statement("jobject jvmSelfRef")
+        statement("std::shared_ptr<int> owners")
         statement("}")
     }
 
@@ -79,9 +82,16 @@ fun CodeBuilder.implementClassMirror(jClass: IrClass) = apply {
         lines(1)
 
         line("${clMirror}::${clMirror}(jobject jvmSelf) {")
+        statement("owners = std::make_shared<int>(1)")
         statement("JNIEnv* env = ${BROOKLYN}::env()")
-        statement("${clMirror}::jvmSelf = env->NewGlobalRef(jvmSelf)")
+        statement("${clMirror}::jvmSelf = jvmSelf")
+        statement("${clMirror}::jvmSelfRef = env->NewGlobalRef(jvmSelf)")
         line("}")
+
+        line("${clMirror}::${clMirror}(const ${clMirror}& other) : jvmSelf(other.jvmSelf), jvmSelfRef(other.jvmSelfRef), owners(other.owners) {")
+        statement("(*owners)++")
+        line("}")
+
 
         if (!jClass.isObject) jClass.constructors.forEach { func ->
             if (func.isExternal) return@forEach
@@ -92,13 +102,15 @@ fun CodeBuilder.implementClassMirror(jClass: IrClass) = apply {
                 val fieldTypeMirror = param.type.jniType() ?: return@joinToString ""
                 ",\n " + fieldTypeMirror.transformToJni.invoke("${param.name}")
             }
+            statement("owners = std::make_shared<int>(1)")
             statement("JNIEnv* env = ${BROOKLYN}::env()")
             statement(
-                "${clMirror}::jvmSelf = env->NewGlobalRef(env->NewObject( " +
+                "${clMirror}::jvmSelf = env->NewObject( " +
                         "${mappingNamespace}::${indexField}->cls, " +
                         "${mappingNamespace}::${indexField}->${func.cppNameMirror} " +
-                        "$arguments ))"
+                        "$arguments )"
             )
+            statement("${clMirror}::jvmSelfRef = env->NewGlobalRef(jvmSelf)")
             line("}")
         }
 
@@ -177,8 +189,12 @@ fun CodeBuilder.implementClassMirror(jClass: IrClass) = apply {
         }
 
         line("${clMirror}::~${clMirror}() {")
-        statement("if (jvmSelf) ${BROOKLYN}::env()->DeleteGlobalRef(jvmSelf)")
+        statement("(*owners)--")
+        line("if (*owners <= 0 && jvmSelfRef) {")
+        statement(" ${BROOKLYN}::env()->DeleteGlobalRef(jvmSelfRef)")
+        statement("jvmSelfRef = NULL")
         statement("jvmSelf = NULL")
+        line("}")
         line("}")
     }
 
