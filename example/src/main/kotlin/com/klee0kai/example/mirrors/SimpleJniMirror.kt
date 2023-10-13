@@ -1,9 +1,12 @@
 package com.klee0kai.example.mirrors
 
 import com.github.klee0kai.bridge.brooklyn.JniMirror
+import kotlin.random.Random
 
 @JniMirror
 class SimpleJniMirror {
+
+    val id = Random.nextInt()
 
     var someInt: Int = 0
     var someString: String = ""
@@ -26,10 +29,14 @@ class SimpleJniMirror {
         someString += strDelta
     }
 
+    fun obJvmId() = id
+
     external fun incInCpp()
 
     external fun incInCpp2(): Int
 
     external fun updateInCpp(delta: Int, strDelta: String): Int
+
+    external fun objId(): Int
 
 }

@@ -30,3 +30,7 @@ int ComKlee0kaiExampleMirrorsSimpleJniMirror::incInCpp2() {
 int ComKlee0kaiExampleMirrorsSimpleJniMirror::updateInCpp(const int &delta, const std::string &strDelta) {
     return 2;
 }
+
+int ComKlee0kaiExampleMirrorsSimpleJniMirror::objId() {
+    return ComKlee0kaiExampleMirrorsSimpleJniMirror::obJvmId();
+}
