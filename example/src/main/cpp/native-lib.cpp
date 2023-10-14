@@ -39,6 +39,22 @@ ComKlee0kaiExampleEngineSimpleJniEngine::copyArray(const std::vector<ComKlee0kai
     return simpleArray2;
 }
 
+std::shared_ptr<std::vector<ComKlee0kaiExampleModelSimple>> ComKlee0kaiExampleEngineSimpleJniEngine::copyArray2(
+        const std::shared_ptr<std::vector<ComKlee0kaiExampleModelSimple>> &simpleArray) {
+    return simpleArray;
+}
+
+std::vector<std::shared_ptr<ComKlee0kaiExampleModelSimple>> ComKlee0kaiExampleEngineSimpleJniEngine::copyArray3(
+        const std::vector<std::shared_ptr<ComKlee0kaiExampleModelSimple>> &simpleArray) {
+    return simpleArray;
+}
+
+std::shared_ptr<std::vector<std::shared_ptr<ComKlee0kaiExampleModelSimple>>>
+ComKlee0kaiExampleEngineSimpleJniEngine::copyArray4(
+        const std::shared_ptr<std::vector<std::shared_ptr<ComKlee0kaiExampleModelSimple>>> &simpleArray) {
+    return simpleArray;
+}
+
 
 void ComKlee0kaiExampleEngineSimpleJniEngine::holdSimpleMirror(
         const brooklyn::ComKlee0kaiExampleMirrorsSimpleJniMirror &simple) {

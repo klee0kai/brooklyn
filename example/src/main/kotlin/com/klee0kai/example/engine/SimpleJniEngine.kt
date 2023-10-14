@@ -17,6 +17,9 @@ object SimpleJniEngine {
     external fun copySimple(simple: Simple): Simple
 
     external fun copyArray(simpleArray: Array<Simple>): Array<Simple>
+    external fun copyArray2(simpleArray: Array<Simple>?): Array<Simple>?
+    external fun copyArray3(simpleArray: Array<Simple?>): Array<Simple?>
+    external fun copyArray4(simpleArray: Array<Simple?>?): Array<Simple?>?
 
     external fun copyNullableType(simple: NullableTypePojo): NullableTypePojo
 
