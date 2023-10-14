@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.ir.util.kotlinFqName
 internal fun stringTypeMirror() =
     CppTypeMirror(
         jniTypeCode = "Ljava/lang/String;",
-        cppTypeMirrorStr = "std::string",
+        cppSimpleTypeMirrorStr = "std::string",
         jniTypeStr = "jstring",
         checkIrClass = { it, nullable ->
             !nullable && it.kotlinFqName.toString() in listOf(
@@ -25,7 +25,7 @@ internal fun stringTypeMirror() =
 internal fun stringNullableTypeMirror() =
     CppTypeMirror(
         jniTypeCode = "Ljava/lang/String;",
-        cppTypeMirrorStr = "std::shared_ptr<std::string>",
+        cppSimpleTypeMirrorStr = "std::shared_ptr<std::string>",
         jniTypeStr = "jstring",
         checkIrClass = { it, _ ->
             it.kotlinFqName.toString() in listOf(

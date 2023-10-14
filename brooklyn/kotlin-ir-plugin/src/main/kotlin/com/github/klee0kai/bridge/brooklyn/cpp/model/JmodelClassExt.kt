@@ -11,16 +11,16 @@ fun CodeBuilder.declareClassModelStructure(jClass: IrClass) = apply {
     val usedTypes = mutableSetOf<IrType>()
     variables {
         lines(1)
-        line("struct ${jClass.jniType()?.cppTypeMirrorStr ?: return@variables} {")
+        line("struct ${jClass.jniType()?.cppSimpleTypeMirrorStr ?: return@variables} {")
         jClass.fields.forEach { field ->
-            field.type.jniType()?.cppPtrTypeMirror?.let { cppType ->
+            field.type.jniType()?.cppFullTypeMirror?.let { cppType ->
                 statement("\t${cppType} ${field.name};")
             }
             usedTypes.add(field.type)
         }
         jClass.properties.forEach { property ->
             val type = property.getter!!.returnType
-            type.jniType()?.cppPtrTypeMirror?.let { cppType ->
+            type.jniType()?.cppFullTypeMirror?.let { cppType ->
                 statement("\t${cppType} ${property.name}")
             }
             usedTypes.add(type)

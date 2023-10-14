@@ -33,7 +33,7 @@ private fun Poet.mapFromJvm(jClass: IrClass, isImpl: Boolean = false) = apply {
     val jvmObjectName = "jvmObject"
     val cppObjectName = "cppObject"
     val indexClVariable = jClass.classId!!.indexVariableName
-    val typeMirror = jClass.jniType()?.cppTypeMirrorStr ?: return@apply
+    val typeMirror = jClass.jniType()?.cppSimpleTypeMirrorStr ?: return@apply
 
     val declare = "std::shared_ptr<$typeMirror> mapFromJvm(JNIEnv *env, jobject $jvmObjectName)"
     lines(1)
@@ -79,7 +79,7 @@ private fun Poet.mapToJvm(jClass: IrClass, isImpl: Boolean = false) = apply {
     val jvmObjectName = "jvmObject"
     val cppObjectName = "cppObject"
     val indexClVariable = jClass.classId!!.indexVariableName
-    val typeMirror = jClass.jniType()?.cppTypeMirrorStr ?: return@apply
+    val typeMirror = jClass.jniType()?.cppSimpleTypeMirrorStr ?: return@apply
 
     val declare = "jobject mapToJvm(JNIEnv *env, const std::shared_ptr<$typeMirror>& $cppObjectName)  "
     lines(1)
@@ -130,7 +130,7 @@ private fun Poet.mapToJvm(jClass: IrClass, isImpl: Boolean = false) = apply {
 
 
 private fun Poet.mapToJvmArray(jClass: IrClass, isImpl: Boolean = false) = apply {
-    val typeMirror = jClass.jniType()?.cppTypeMirrorStr ?: return@apply
+    val typeMirror = jClass.jniType()?.cppSimpleTypeMirrorStr ?: return@apply
     val indexClVariable = jClass.classId!!.indexVariableName
     val declare = "jobjectArray mapArrayToJvm(JNIEnv *env, const std::shared_ptr<std::vector<${typeMirror}>> &array)   "
     lines(1)
@@ -149,7 +149,7 @@ private fun Poet.mapToJvmArray(jClass: IrClass, isImpl: Boolean = false) = apply
 }
 
 private fun Poet.mapToJvmArrayNullable(jClass: IrClass, isImpl: Boolean = false) = apply {
-    val typeMirror = jClass.jniType()?.cppTypeMirrorStr ?: return@apply
+    val typeMirror = jClass.jniType()?.cppSimpleTypeMirrorStr ?: return@apply
     val indexClVariable = jClass.classId!!.indexVariableName
     val declare = "jobjectArray mapArrayNullableToJvm(JNIEnv *env, const std::shared_ptr<std::vector<std::shared_ptr<${typeMirror}>>> &array)   "
     lines(1)
@@ -168,7 +168,7 @@ private fun Poet.mapToJvmArrayNullable(jClass: IrClass, isImpl: Boolean = false)
 }
 
 private fun Poet.mapFromJvmArray(jClass: IrClass, isImpl: Boolean = false) = apply {
-    val typeMirror = jClass.jniType()?.cppTypeMirrorStr ?: return@apply
+    val typeMirror = jClass.jniType()?.cppSimpleTypeMirrorStr ?: return@apply
     val declare =
         "std::shared_ptr<std::vector<${typeMirror}>> mapArrayFromJvm(JNIEnv *env, const jobjectArray &jarray )"
     lines(1)
@@ -189,7 +189,7 @@ private fun Poet.mapFromJvmArray(jClass: IrClass, isImpl: Boolean = false) = app
 
 
 private fun Poet.mapFromJvmArrayNullable(jClass: IrClass, isImpl: Boolean = false) = apply {
-    val typeMirror = jClass.jniType()?.cppTypeMirrorStr ?: return@apply
+    val typeMirror = jClass.jniType()?.cppSimpleTypeMirrorStr ?: return@apply
     val declare =
         "std::shared_ptr<std::vector<std::shared_ptr<${typeMirror}>>> mapArrayNullableFromJvm(JNIEnv *env, const jobjectArray &jarray )"
     lines(1)

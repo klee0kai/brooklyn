@@ -32,6 +32,13 @@ ComKlee0kaiExampleMirrorsSimpleJniMirror ComKlee0kaiExampleEngineSimpleJniEngine
     return mirror3;
 }
 
+std::vector<ComKlee0kaiExampleModelSimple>
+ComKlee0kaiExampleEngineSimpleJniEngine::copyArray(const std::vector<ComKlee0kaiExampleModelSimple> &simpleArray) {
+    auto simpleArray2 = std::vector<ComKlee0kaiExampleModelSimple>(simpleArray.size());
+    std::copy(simpleArray.begin(), simpleArray.end(), simpleArray2.begin());
+    return simpleArray2;
+}
+
 
 void ComKlee0kaiExampleEngineSimpleJniEngine::holdSimpleMirror(
         const brooklyn::ComKlee0kaiExampleMirrorsSimpleJniMirror &simple) {

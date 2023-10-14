@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.ir.util.kotlinFqName
 internal fun boxedTypeMirrors() = arrayOf(
     CppTypeMirror(
         jniTypeCode = "Ljava/lang/Boolean;",
-        cppTypeMirrorStr = "std::shared_ptr<int>",
+        cppSimpleTypeMirrorStr = "std::shared_ptr<int>",
         checkIrClass = { it, nullable ->
             nullable && it.kotlinFqName.toString() in listOf(
                 "java.lang.Boolean",
@@ -17,7 +17,7 @@ internal fun boxedTypeMirrors() = arrayOf(
     ),
     CppTypeMirror(
         jniTypeCode = "Ljava/lang/Integer;",
-        cppTypeMirrorStr = "std::shared_ptr<int>",
+        cppSimpleTypeMirrorStr = "std::shared_ptr<int>",
         checkIrClass = { it, nullable ->
             nullable && it.kotlinFqName.toString() in listOf(
                 "java.lang.Integer",
@@ -30,7 +30,7 @@ internal fun boxedTypeMirrors() = arrayOf(
     ),
     CppTypeMirror(
         jniTypeCode = "Ljava/lang/Long;",
-        cppTypeMirrorStr = "std::shared_ptr<int64_t>",
+        cppSimpleTypeMirrorStr = "std::shared_ptr<int64_t>",
         checkIrClass = { it, nullable ->
             nullable && it.kotlinFqName.toString() in listOf(
                 "java.lang.Long",
@@ -42,7 +42,7 @@ internal fun boxedTypeMirrors() = arrayOf(
     ),
     CppTypeMirror(
         jniTypeCode = "Ljava/lang/Float;",
-        cppTypeMirrorStr = "std::shared_ptr<float>",
+        cppSimpleTypeMirrorStr = "std::shared_ptr<float>",
         checkIrClass = { it, nullable ->
             nullable && it.kotlinFqName.toString() in listOf(
                 "java.lang.Float",
@@ -54,7 +54,7 @@ internal fun boxedTypeMirrors() = arrayOf(
     ),
     CppTypeMirror(
         jniTypeCode = "Ljava/lang/Double;",
-        cppTypeMirrorStr = "std::shared_ptr<double>",
+        cppSimpleTypeMirrorStr = "std::shared_ptr<double>",
         checkIrClass = { it, nullable ->
             nullable && it.kotlinFqName.toString() in listOf(
                 "java.lang.Double",
@@ -66,7 +66,7 @@ internal fun boxedTypeMirrors() = arrayOf(
     ),
     CppTypeMirror(
         jniTypeCode = "Ljava/lang/Character;",
-        cppTypeMirrorStr = "std::shared_ptr<char>",
+        cppSimpleTypeMirrorStr = "std::shared_ptr<char>",
         checkIrClass = { it, nullable ->
             nullable && it.kotlinFqName.toString() in listOf(
                 "java.lang.Character",
@@ -78,7 +78,7 @@ internal fun boxedTypeMirrors() = arrayOf(
     ),
     CppTypeMirror(
         jniTypeCode = "Ljava/lang/Short;",
-        cppTypeMirrorStr = "std::shared_ptr<int>",
+        cppSimpleTypeMirrorStr = "std::shared_ptr<int>",
         checkIrClass = { it, nullable ->
             nullable && it.kotlinFqName.toString() in listOf(
                 "java.lang.Short",
@@ -90,7 +90,7 @@ internal fun boxedTypeMirrors() = arrayOf(
     ),
     CppTypeMirror(
         jniTypeCode = "Ljava/lang/Byte;",
-        cppTypeMirrorStr = "std::shared_ptr<int>",
+        cppSimpleTypeMirrorStr = "std::shared_ptr<int>",
         checkIrClass = { it, nullable ->
             nullable && it.kotlinFqName.toString() in listOf(
                 "java.lang.Byte",
