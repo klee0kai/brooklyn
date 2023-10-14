@@ -21,6 +21,11 @@ object SimpleJniEngine {
     external fun copyArray3(simpleArray: Array<Simple?>): Array<Simple?>
     external fun copyArray4(simpleArray: Array<Simple?>?): Array<Simple?>?
 
+    external fun copyMirrorArray(simpleArray: Array<SimpleJniMirror>): Array<SimpleJniMirror>
+    external fun copyMirrorArray2(simpleArray: Array<SimpleJniMirror>?): Array<SimpleJniMirror>?
+    external fun copyMirrorArray3(simpleArray: Array<SimpleJniMirror?>): Array<SimpleJniMirror?>
+    external fun copyMirrorArray4(simpleArray: Array<SimpleJniMirror?>?): Array<SimpleJniMirror?>?
+
     external fun copyNullableType(simple: NullableTypePojo): NullableTypePojo
 
     external fun createSimpleMirror1(): SimpleJniMirror

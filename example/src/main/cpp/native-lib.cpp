@@ -56,6 +56,29 @@ ComKlee0kaiExampleEngineSimpleJniEngine::copyArray4(
 }
 
 
+std::vector<ComKlee0kaiExampleMirrorsSimpleJniMirror> ComKlee0kaiExampleEngineSimpleJniEngine::copyMirrorArray(
+        const std::vector<ComKlee0kaiExampleMirrorsSimpleJniMirror> &simpleArray) {
+    return simpleArray;
+}
+
+std::shared_ptr<std::vector<ComKlee0kaiExampleMirrorsSimpleJniMirror>>
+ComKlee0kaiExampleEngineSimpleJniEngine::copyMirrorArray2(
+        const std::shared_ptr<std::vector<ComKlee0kaiExampleMirrorsSimpleJniMirror>> &simpleArray) {
+    return simpleArray;
+}
+
+std::vector<std::shared_ptr<ComKlee0kaiExampleMirrorsSimpleJniMirror>>
+ComKlee0kaiExampleEngineSimpleJniEngine::copyMirrorArray3(
+        const std::vector<std::shared_ptr<ComKlee0kaiExampleMirrorsSimpleJniMirror>> &simpleArray) {
+    return simpleArray;
+}
+
+std::shared_ptr<std::vector<std::shared_ptr<ComKlee0kaiExampleMirrorsSimpleJniMirror>>>
+ComKlee0kaiExampleEngineSimpleJniEngine::copyMirrorArray4(
+        const std::shared_ptr<std::vector<std::shared_ptr<ComKlee0kaiExampleMirrorsSimpleJniMirror>>> &simpleArray) {
+    return simpleArray;
+}
+
 void ComKlee0kaiExampleEngineSimpleJniEngine::holdSimpleMirror(
         const brooklyn::ComKlee0kaiExampleMirrorsSimpleJniMirror &simple) {
     simpleMirror = std::make_shared<ComKlee0kaiExampleMirrorsSimpleJniMirror>(simple);
