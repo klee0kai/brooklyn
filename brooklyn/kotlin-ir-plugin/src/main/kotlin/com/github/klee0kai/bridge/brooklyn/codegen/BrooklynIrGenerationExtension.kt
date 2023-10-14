@@ -113,7 +113,7 @@ class BrooklynIrGenerationExtension(
                 .declareClassIndexStructure(declaration)
                 .initJniClassApi()
                 .deinitJniClassApi()
-                .mapJniClassApi(declaration)
+                .mapJniClass(declaration)
 
             gen.getOrCreate(
                 clId.mapperCppFile,
@@ -125,7 +125,7 @@ class BrooklynIrGenerationExtension(
                 .declareClassIndexField(declaration)
                 .initJniClassImpl(declaration)
                 .deinitJniClassImpl(declaration)
-                .mapJniClassImpl(declaration)
+                .mapJniClass(declaration, isImpl = true)
 
             gen.getOrCreate(clId.modelHeaderFile, headersInitBlock())
                 .declareClassModelStructure(declaration)

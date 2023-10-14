@@ -13,41 +13,37 @@ import org.jetbrains.kotlin.ir.util.constructors
 import org.jetbrains.kotlin.ir.util.fields
 import org.jetbrains.kotlin.ir.util.properties
 
-fun CodeBuilder.mapJniClassApi(jClass: IrClass) = apply {
+fun CodeBuilder.mapJniClass(jClass: IrClass, isImpl: Boolean = false) = apply {
+    header {
+        if (isImpl) {
+            statement("using namespace std")
+        }
+    }
     body {
-        val typeMirror = jClass.jniType()?.cppTypeMirrorStr ?: return@body
-
-        lines(1)
-        statement("std::shared_ptr<$typeMirror> mapFromJvm(JNIEnv *env, jobject j$typeMirror)")
-
-        lines(1)
-        statement("jobject mapToJvm(JNIEnv *env, const std::shared_ptr<$typeMirror>& j$typeMirror)")
-
-        lines(1)
-        statement("std::vector<$typeMirror> mapArrayFromJvm(JNIEnv *env, jobjectArray j$typeMirror)")
-
-        lines(1)
-        statement("jobjectArray mapArrayToJvm(JNIEnv *env, const std::vector<$typeMirror>& j$typeMirror)")
+        mapFromJvm(jClass, isImpl)
+        mapToJvm(jClass, isImpl)
+        mapToJvmArray(jClass, isImpl)
+        mapFromJvmArray(jClass, isImpl)
+        mapToJvmArrayNullable(jClass, isImpl)
+        mapFromJvmArrayNullable(jClass, isImpl)
     }
 }
 
-fun CodeBuilder.mapJniClassImpl(jClass: IrClass) = apply {
-    body {
-        mapFromJvmImpl(jClass)
-        mapToJvmImpl(jClass)
-    }
-}
-
-private fun Poet.mapFromJvmImpl(jClass: IrClass) = apply {
+private fun Poet.mapFromJvm(jClass: IrClass, isImpl: Boolean = false) = apply {
     val jvmObjectName = "jvmObject"
     val cppObjectName = "cppObject"
     val indexClVariable = jClass.classId!!.indexVariableName
-    val typeMirror = jClass.jniType()?.cppTypeMirrorStr
+    val typeMirror = jClass.jniType()?.cppTypeMirrorStr ?: return@apply
 
+    val declare = "std::shared_ptr<$typeMirror> mapFromJvm(JNIEnv *env, jobject $jvmObjectName)"
     lines(1)
-    line("std::shared_ptr<$typeMirror> mapFromJvm(JNIEnv *env, jobject $jvmObjectName ) {")
-    statement("if (!$jvmObjectName) return  std::shared_ptr<${typeMirror}>() ")
-    line("std::shared_ptr<$typeMirror> $cppObjectName = std::make_shared<$typeMirror>();")
+    if (!isImpl) {
+        statement(declare)
+        return@apply
+    }
+    line("$declare {")
+    statement("if (!$jvmObjectName) return  shared_ptr<${typeMirror}>() ")
+    line("shared_ptr<$typeMirror> $cppObjectName = make_shared<$typeMirror>();")
 
     jClass.fields.forEach { field ->
         val fieldTypeMirror = field.type.jniType() ?: return@forEach
@@ -79,15 +75,19 @@ private fun Poet.mapFromJvmImpl(jClass: IrClass) = apply {
     lines(1)
 }
 
-
-private fun Poet.mapToJvmImpl(jClass: IrClass) = apply {
+private fun Poet.mapToJvm(jClass: IrClass, isImpl: Boolean = false) = apply {
     val jvmObjectName = "jvmObject"
     val cppObjectName = "cppObject"
     val indexClVariable = jClass.classId!!.indexVariableName
-    val typeMirror = jClass.jniType()?.cppTypeMirrorStr
+    val typeMirror = jClass.jniType()?.cppTypeMirrorStr ?: return@apply
 
+    val declare = "jobject mapToJvm(JNIEnv *env, const std::shared_ptr<$typeMirror>& $cppObjectName)  "
     lines(1)
-    line("jobject mapToJvm(JNIEnv *env, const std::shared_ptr<$typeMirror>& $cppObjectName) {")
+    if (!isImpl) {
+        statement(declare)
+        return@apply
+    }
+    line("$declare {")
     statement("if (!$cppObjectName) return NULL")
 
     val constructor = jClass.constructors.first()
@@ -129,3 +129,81 @@ private fun Poet.mapToJvmImpl(jClass: IrClass) = apply {
 }
 
 
+private fun Poet.mapToJvmArray(jClass: IrClass, isImpl: Boolean = false) = apply {
+    val typeMirror = jClass.jniType()?.cppTypeMirrorStr ?: return@apply
+    val indexClVariable = jClass.classId!!.indexVariableName
+    val declare = "jobjectArray mapArrayToJvm(JNIEnv *env, const std::shared_ptr<std::vector<${typeMirror}>> &array)   "
+    lines(1)
+    if (!isImpl) {
+        statement(declare)
+        return@apply
+    }
+    line("$declare {")
+    statement("if (!array)return NULL")
+    statement("jobjectArray jArray = env->NewObjectArray(array->size(), ${indexClVariable}->cls, NULL)")
+    line("for (int i = 0; i < array->size(); i++) {")
+    statement("env->SetObjectArrayElement(jArray, i, mapToJvm(env, make_shared<${typeMirror}>( (*array)[i] )))")
+    line("}")
+    statement("return jArray")
+    line("}")
+}
+
+private fun Poet.mapToJvmArrayNullable(jClass: IrClass, isImpl: Boolean = false) = apply {
+    val typeMirror = jClass.jniType()?.cppTypeMirrorStr ?: return@apply
+    val indexClVariable = jClass.classId!!.indexVariableName
+    val declare = "jobjectArray mapArrayNullableToJvm(JNIEnv *env, const std::shared_ptr<std::vector<std::shared_ptr<${typeMirror}>>> &array)   "
+    lines(1)
+    if (!isImpl) {
+        statement(declare)
+        return@apply
+    }
+    line("$declare {")
+    statement("if (!array)return NULL")
+    statement("jobjectArray jArray = env->NewObjectArray(array->size(), ${indexClVariable}->cls, NULL)")
+    line("for (int i = 0; i < array->size(); i++) {")
+    statement("env->SetObjectArrayElement(jArray, i, mapToJvm(env, (*array)[i] ))")
+    line("}")
+    statement("return jArray")
+    line("}")
+}
+
+private fun Poet.mapFromJvmArray(jClass: IrClass, isImpl: Boolean = false) = apply {
+    val typeMirror = jClass.jniType()?.cppTypeMirrorStr ?: return@apply
+    val declare =
+        "std::shared_ptr<std::vector<${typeMirror}>> mapArrayFromJvm(JNIEnv *env, const jobjectArray &jarray )"
+    lines(1)
+    if (!isImpl) {
+        statement(declare)
+        return@apply
+    }
+    line("$declare {")
+    statement("if (!jarray)return {}")
+    statement("int len = env->GetArrayLength(jarray)")
+    statement("auto array = vector<${typeMirror}>(len)")
+    line("for (int i = 0; i < len; i++) {")
+    statement("array[i] = *mapFromJvm(env, env->GetObjectArrayElement(jarray, i))")
+    line("}")
+    statement("return make_shared<vector<${typeMirror}>>(array)")
+    line("}")
+}
+
+
+private fun Poet.mapFromJvmArrayNullable(jClass: IrClass, isImpl: Boolean = false) = apply {
+    val typeMirror = jClass.jniType()?.cppTypeMirrorStr ?: return@apply
+    val declare =
+        "std::shared_ptr<std::vector<std::shared_ptr<${typeMirror}>>> mapArrayNullableFromJvm(JNIEnv *env, const jobjectArray &jarray )"
+    lines(1)
+    if (!isImpl) {
+        statement(declare)
+        return@apply
+    }
+    line("$declare {")
+    statement("if (!jarray)return {}")
+    statement("int len = env->GetArrayLength(jarray)")
+    statement("auto array = vector<shared_ptr<${typeMirror}>>(len)")
+    line("for (int i = 0; i < len; i++) {")
+    statement("array[i] = mapFromJvm(env, env->GetObjectArrayElement(jarray, i))")
+    line("}")
+    statement("return make_shared<std::vector<shared_ptr<${typeMirror}>>>(array)")
+    line("}")
+}
