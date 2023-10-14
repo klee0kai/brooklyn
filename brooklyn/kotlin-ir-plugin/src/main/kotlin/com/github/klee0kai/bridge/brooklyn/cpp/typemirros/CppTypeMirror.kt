@@ -46,12 +46,9 @@ class CppTypeMirror(
     val jniTypeStr: String = "jobject",
 
     val isPtr: Boolean = false,
-    val irType: IrType? = null,
     val classId: ClassId? = null,
 
-    @Deprecated("use isPtr/isType/classId")
     val checkIrType: (IrType) -> Boolean = { false },
-    @Deprecated("use isPtr/isType/classId")
     val checkIrClass: (IrClass, nullable: Boolean) -> Boolean = { _, _ -> false },
 
     val transformToJni: TransformJniType,
