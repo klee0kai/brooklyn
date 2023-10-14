@@ -39,3 +39,85 @@ fun Poet.mapBooleanToJava(isImpl: Boolean = false) = apply {
 
     line("}")
 }
+
+
+fun Poet.mapBooleanArrayFromJava(isImpl: Boolean = false) =
+    mapPrimitiveTypeToJvm(
+        isImpl = isImpl,
+        name = "mapFromJBooleanArray",
+        cppType = "int",
+        jType = "jboolean",
+        jArrayType = "jbooleanArray",
+        jGetElementsMethod = "GetBooleanArrayElements",
+        jReleaseArrayMethod = "ReleaseBooleanArrayElements"
+    )
+
+
+fun Poet.mapBooleanArrayToJava(isImpl: Boolean = false) =
+    mapPrimitiveTypeFromJvm(
+        isImpl = isImpl,
+        name = "mapToJBooleanArray",
+        cppType = "int",
+        jType = "jboolean",
+        jArrayType = "jbooleanArray",
+        jCreateArrayMethod = "NewBooleanArray",
+        jSetArrayMethod = "SetBooleanArrayRegion",
+    )
+
+
+fun Poet.mapPrimitiveTypeToJvm(
+    isImpl: Boolean,
+    name: String,
+    cppType: String,
+    jType: String,
+    jArrayType: String,
+    jGetElementsMethod: String,
+    jReleaseArrayMethod: String,
+) = apply {
+    val declare =
+        "std::shared_ptr<std::vector<${cppType}>> ${name}(JNIEnv *env, const ${jArrayType}& jarray) "
+    if (!isImpl) {
+        statement(declare)
+        return@apply
+    }
+    line("$declare {")
+    statement("if (!jarray)return {}")
+    statement("int len = env->GetArrayLength(jarray)")
+    statement("$jType *tempArray = env->${jGetElementsMethod}(jarray, NULL)")
+    statement("auto array = std::vector<${cppType}>(len)")
+    line("for (int i = 0; i < len; i++) {")
+    statement("array[i] = ${cppType}(tempArray[i]);")
+    line("}")
+    statement("env->${jReleaseArrayMethod}(jarray, tempArray, 0)")
+    statement("return std::make_shared<std::vector<${cppType}>>(array)")
+    line("}")
+}
+
+
+fun Poet.mapPrimitiveTypeFromJvm(
+    isImpl: Boolean,
+    name: String,
+    cppType: String,
+    jType: String,
+    jArrayType: String,
+    jCreateArrayMethod: String,
+    jSetArrayMethod: String,
+) = apply {
+    val declare = "$jArrayType ${name}(JNIEnv *env, const std::shared_ptr<std::vector<${cppType}>> &array) "
+    if (!isImpl) {
+        statement(declare)
+        return@apply
+    }
+    line("$declare {")
+    statement("if (!array)return NULL")
+    statement("int len = array->size()")
+    statement("$jType *tempArray = new $jType[len]")
+    line("for (int i = 0; i < len; i++) {")
+    statement("tempArray[i] = $jType((*array)[i])")
+    line("}")
+    statement("$jArrayType jarray = env->$jCreateArrayMethod(len)")
+    statement("env->$jSetArrayMethod(jarray, 0, len, tempArray)")
+    statement("delete[] tempArray")
+    statement("return jarray")
+    line("}")
+}

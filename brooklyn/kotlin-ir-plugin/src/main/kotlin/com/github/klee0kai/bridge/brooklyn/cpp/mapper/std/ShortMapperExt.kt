@@ -38,3 +38,27 @@ fun Poet.mapShortToJava(isImpl: Boolean = false) = apply {
     statement("return valuePtr ? env->NewObject(shortIndex->cls, shortIndex->toJvm, jshort( *valuePtr ) ) : NULL")
     line("}")
 }
+
+
+fun Poet.mapShortArrayFromJava(isImpl: Boolean = false) =
+    mapPrimitiveTypeToJvm(
+        isImpl = isImpl,
+        name = "mapFromJLongArray",
+        cppType = "int",
+        jType = "jshort",
+        jArrayType = "jshortArray",
+        jGetElementsMethod = "GetShortArrayElements",
+        jReleaseArrayMethod = "ReleaseShortArrayElements"
+    )
+
+
+fun Poet.mapShortArrayToJava(isImpl: Boolean = false) =
+    mapPrimitiveTypeFromJvm(
+        isImpl = isImpl,
+        name = "mapToJLongArray",
+        cppType = "int",
+        jType = "jshort",
+        jArrayType = "jshortArray",
+        jCreateArrayMethod = "NewShortArray",
+        jSetArrayMethod = "SetShortArrayRegion",
+    )

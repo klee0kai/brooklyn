@@ -38,3 +38,27 @@ fun Poet.mapCharToJava(isImpl: Boolean = false) = apply {
     statement("return valuePtr ? env->NewObject(charIndex->cls, charIndex->toJvm, jchar( *valuePtr ) ) : NULL")
     line("}")
 }
+
+
+fun Poet.mapCharArrayFromJava(isImpl: Boolean = false) =
+    mapPrimitiveTypeToJvm(
+        isImpl = isImpl,
+        name = "mapFromJCharArray",
+        cppType = "char",
+        jType = "jchar",
+        jArrayType = "jcharArray",
+        jGetElementsMethod = "GetCharArrayElements",
+        jReleaseArrayMethod = "ReleaseCharArrayElements"
+    )
+
+
+fun Poet.mapCharArrayToJava(isImpl: Boolean = false) =
+    mapPrimitiveTypeFromJvm(
+        isImpl = isImpl,
+        name = "mapToJCharArray",
+        cppType = "char",
+        jType = "jchar",
+        jArrayType = "jcharArray",
+        jCreateArrayMethod = "NewCharArray",
+        jSetArrayMethod = "SetCharArrayRegion",
+    )

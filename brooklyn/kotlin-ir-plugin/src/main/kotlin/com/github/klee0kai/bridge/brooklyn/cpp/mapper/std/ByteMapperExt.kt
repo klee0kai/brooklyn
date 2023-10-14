@@ -38,3 +38,29 @@ fun Poet.mapByteToJava(isImpl: Boolean = false) = apply {
     statement("return valuePtr ? env->NewObject(byteIndex->cls, byteIndex->toJvm, jbyte( *valuePtr ) ) : NULL")
     line("}")
 }
+
+
+fun Poet.mapByteArrayFromJava(isImpl: Boolean = false) =
+    mapPrimitiveTypeToJvm(
+        isImpl = isImpl,
+        name = "mapFromJByteArray",
+        cppType = "int",
+        jType = "jbyte",
+        jArrayType = "jbyteArray",
+        jGetElementsMethod = "GetByteArrayElements",
+        jReleaseArrayMethod = "ReleaseByteArrayElements"
+    )
+
+
+fun Poet.mapByteArrayToJava(isImpl: Boolean = false) =
+    mapPrimitiveTypeFromJvm(
+        isImpl = isImpl,
+        name = "mapToJByteArray",
+        cppType = "int",
+        jType = "jbyte",
+        jArrayType = "jbyteArray",
+        jCreateArrayMethod = "NewByteArray",
+        jSetArrayMethod = "SetByteArrayRegion",
+    )
+
+

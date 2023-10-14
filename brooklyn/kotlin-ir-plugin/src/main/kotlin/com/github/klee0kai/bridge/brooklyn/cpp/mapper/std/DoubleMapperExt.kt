@@ -38,3 +38,28 @@ fun Poet.mapDoubleToJava(isImpl: Boolean = false) = apply {
     statement("return valuePtr ? env->NewObject(doubleIndex->cls, doubleIndex->toJvm, jdouble( *valuePtr ) ) : NULL")
     line("}")
 }
+
+
+
+fun Poet.mapDoubleArrayFromJava(isImpl: Boolean = false) =
+    mapPrimitiveTypeToJvm(
+        isImpl = isImpl,
+        name = "mapFromJDoubleArray",
+        cppType = "double",
+        jType = "jdouble",
+        jArrayType = "jdoubleArray",
+        jGetElementsMethod = "GetDoubleArrayElements",
+        jReleaseArrayMethod = "ReleaseDoubleArrayElements"
+    )
+
+
+fun Poet.mapDoubleArrayToJava(isImpl: Boolean = false) =
+    mapPrimitiveTypeFromJvm(
+        isImpl = isImpl,
+        name = "mapToJDoubleArray",
+        cppType = "double",
+        jType = "jdouble",
+        jArrayType = "jdoubleArray",
+        jCreateArrayMethod = "NewDoubleArray",
+        jSetArrayMethod = "SetDoubleArrayRegion",
+    )

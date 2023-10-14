@@ -39,3 +39,26 @@ fun Poet.mapIntegerToJava(isImpl: Boolean = false) = apply {
 
     line("}")
 }
+
+fun Poet.mapIntegerArrayFromJava(isImpl: Boolean = false) =
+    mapPrimitiveTypeToJvm(
+        isImpl = isImpl,
+        name = "mapFromJIntegerArray",
+        cppType = "int",
+        jType = "jint",
+        jArrayType = "jintArray",
+        jGetElementsMethod = "GetIntArrayElements",
+        jReleaseArrayMethod = "ReleaseIntArrayElements"
+    )
+
+
+fun Poet.mapIntegerArrayToJava(isImpl: Boolean = false) =
+    mapPrimitiveTypeFromJvm(
+        isImpl = isImpl,
+        name = "mapToJIntegerArray",
+        cppType = "int",
+        jType = "jint",
+        jArrayType = "jintArray",
+        jCreateArrayMethod = "NewIntArray",
+        jSetArrayMethod = "SetIntArrayRegion",
+    )

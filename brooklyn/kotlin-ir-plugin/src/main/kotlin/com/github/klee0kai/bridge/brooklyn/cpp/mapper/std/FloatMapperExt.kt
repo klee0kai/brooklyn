@@ -38,3 +38,26 @@ fun Poet.mapFloatToJava(isImpl: Boolean = false) = apply {
     statement("return valuePtr ? env->NewObject(floatIndex->cls, floatIndex->toJvm, jfloat( *valuePtr ) ) : NULL")
     line("}")
 }
+
+fun Poet.mapFloatArrayFromJava(isImpl: Boolean = false) =
+    mapPrimitiveTypeToJvm(
+        isImpl = isImpl,
+        name = "mapFromJFloatArray",
+        cppType = "float",
+        jType = "jfloat",
+        jArrayType = "jfloatArray",
+        jGetElementsMethod = "GetFloatArrayElements",
+        jReleaseArrayMethod = "ReleaseFloatArrayElements"
+    )
+
+
+fun Poet.mapFloatArrayToJava(isImpl: Boolean = false) =
+    mapPrimitiveTypeFromJvm(
+        isImpl = isImpl,
+        name = "mapToJFloatArray",
+        cppType = "float",
+        jType = "jfloat",
+        jArrayType = "jfloatArray",
+        jCreateArrayMethod = "NewFloatArray",
+        jSetArrayMethod = "SetFloatArrayRegion",
+    )

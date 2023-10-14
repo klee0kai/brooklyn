@@ -38,3 +38,27 @@ fun Poet.mapLongToJava(isImpl: Boolean = false) = apply {
     statement("return cppLong ? env->NewObject(longIndex->cls, longIndex->toJvm, jlong( *cppLong ) ) : NULL")
     line("}")
 }
+
+
+fun Poet.mapLongArrayFromJava(isImpl: Boolean = false) =
+    mapPrimitiveTypeToJvm(
+        isImpl = isImpl,
+        name = "mapFromJLongArray",
+        cppType = "int64_t",
+        jType = "jlong",
+        jArrayType = "jlongArray",
+        jGetElementsMethod = "GetLongArrayElements",
+        jReleaseArrayMethod = "ReleaseLongArrayElements"
+    )
+
+
+fun Poet.mapLongArrayToJava(isImpl: Boolean = false) =
+    mapPrimitiveTypeFromJvm(
+        isImpl = isImpl,
+        name = "mapToJLongArray",
+        cppType = "int64_t",
+        jType = "jlong",
+        jArrayType = "jlongArray",
+        jCreateArrayMethod = "NewLongArray",
+        jSetArrayMethod = "SetLongArrayRegion",
+    )
