@@ -18,6 +18,8 @@ class ArraysModel @JvmOverloads constructor(
     var nullableShortArray: ShortArray? = null,
     var floatArray: FloatArray = FloatArray(0),
     var nullableFloatArray: FloatArray? = null,
+    var doubleArray: DoubleArray = DoubleArray(0),
+    var nullableDoubleArray: DoubleArray? = null,
 
     var simpleStringArray: Array<String> = emptyArray(),
     var nullableStringArray: Array<String>? = null,

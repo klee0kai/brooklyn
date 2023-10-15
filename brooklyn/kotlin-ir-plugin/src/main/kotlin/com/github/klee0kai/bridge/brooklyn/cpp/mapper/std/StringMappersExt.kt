@@ -9,8 +9,8 @@ import com.github.klee0kai.bridge.brooklyn.poet.Poet
 fun Poet.stringIndexInit() = apply {
     statement("if (stringIndex) return 0")
     statement("stringIndex = std::make_shared<SimpleIndexStructure>()")
-    statement("byteIndex->cls = (jclass) env->NewGlobalRef( env->FindClass(\"java/lang/String\") )")
-    statement("if (!byteIndex->cls) return -1")
+    statement("stringIndex->cls = (jclass) env->NewGlobalRef( env->FindClass(\"java/lang/String\") )")
+    statement("if (!stringIndex->cls) return -1")
 }
 
 
@@ -55,7 +55,7 @@ fun CodeBuilder.mapFromJStringArray(isImpl: Boolean = false) = apply {
         line("$declare { ")
         statement("if (!jarray)return {}")
         statement("int len = env->GetArrayLength(jarray)")
-        statement("auto array = std::vector<std::string>()")
+        statement("auto array = std::vector<std::string>( len )")
         line("for (int i = 0; i < len; i++) {")
         statement("array[i] = *mapJString(env, (jstring) env->GetObjectArrayElement(jarray, i))")
         line("}")
@@ -76,7 +76,7 @@ fun CodeBuilder.mapFromJStringArrayNullable(isImpl: Boolean = false) = apply {
         line("$declare { ")
         statement("if (!jarray)return {}")
         statement("int len = env->GetArrayLength(jarray)")
-        statement("auto array = vector<shared_ptr<string>>()")
+        statement("auto array = vector<shared_ptr<string>>( len )")
         line("for (int i = 0; i < len; i++) {")
         statement("array[i] = mapJString(env, (jstring) env->GetObjectArrayElement(jarray, i))")
         line("}")
@@ -120,7 +120,7 @@ fun CodeBuilder.mapToJStringArrayNullable(isImpl: Boolean = false) = apply {
         statement("int len = array->size()")
         statement("auto jarray = env->NewObjectArray(len, stringIndex->cls, NULL)")
         line("for (int i = 0; i < len; i++) {")
-        statement("env->SetObjectArrayElement(jarray, i, mapToJString(env, (*array)[i]))")
+        statement("env->SetObjectArrayElement(jarray, i, array ? mapToJString(env, (*array)[i]) : NULL )")
         line("}")
         statement("return jarray")
         line("}")

@@ -5,7 +5,7 @@ import com.klee0kai.example.model.Simple
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
-class ArrayPojoTexts {
+class ArrayPojoTests {
 
     @Test
     fun simpleArrayCopyTest() {
