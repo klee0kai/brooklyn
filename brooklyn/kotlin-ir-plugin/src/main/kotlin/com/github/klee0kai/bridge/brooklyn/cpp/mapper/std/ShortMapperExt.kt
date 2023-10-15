@@ -43,7 +43,7 @@ fun Poet.mapShortToJava(isImpl: Boolean = false) = apply {
 fun Poet.mapShortArrayFromJava(isImpl: Boolean = false) =
     mapPrimitiveTypeToJvm(
         isImpl = isImpl,
-        name = "mapFromJLongArray",
+        name = "mapFromJShortArray",
         cppType = "int",
         jType = "jshort",
         jArrayType = "jshortArray",
@@ -55,7 +55,7 @@ fun Poet.mapShortArrayFromJava(isImpl: Boolean = false) =
 fun Poet.mapShortArrayToJava(isImpl: Boolean = false) =
     mapPrimitiveTypeFromJvm(
         isImpl = isImpl,
-        name = "mapToJLongArray",
+        name = "mapToJShortArray",
         cppType = "int",
         jType = "jshort",
         jArrayType = "jshortArray",

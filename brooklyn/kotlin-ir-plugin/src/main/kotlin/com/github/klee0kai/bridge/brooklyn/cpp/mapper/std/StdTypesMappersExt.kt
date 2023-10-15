@@ -118,7 +118,9 @@ fun CodeBuilder.stdTypeMappers(isImpl: Boolean = false) = apply {
         mapFromJString(isImpl)
         mapToJString(isImpl)
         mapFromJStringArray(isImpl)
+        mapFromJStringArrayNullable(isImpl)
         mapToJStringArray(isImpl)
+        mapToJStringArrayNullable(isImpl)
 
     }
 }

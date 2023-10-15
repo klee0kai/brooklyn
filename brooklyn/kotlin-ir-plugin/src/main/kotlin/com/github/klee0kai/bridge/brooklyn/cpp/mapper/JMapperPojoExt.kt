@@ -49,6 +49,7 @@ private fun Poet.mapFromJvm(jClass: IrClass, isImpl: Boolean = false) = apply {
         val fieldTypeMirror = field.type.jniType() ?: return@forEach
 
         val extractFromField = fieldTypeMirror.extractFromField.invoke(
+            type = fieldTypeMirror,
             jvmObj = jvmObjectName,
             fieldOrMethodId = "${indexClVariable}->${field.name}",
             args = "",
@@ -62,6 +63,7 @@ private fun Poet.mapFromJvm(jClass: IrClass, isImpl: Boolean = false) = apply {
         val propertyTypeMirror = property.getter?.returnType?.jniType() ?: return@forEach
 
         val extractFromProperty = propertyTypeMirror.extractFromMethod.invoke(
+            type = propertyTypeMirror,
             jvmObj = jvmObjectName,
             fieldOrMethodId = "${indexClVariable}->${property.name}_getter",
             args = "",
@@ -151,7 +153,8 @@ private fun Poet.mapToJvmArray(jClass: IrClass, isImpl: Boolean = false) = apply
 private fun Poet.mapToJvmArrayNullable(jClass: IrClass, isImpl: Boolean = false) = apply {
     val typeMirror = jClass.jniType()?.cppSimpleTypeMirrorStr ?: return@apply
     val indexClVariable = jClass.classId!!.indexVariableName
-    val declare = "jobjectArray mapArrayNullableToJvm(JNIEnv *env, const std::shared_ptr<std::vector<std::shared_ptr<${typeMirror}>>> &array)   "
+    val declare =
+        "jobjectArray mapArrayNullableToJvm(JNIEnv *env, const std::shared_ptr<std::vector<std::shared_ptr<${typeMirror}>>> &array)   "
     lines(1)
     if (!isImpl) {
         statement(declare)

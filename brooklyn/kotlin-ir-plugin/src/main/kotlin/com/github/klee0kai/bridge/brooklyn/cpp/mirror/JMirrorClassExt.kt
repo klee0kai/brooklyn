@@ -131,9 +131,10 @@ fun CodeBuilder.implementClassMirror(jClass: IrClass) = apply {
                     statement(
                         returnType.transformToCpp.invoke(
                             returnType.extractFromStaticMethod.invoke(
-                                "${mappingNamespace}::${indexField}->cls",
-                                "${mappingNamespace}::${indexField}->${func.cppNameMirror} ",
-                                arguments
+                                type = returnType,
+                                jvmObj = "${mappingNamespace}::${indexField}->cls",
+                                fieldOrMethodId = "${mappingNamespace}::${indexField}->${func.cppNameMirror} ",
+                                args = arguments
                             )
                         )
                     )
@@ -162,9 +163,10 @@ fun CodeBuilder.implementClassMirror(jClass: IrClass) = apply {
                     statement(
                         returnType.transformToCpp.invoke(
                             returnType.extractFromMethod.invoke(
-                                "jvmSelf",
-                                "${mappingNamespace}::${indexField}->${func.cppNameMirror} ",
-                                arguments
+                                type = returnType,
+                                jvmObj = "jvmSelf",
+                                fieldOrMethodId = "${mappingNamespace}::${indexField}->${func.cppNameMirror} ",
+                                args = arguments
                             )
                         )
                     )

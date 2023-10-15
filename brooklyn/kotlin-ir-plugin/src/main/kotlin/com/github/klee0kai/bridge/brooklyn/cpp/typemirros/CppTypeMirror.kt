@@ -16,6 +16,7 @@ fun interface ExtractJniType {
      *  extract jstring from field or method
      */
     fun invoke(
+        type: CppTypeMirror,
         jvmObj: String,
         fieldOrMethodId: String,
         args: String,
@@ -85,14 +86,15 @@ fun IrClass.cppMappingNameSpace() = cppModelMirror()?.let { "${it}_mapping" } ?:
 // https://docs.oracle.com/javase/8/docs/technotes/guides/jni/spec/types.html
 val allCppTypeMirrors: MutableList<CppTypeMirror> = mutableListOf(
     *primitiveTypeMirrors(),
+    *primitiveArraysTypeMirrors(),
     *boxedTypeMirrors(),
-    stringTypeMirror(),
-    stringNullableTypeMirror(),
+    *stringsTypeMirror(),
 )
 
 
-fun extractJniType(method: String) = ExtractJniType { jvmObj, fieldOrMethodId, args ->
-    "env->${method}( ${listOf(jvmObj, fieldOrMethodId, args).joinArgs()} )"
+fun extractJniType(method: String) = ExtractJniType { type, jvmObj, fieldOrMethodId, args ->
+    val castType = if (type.jniTypeStr != "jobject") "( ${type.jniTypeStr}  )" else "";
+    " $castType env->${method}( ${listOf(jvmObj, fieldOrMethodId, args).joinArgs()} )"
 }
 
 fun insertJniType(method: String) = InsertJniType { variable, jvmObj, fieldOrMethodId ->

@@ -65,6 +65,27 @@ fun CodeBuilder.mapFromJStringArray(isImpl: Boolean = false) = apply {
 }
 
 
+fun CodeBuilder.mapFromJStringArrayNullable(isImpl: Boolean = false) = apply {
+    val declare =
+        "std::shared_ptr<std::vector<std::shared_ptr<std::string>>> mapFromJStringArrayNullable(JNIEnv *env, const jobjectArray &jarray) "
+    if (!isImpl) {
+        statement(declare)
+        return@apply
+    }
+    body {
+        line("$declare { ")
+        statement("if (!jarray)return {}")
+        statement("int len = env->GetArrayLength(jarray)")
+        statement("auto array = vector<shared_ptr<string>>()")
+        line("for (int i = 0; i < len; i++) {")
+        statement("array[i] = mapJString(env, (jstring) env->GetObjectArrayElement(jarray, i))")
+        line("}")
+        statement("return make_shared<vector<shared_ptr<string>>>(array)")
+        line("}")
+    }
+}
+
+
 fun CodeBuilder.mapToJStringArray(isImpl: Boolean = false) = apply {
     val declare =
         "jobjectArray mapToJStringArray(JNIEnv *env, const std::shared_ptr<std::vector<std::string>> &array)"
@@ -79,6 +100,27 @@ fun CodeBuilder.mapToJStringArray(isImpl: Boolean = false) = apply {
         statement("auto jarray = env->NewObjectArray(len, stringIndex->cls, NULL)")
         line("for (int i = 0; i < len; i++) {")
         statement("env->SetObjectArrayElement(jarray, i, mapToJString(env, make_shared<string>((*array)[i])))")
+        line("}")
+        statement("return jarray")
+        line("}")
+    }
+}
+
+
+fun CodeBuilder.mapToJStringArrayNullable(isImpl: Boolean = false) = apply {
+    val declare =
+        "jobjectArray mapToJStringArrayNullable(JNIEnv *env, const std::shared_ptr<std::vector<std::shared_ptr<std::string>>> &array)"
+    if (!isImpl) {
+        statement(declare)
+        return@apply
+    }
+    body {
+        line("$declare { ")
+        statement("if (!array)return NULL")
+        statement("int len = array->size()")
+        statement("auto jarray = env->NewObjectArray(len, stringIndex->cls, NULL)")
+        line("for (int i = 0; i < len; i++) {")
+        statement("env->SetObjectArrayElement(jarray, i, mapToJString(env, (*array)[i]))")
         line("}")
         statement("return jarray")
         line("}")
