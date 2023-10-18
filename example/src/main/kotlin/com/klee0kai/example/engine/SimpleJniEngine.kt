@@ -5,6 +5,7 @@ import com.github.klee0kai.bridge.brooklyn.Brooklyn
 import com.github.klee0kai.bridge.brooklyn.JniMirror
 import com.klee0kai.example.mirrors.SimpleJniMirror
 import com.klee0kai.example.model.ArraysModel
+import com.klee0kai.example.model.BoxedArraysModel
 import com.klee0kai.example.model.NullableTypePojo
 import com.klee0kai.example.model.Simple
 
@@ -30,6 +31,8 @@ object SimpleJniEngine {
     external fun copyNullableType(simple: NullableTypePojo): NullableTypePojo
 
     external fun copyArrayModel(arrays: ArraysModel): ArraysModel
+
+    external fun copyBoxedArrayModel(arrays: BoxedArraysModel): BoxedArraysModel
 
     external fun createSimpleMirror1(): SimpleJniMirror
 

@@ -85,6 +85,11 @@ ComKlee0kaiExampleEngineSimpleJniEngine::copyArrayModel(const brooklyn::ComKlee0
     return arrays;
 }
 
+ComKlee0kaiExampleModelBoxedArraysModel ComKlee0kaiExampleEngineSimpleJniEngine::copyBoxedArrayModel(
+        const brooklyn::ComKlee0kaiExampleModelBoxedArraysModel &arrays) {
+    return arrays;
+}
+
 void ComKlee0kaiExampleEngineSimpleJniEngine::holdSimpleMirror(
         const brooklyn::ComKlee0kaiExampleMirrorsSimpleJniMirror &simple) {
     simpleMirror = std::make_shared<ComKlee0kaiExampleMirrorsSimpleJniMirror>(simple);
