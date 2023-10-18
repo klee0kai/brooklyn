@@ -78,14 +78,14 @@ fun Poet.mapDoubleArrayToJava(isImpl: Boolean = false) =apply {
     )
     mapBoxedArrayToJvm(
         isImpl = isImpl,
-        name = "mapToJBoxedBooleanArray",
+        name = "mapToJBoxedDoubleArray",
         cppType = "double",
         indexVariable = "doubleIndex",
         mappingMethod = { variable -> "mapToJDoubleBoxed(env, std::make_shared<double>( $variable ) )" }
     )
     mapBoxedArrayToJvm(
         isImpl = isImpl,
-        name = "mapToJBooleanNullableArray",
+        name = "mapToJDoubleNullableArray",
         cppType = "std::shared_ptr<double>",
         indexVariable = "doubleIndex",
         mappingMethod = { variable -> "mapToJDoubleBoxed(env, $variable )" }
