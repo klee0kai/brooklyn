@@ -16,7 +16,7 @@ fun Poet.longIndexInit() = apply {
 
 
 fun Poet.mapLongFromJava(isImpl: Boolean = false) = apply {
-    val declare = "std::shared_ptr<int64_t> mapFromJLong(JNIEnv *env, jobject jLong) "
+    val declare = "std::shared_ptr<int64_t> mapFromJLongBoxed(JNIEnv *env, jobject jLong) "
     if (!isImpl) {
         statement(declare)
         return@apply
@@ -29,7 +29,7 @@ fun Poet.mapLongFromJava(isImpl: Boolean = false) = apply {
 
 
 fun Poet.mapLongToJava(isImpl: Boolean = false) = apply {
-    val declare = "jobject mapToJLong(JNIEnv *env, const std::shared_ptr<int64_t>& cppLong) "
+    val declare = "jobject mapToJLongBoxed(JNIEnv *env, const std::shared_ptr<int64_t>& cppLong) "
     if (!isImpl) {
         statement(declare)
         return@apply
@@ -37,4 +37,56 @@ fun Poet.mapLongToJava(isImpl: Boolean = false) = apply {
     line("$declare {")
     statement("return cppLong ? env->NewObject(longIndex->cls, longIndex->toJvm, jlong( *cppLong ) ) : NULL")
     line("}")
+}
+
+
+fun Poet.mapLongArrayFromJava(isImpl: Boolean = false) =apply {
+    mapPrimitiveArrayFromJvm(
+        isImpl = isImpl,
+        name = "mapFromJLongArray",
+        cppType = "int64_t",
+        jType = "jlong",
+        jArrayType = "jlongArray",
+        jGetElementsMethod = "GetLongArrayElements",
+        jReleaseArrayMethod = "ReleaseLongArrayElements"
+    )
+    mapBoxedArrayFromJvm(
+        isImpl = isImpl,
+        name = "mapFromJBoxedLongArray",
+        cppType = "int64_t",
+        mappingMethod = { variable -> "*mapFromJLongBoxed(env, $variable )" }
+    )
+    mapBoxedArrayFromJvm(
+        isImpl = isImpl,
+        name = "mapFromJLongNullableArray",
+        cppType = "std::shared_ptr<int64_t>",
+        mappingMethod = { variable -> "mapFromJLongBoxed(env, $variable )" }
+    )
+}
+
+
+fun Poet.mapLongArrayToJava(isImpl: Boolean = false) =apply {
+    mapPrimitiveArrayToJvm(
+        isImpl = isImpl,
+        name = "mapToJLongArray",
+        cppType = "int64_t",
+        jType = "jlong",
+        jArrayType = "jlongArray",
+        jCreateArrayMethod = "NewLongArray",
+        jSetArrayMethod = "SetLongArrayRegion",
+    )
+    mapBoxedArrayToJvm(
+        isImpl = isImpl,
+        name = "mapToJBoxedLongArray",
+        cppType = "int64_t",
+        indexVariable = "longIndex",
+        mappingMethod = { variable -> "mapToJLongBoxed(env, std::make_shared<int64_t>( $variable ) )" }
+    )
+    mapBoxedArrayToJvm(
+        isImpl = isImpl,
+        name = "mapToJLongNullableArray",
+        cppType = "std::shared_ptr<int64_t>",
+        indexVariable = "longIndex",
+        mappingMethod = { variable -> "mapToJLongBoxed(env, $variable )" }
+    )
 }

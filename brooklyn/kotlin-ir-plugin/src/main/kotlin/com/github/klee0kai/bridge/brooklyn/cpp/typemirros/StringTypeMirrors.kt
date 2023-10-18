@@ -1,11 +1,12 @@
 package com.github.klee0kai.bridge.brooklyn.cpp.typemirros
 
+import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.kotlinFqName
 
-internal fun stringTypeMirror() =
+internal fun stringsTypeMirror() = arrayOf(
     CppTypeMirror(
         jniTypeCode = "Ljava/lang/String;",
-        cppTypeMirrorStr = "std::string",
+        cppSimpleTypeMirrorStr = "std::string",
         jniTypeStr = "jstring",
         checkIrClass = { it, nullable ->
             !nullable && it.kotlinFqName.toString() in listOf(
@@ -20,12 +21,10 @@ internal fun stringTypeMirror() =
         extractFromStaticField = extractJniString("GetStaticObjectField"),
         extractFromMethod = extractJniString("CallObjectMethod"),
         extractFromStaticMethod = extractJniString("CallStaticObjectMethod"),
-    )
-
-internal fun stringNullableTypeMirror() =
+    ),
     CppTypeMirror(
         jniTypeCode = "Ljava/lang/String;",
-        cppTypeMirrorStr = "std::shared_ptr<std::string>",
+        cppSimpleTypeMirrorStr = "std::shared_ptr<std::string>",
         jniTypeStr = "jstring",
         checkIrClass = { it, _ ->
             it.kotlinFqName.toString() in listOf(
@@ -42,10 +41,107 @@ internal fun stringNullableTypeMirror() =
         extractFromStaticMethod = extractJniString("CallStaticObjectMethod"),
         insertToField = insertJniType("SetObjectField"),
         insertToStaticField = insertJniType("SetStaticObjectField"),
-    )
+    ),
+    CppTypeMirror(
+        jniTypeCode = "[Ljava/lang/String;",
+        cppSimpleTypeMirrorStr = "std::string",
+        cppFullTypeMirror = "std::vector<std::string>",
+        jniTypeStr = "jobjectArray",
+        checkIrType = { type ->
+            type.isArray { argType ->
+                val argClass = argType.getClass() ?: return@isArray false
+                !argType.isNullable() && argClass.kotlinFqName.toString() in listOf(
+                    "java.lang.String",
+                    "kotlin.String",
+                    "kotlin.CharSequence",
+                )
+            }
+        },
+        transformToJni = { variable -> "brooklyn::mapper::mapToJStringArray(env,  std::make_shared<std::vector<std::string>>(   $variable ) ) " },
+        transformToCpp = { variable -> "*brooklyn::mapper::mapFromJStringArray(env, ${variable}) " },
+    ),
+    CppTypeMirror(
+        jniTypeCode = "[Ljava/lang/String;",
+        cppSimpleTypeMirrorStr = "std::string",
+        cppFullTypeMirror = "std::shared_ptr<std::vector<std::string>>",
+        jniTypeStr = "jobjectArray",
+        checkIrType = { type ->
+            type.isNullableArray { argType ->
+                val argClass = argType.getClass() ?: return@isNullableArray false
+                !argType.isNullable() && argClass.kotlinFqName.toString() in listOf(
+                    "java.lang.String",
+                    "kotlin.String",
+                    "kotlin.CharSequence",
+                )
+            }
+        },
+        transformToJni = { variable -> "brooklyn::mapper::mapToJStringArray(env, $variable )  " },
+        transformToCpp = { variable -> "brooklyn::mapper::mapFromJStringArray(env, ${variable}) " },
+    ),
+    CppTypeMirror(
+        jniTypeCode = "[Ljava/lang/String;",
+        cppSimpleTypeMirrorStr = "std::string",
+        cppFullTypeMirror = "std::vector<std::shared_ptr<std::string>>",
+        jniTypeStr = "jobjectArray",
+        checkIrType = { type ->
+            type.isArray { argType ->
+                val argClass = argType.getClass() ?: return@isArray false
+                argClass.kotlinFqName.toString() in listOf(
+                    "java.lang.String",
+                    "kotlin.String",
+                    "kotlin.CharSequence",
+                )
+            }
+        },
+        transformToJni = { variable -> "brooklyn::mapper::mapToJStringArrayNullable(env,  std::make_shared<std::vector<std::shared_ptr<std::string>>>(   $variable ) ) " },
+        transformToCpp = { variable -> "*brooklyn::mapper::mapFromJStringArrayNullable(env, ${variable}) " },
+    ),
+    CppTypeMirror(
+        jniTypeCode = "[Ljava/lang/String;",
+        cppSimpleTypeMirrorStr = "std::string",
+        cppFullTypeMirror = "std::shared_ptr<std::vector<std::shared_ptr<std::string>>>",
+        jniTypeStr = "jobjectArray",
+        checkIrType = { type ->
+            type.isNullableArray { argType ->
+                val argClass = argType.getClass() ?: return@isNullableArray false
+                argClass.kotlinFqName.toString() in listOf(
+                    "java.lang.String",
+                    "kotlin.String",
+                    "kotlin.CharSequence",
+                )
+            }
+        },
+        transformToJni = { variable -> "brooklyn::mapper::mapToJStringArrayNullable(env, $variable )  " },
+        transformToCpp = { variable -> "brooklyn::mapper::mapFromJStringArrayNullable(env, ${variable}) " },
+    ),
+)
 
 
-fun extractJniString(method: String) = ExtractJniType { jvmObj, fieldOrMethodId, args ->
-    " ( jstring )  env->${method}( ${listOf(jvmObj, fieldOrMethodId, args).joinArgs()} )"
+fun extractJniString(method: String) = ExtractJniType { type, jvmObj, fieldOrMethodId, args ->
+    " ( ${type.jniTypeStr} )  env->${method}( ${listOf(jvmObj, fieldOrMethodId, args).joinArgs()} )"
 }
 
+
+fun IrType.isNullableArray(argTypeCheck: (IrType) -> Boolean): Boolean {
+    return if (isNullableArray()) {
+        val argType = (this as? IrSimpleType)
+            ?.arguments
+            ?.getOrNull(0)
+            ?.typeOrNull
+            ?: return false
+
+        return argTypeCheck.invoke(argType)
+    } else false
+}
+
+
+fun IrType.isArray(argTypeCheck: (IrType) -> Boolean): Boolean {
+    return if (isArray()) {
+        val argType = (this as? IrSimpleType)
+            ?.arguments
+            ?.getOrNull(0)
+            ?.typeOrNull
+            ?: return false
+        return argTypeCheck.invoke(argType)
+    } else false
+}

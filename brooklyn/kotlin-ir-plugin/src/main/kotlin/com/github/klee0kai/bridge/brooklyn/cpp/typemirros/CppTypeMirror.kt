@@ -6,9 +6,7 @@ import com.github.klee0kai.bridge.brooklyn.cpp.common.camelCase
 import com.github.klee0kai.bridge.brooklyn.cpp.common.firstCamelCase
 import com.github.klee0kai.bridge.brooklyn.cpp.common.snakeCase
 import org.jetbrains.kotlin.ir.declarations.IrClass
-import org.jetbrains.kotlin.ir.types.IrType
-import org.jetbrains.kotlin.ir.types.getClass
-import org.jetbrains.kotlin.ir.types.isNullable
+import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.classId
 import org.jetbrains.kotlin.ir.util.kotlinFqName
 import org.jetbrains.kotlin.name.ClassId
@@ -18,6 +16,7 @@ fun interface ExtractJniType {
      *  extract jstring from field or method
      */
     fun invoke(
+        type: CppTypeMirror,
         jvmObj: String,
         fieldOrMethodId: String,
         args: String,
@@ -42,10 +41,10 @@ fun interface TransformJniType {
 
 class CppTypeMirror(
     val jniTypeCode: String,
-    val cppTypeMirrorStr: String,
+    val cppSimpleTypeMirrorStr: String,
+    cppFullTypeMirror: String? = null,
     val jniTypeStr: String = "jobject",
 
-    val isPtr: Boolean = false,
     val classId: ClassId? = null,
 
     val checkIrType: (IrType) -> Boolean = { false },
@@ -62,7 +61,7 @@ class CppTypeMirror(
     val insertToField: InsertJniType = insertJniType("SetObjectField"),
     val insertToStaticField: InsertJniType = insertJniType("SetStaticObjectField"),
 ) {
-    val cppPtrTypeMirror get() = if (isPtr) "std::shared_ptr<${cppTypeMirrorStr}>" else cppTypeMirrorStr
+    val cppFullTypeMirror = cppFullTypeMirror ?: cppSimpleTypeMirrorStr
 }
 
 fun IrType.jniType(): CppTypeMirror? {
@@ -87,14 +86,16 @@ fun IrClass.cppMappingNameSpace() = cppModelMirror()?.let { "${it}_mapping" } ?:
 // https://docs.oracle.com/javase/8/docs/technotes/guides/jni/spec/types.html
 val allCppTypeMirrors: MutableList<CppTypeMirror> = mutableListOf(
     *primitiveTypeMirrors(),
+    *primitiveArraysTypeMirrors(),
     *boxedTypeMirrors(),
-    stringTypeMirror(),
-    stringNullableTypeMirror(),
+    *stringsTypeMirror(),
+    *boxedArraysTypeMirrors(),
 )
 
 
-fun extractJniType(method: String) = ExtractJniType { jvmObj, fieldOrMethodId, args ->
-    "env->${method}( ${listOf(jvmObj, fieldOrMethodId, args).joinArgs()} )"
+fun extractJniType(method: String) = ExtractJniType { type, jvmObj, fieldOrMethodId, args ->
+    val castType = if (type.jniTypeStr != "jobject") "( ${type.jniTypeStr}  )" else "";
+    " $castType env->${method}( ${listOf(jvmObj, fieldOrMethodId, args).joinArgs()} )"
 }
 
 fun insertJniType(method: String) = InsertJniType { variable, jvmObj, fieldOrMethodId ->
@@ -111,7 +112,7 @@ fun MutableList<CppTypeMirror>.addSupportedPojoClass(clazz: IrClass) {
     add(
         CppTypeMirror(
             jniTypeCode = "L${clazz.kotlinFqName.toString().snakeCase("/")};",
-            cppTypeMirrorStr = cppModelMirror,
+            cppSimpleTypeMirrorStr = cppModelMirror,
             jniTypeStr = "jobject",
             classId = classId,
             checkIrClass = { cl, nullable -> !nullable && cl.classId == clazz.classId },
@@ -122,13 +123,104 @@ fun MutableList<CppTypeMirror>.addSupportedPojoClass(clazz: IrClass) {
     add(
         CppTypeMirror(
             jniTypeCode = "L${clazz.kotlinFqName.toString().snakeCase("/")};",
-            cppTypeMirrorStr = cppModelMirror,
+            cppSimpleTypeMirrorStr = cppModelMirror,
+            cppFullTypeMirror = "std::shared_ptr<${cppModelMirror}>",
             jniTypeStr = "jobject",
-            isPtr = true,
             classId = classId,
             checkIrClass = { cl, _ -> cl.classId == clazz.classId },
             transformToJni = { variable -> "${BROOKLYN}::${MAPPER}::${namespace}::mapToJvm(env,  $variable )" },
             transformToCpp = { variable -> "${BROOKLYN}::${MAPPER}::${namespace}::mapFromJvm(env, $variable ) " },
+        )
+    )
+    add(
+        CppTypeMirror(
+            jniTypeCode = "[L${clazz.kotlinFqName.toString().snakeCase("/")};",
+            cppSimpleTypeMirrorStr = cppModelMirror,
+            cppFullTypeMirror = "std::vector<${cppModelMirror}>",
+            jniTypeStr = "jobjectArray",
+            classId = classId,
+            checkIrType = { type ->
+                if (type.isArray()) {
+                    val argType = (type as? IrSimpleType)
+                        ?.arguments
+                        ?.getOrNull(0)
+                        ?.typeOrNull
+                        ?: return@CppTypeMirror false
+                    val argClass = argType.getClass()
+                    !argType.isNullable() && argClass?.classId == clazz.classId
+                } else false
+
+            },
+            transformToJni = { variable -> "${BROOKLYN}::${MAPPER}::${namespace}::mapArrayToJvm(env, std::make_shared<std::vector<${cppModelMirror}>>(  $variable ) )" },
+            transformToCpp = { variable -> "*${BROOKLYN}::${MAPPER}::${namespace}::mapArrayFromJvm(env, $variable ) " },
+        )
+    )
+    add(
+        CppTypeMirror(
+            jniTypeCode = "[L${clazz.kotlinFqName.toString().snakeCase("/")};",
+            cppSimpleTypeMirrorStr = cppModelMirror,
+            cppFullTypeMirror = "std::shared_ptr<std::vector<${cppModelMirror}>>",
+            jniTypeStr = "jobjectArray",
+            classId = classId,
+            checkIrType = { type ->
+                if (type.isNullableArray()) {
+                    val argType = (type as? IrSimpleType)
+                        ?.arguments
+                        ?.getOrNull(0)
+                        ?.typeOrNull
+                        ?: return@CppTypeMirror false
+                    val argClass = argType.getClass()
+                    !argType.isNullable() && argClass?.classId == clazz.classId
+                } else false
+
+            },
+            transformToJni = { variable -> "${BROOKLYN}::${MAPPER}::${namespace}::mapArrayToJvm(env,  $variable )" },
+            transformToCpp = { variable -> "${BROOKLYN}::${MAPPER}::${namespace}::mapArrayFromJvm(env, $variable ) " },
+        )
+    )
+    add(
+        CppTypeMirror(
+            jniTypeCode = "[L${clazz.kotlinFqName.toString().snakeCase("/")};",
+            cppSimpleTypeMirrorStr = cppModelMirror,
+            cppFullTypeMirror = "std::vector<std::shared_ptr<${cppModelMirror}>>",
+            jniTypeStr = "jobjectArray",
+            classId = classId,
+            checkIrType = { type ->
+                if (type.isArray()) {
+                    val argType = (type as? IrSimpleType)
+                        ?.arguments
+                        ?.getOrNull(0)
+                        ?.typeOrNull
+                        ?: return@CppTypeMirror false
+                    val argClass = argType.getClass()
+                    argClass?.classId == clazz.classId
+                } else false
+            },
+            transformToJni = { variable -> "${BROOKLYN}::${MAPPER}::${namespace}::mapArrayNullableToJvm(env, std::make_shared<std::vector<std::shared_ptr<${cppModelMirror}>>>(  $variable ) )" },
+            transformToCpp = { variable -> "*${BROOKLYN}::${MAPPER}::${namespace}::mapArrayNullableFromJvm(env, $variable ) " },
+        )
+    )
+    add(
+        CppTypeMirror(
+            jniTypeCode = "[L${clazz.kotlinFqName.toString().snakeCase("/")};",
+            cppSimpleTypeMirrorStr = cppModelMirror,
+            cppFullTypeMirror = "std::shared_ptr<std::vector<std::shared_ptr<${cppModelMirror}>>>",
+            jniTypeStr = "jobjectArray",
+            classId = classId,
+            checkIrType = { type ->
+                if (type.isNullableArray()) {
+                    val argType = (type as? IrSimpleType)
+                        ?.arguments
+                        ?.getOrNull(0)
+                        ?.typeOrNull
+                        ?: return@CppTypeMirror false
+                    val argClass = argType.getClass()
+                    argClass?.classId == clazz.classId
+                } else false
+
+            },
+            transformToJni = { variable -> "${BROOKLYN}::${MAPPER}::${namespace}::mapArrayNullableToJvm(env, $variable )" },
+            transformToCpp = { variable -> "${BROOKLYN}::${MAPPER}::${namespace}::mapArrayNullableFromJvm(env, $variable ) " },
         )
     )
 }
@@ -136,10 +228,11 @@ fun MutableList<CppTypeMirror>.addSupportedPojoClass(clazz: IrClass) {
 fun MutableList<CppTypeMirror>.addSupportedMirrorClass(clazz: IrClass) {
     val classId = clazz.classId!!
     val cppModelMirror = clazz.cppModelMirror() ?: return
+    val namespace = clazz.cppMappingNameSpace()
     add(
         CppTypeMirror(
             jniTypeCode = "L${clazz.kotlinFqName.toString().snakeCase("/")};",
-            cppTypeMirrorStr = cppModelMirror,
+            cppSimpleTypeMirrorStr = cppModelMirror,
             jniTypeStr = "jobject",
             classId = classId,
             checkIrClass = { cl, nullable -> !nullable && cl.classId == clazz.classId },
@@ -150,13 +243,104 @@ fun MutableList<CppTypeMirror>.addSupportedMirrorClass(clazz: IrClass) {
     add(
         CppTypeMirror(
             jniTypeCode = "L${clazz.kotlinFqName.toString().snakeCase("/")};",
-            cppTypeMirrorStr = cppModelMirror,
+            cppSimpleTypeMirrorStr = cppModelMirror,
+            cppFullTypeMirror = "std::shared_ptr<${cppModelMirror}>",
             jniTypeStr = "jobject",
-            isPtr = true,
             classId = classId,
             checkIrClass = { cl, _ -> cl.classId == clazz.classId },
             transformToJni = { variable -> "${variable}->jvmObject()" },
             transformToCpp = { variable -> "std::make_shared<${BROOKLYN}::${cppModelMirror}>( $variable ) " },
+        )
+    )
+    add(
+        CppTypeMirror(
+            jniTypeCode = "[L${clazz.kotlinFqName.toString().snakeCase("/")};",
+            cppSimpleTypeMirrorStr = cppModelMirror,
+            cppFullTypeMirror = "std::vector<${cppModelMirror}>",
+            jniTypeStr = "jobjectArray",
+            classId = classId,
+            checkIrType = { type ->
+                if (type.isArray()) {
+                    val argType = (type as? IrSimpleType)
+                        ?.arguments
+                        ?.getOrNull(0)
+                        ?.typeOrNull
+                        ?: return@CppTypeMirror false
+                    val argClass = argType.getClass()
+                    !argType.isNullable() && argClass?.classId == clazz.classId
+                } else false
+
+            },
+            transformToJni = { variable -> "${BROOKLYN}::${MAPPER}::${namespace}::mapArrayToJvm(env, std::make_shared<std::vector<${cppModelMirror}>>(  $variable ) )" },
+            transformToCpp = { variable -> "*${BROOKLYN}::${MAPPER}::${namespace}::mapArrayFromJvm(env, $variable ) " },
+        )
+    )
+    add(
+        CppTypeMirror(
+            jniTypeCode = "[L${clazz.kotlinFqName.toString().snakeCase("/")};",
+            cppSimpleTypeMirrorStr = cppModelMirror,
+            cppFullTypeMirror = "std::shared_ptr<std::vector<${cppModelMirror}>>",
+            jniTypeStr = "jobjectArray",
+            classId = classId,
+            checkIrType = { type ->
+                if (type.isNullableArray()) {
+                    val argType = (type as? IrSimpleType)
+                        ?.arguments
+                        ?.getOrNull(0)
+                        ?.typeOrNull
+                        ?: return@CppTypeMirror false
+                    val argClass = argType.getClass()
+                    !argType.isNullable() && argClass?.classId == clazz.classId
+                } else false
+
+            },
+            transformToJni = { variable -> "${BROOKLYN}::${MAPPER}::${namespace}::mapArrayToJvm(env,  $variable )" },
+            transformToCpp = { variable -> "${BROOKLYN}::${MAPPER}::${namespace}::mapArrayFromJvm(env, $variable ) " },
+        )
+    )
+    add(
+        CppTypeMirror(
+            jniTypeCode = "[L${clazz.kotlinFqName.toString().snakeCase("/")};",
+            cppSimpleTypeMirrorStr = cppModelMirror,
+            cppFullTypeMirror = "std::vector<std::shared_ptr<${cppModelMirror}>>",
+            jniTypeStr = "jobjectArray",
+            classId = classId,
+            checkIrType = { type ->
+                if (type.isArray()) {
+                    val argType = (type as? IrSimpleType)
+                        ?.arguments
+                        ?.getOrNull(0)
+                        ?.typeOrNull
+                        ?: return@CppTypeMirror false
+                    val argClass = argType.getClass()
+                    argClass?.classId == clazz.classId
+                } else false
+            },
+            transformToJni = { variable -> "${BROOKLYN}::${MAPPER}::${namespace}::mapArrayNullableToJvm(env, std::make_shared<std::vector<std::shared_ptr<${cppModelMirror}>>>(  $variable ) )" },
+            transformToCpp = { variable -> "*${BROOKLYN}::${MAPPER}::${namespace}::mapArrayNullableFromJvm(env, $variable ) " },
+        )
+    )
+    add(
+        CppTypeMirror(
+            jniTypeCode = "[L${clazz.kotlinFqName.toString().snakeCase("/")};",
+            cppSimpleTypeMirrorStr = cppModelMirror,
+            cppFullTypeMirror = "std::shared_ptr<std::vector<std::shared_ptr<${cppModelMirror}>>>",
+            jniTypeStr = "jobjectArray",
+            classId = classId,
+            checkIrType = { type ->
+                if (type.isNullableArray()) {
+                    val argType = (type as? IrSimpleType)
+                        ?.arguments
+                        ?.getOrNull(0)
+                        ?.typeOrNull
+                        ?: return@CppTypeMirror false
+                    val argClass = argType.getClass()
+                    argClass?.classId == clazz.classId
+                } else false
+
+            },
+            transformToJni = { variable -> "${BROOKLYN}::${MAPPER}::${namespace}::mapArrayNullableToJvm(env, $variable )" },
+            transformToCpp = { variable -> "${BROOKLYN}::${MAPPER}::${namespace}::mapArrayNullableFromJvm(env, $variable ) " },
         )
     )
 }

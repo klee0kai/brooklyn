@@ -16,7 +16,7 @@ fun Poet.floatIndexInit() = apply {
 
 
 fun Poet.mapFloatFromJava(isImpl: Boolean = false) = apply {
-    val declare = "std::shared_ptr<float> mapFromJFloat(JNIEnv *env, jobject jFloat) "
+    val declare = "std::shared_ptr<float> mapFromJFloatBoxed(JNIEnv *env, jobject jFloat) "
     if (!isImpl) {
         statement(declare)
         return@apply
@@ -29,7 +29,7 @@ fun Poet.mapFloatFromJava(isImpl: Boolean = false) = apply {
 
 
 fun Poet.mapFloatToJava(isImpl: Boolean = false) = apply {
-    val declare = "jobject mapToJFloat(JNIEnv *env, const std::shared_ptr<float>& valuePtr) "
+    val declare = "jobject mapToJFloatBoxed(JNIEnv *env, const std::shared_ptr<float>& valuePtr) "
     if (!isImpl) {
         statement(declare)
         return@apply
@@ -37,4 +37,55 @@ fun Poet.mapFloatToJava(isImpl: Boolean = false) = apply {
     line("$declare {")
     statement("return valuePtr ? env->NewObject(floatIndex->cls, floatIndex->toJvm, jfloat( *valuePtr ) ) : NULL")
     line("}")
+}
+
+fun Poet.mapFloatArrayFromJava(isImpl: Boolean = false) = apply {
+    mapPrimitiveArrayFromJvm(
+        isImpl = isImpl,
+        name = "mapFromJFloatArray",
+        cppType = "float",
+        jType = "jfloat",
+        jArrayType = "jfloatArray",
+        jGetElementsMethod = "GetFloatArrayElements",
+        jReleaseArrayMethod = "ReleaseFloatArrayElements"
+    )
+    mapBoxedArrayFromJvm(
+        isImpl = isImpl,
+        name = "mapFromJBoxedFloatArray",
+        cppType = "float",
+        mappingMethod = { variable -> "*mapFromJFloatBoxed(env, $variable )" }
+    )
+    mapBoxedArrayFromJvm(
+        isImpl = isImpl,
+        name = "mapFromJFloatNullableArray",
+        cppType = "std::shared_ptr<float>",
+        mappingMethod = { variable -> "mapFromJFloatBoxed(env, $variable )" }
+    )
+}
+
+
+fun Poet.mapFloatArrayToJava(isImpl: Boolean = false) = apply {
+    mapPrimitiveArrayToJvm(
+        isImpl = isImpl,
+        name = "mapToJFloatArray",
+        cppType = "float",
+        jType = "jfloat",
+        jArrayType = "jfloatArray",
+        jCreateArrayMethod = "NewFloatArray",
+        jSetArrayMethod = "SetFloatArrayRegion",
+    )
+    mapBoxedArrayToJvm(
+        isImpl = isImpl,
+        name = "mapToJBoxedFloatArray",
+        cppType = "float",
+        indexVariable = "floatIndex",
+        mappingMethod = { variable -> "mapToJFloatBoxed(env, std::make_shared<float>( $variable ) )" }
+    )
+    mapBoxedArrayToJvm(
+        isImpl = isImpl,
+        name = "mapToJFloatNullableArray",
+        cppType = "std::shared_ptr<float>",
+        indexVariable = "floatIndex",
+        mappingMethod = { variable -> "mapToJFloatBoxed(env, $variable )" }
+    )
 }

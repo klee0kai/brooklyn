@@ -16,7 +16,7 @@ fun Poet.doubleIndexInit() = apply {
 
 
 fun Poet.mapDoubleFromJava(isImpl: Boolean = false) = apply {
-    val declare = "std::shared_ptr<double> mapFromJDouble(JNIEnv *env, jobject jValue) "
+    val declare = "std::shared_ptr<double> mapFromJDoubleBoxed(JNIEnv *env, jobject jValue) "
     if (!isImpl) {
         statement(declare)
         return@apply
@@ -29,7 +29,7 @@ fun Poet.mapDoubleFromJava(isImpl: Boolean = false) = apply {
 
 
 fun Poet.mapDoubleToJava(isImpl: Boolean = false) = apply {
-    val declare = "jobject mapToJDouble(JNIEnv *env, const std::shared_ptr<double>& valuePtr) "
+    val declare = "jobject mapToJDoubleBoxed(JNIEnv *env, const std::shared_ptr<double>& valuePtr) "
     if (!isImpl) {
         statement(declare)
         return@apply
@@ -37,4 +37,57 @@ fun Poet.mapDoubleToJava(isImpl: Boolean = false) = apply {
     line("$declare {")
     statement("return valuePtr ? env->NewObject(doubleIndex->cls, doubleIndex->toJvm, jdouble( *valuePtr ) ) : NULL")
     line("}")
+}
+
+
+
+fun Poet.mapDoubleArrayFromJava(isImpl: Boolean = false) =apply {
+    mapPrimitiveArrayFromJvm(
+        isImpl = isImpl,
+        name = "mapFromJDoubleArray",
+        cppType = "double",
+        jType = "jdouble",
+        jArrayType = "jdoubleArray",
+        jGetElementsMethod = "GetDoubleArrayElements",
+        jReleaseArrayMethod = "ReleaseDoubleArrayElements"
+    )
+    mapBoxedArrayFromJvm(
+        isImpl = isImpl,
+        name = "mapFromJBoxedDoubleArray",
+        cppType = "double",
+        mappingMethod = { variable -> "*mapFromJDoubleBoxed(env, $variable )" }
+    )
+    mapBoxedArrayFromJvm(
+        isImpl = isImpl,
+        name = "mapFromJDoubleNullableArray",
+        cppType = "std::shared_ptr<double>",
+        mappingMethod = { variable -> "mapFromJDoubleBoxed(env, $variable )" }
+    )
+}
+
+
+fun Poet.mapDoubleArrayToJava(isImpl: Boolean = false) =apply {
+    mapPrimitiveArrayToJvm(
+        isImpl = isImpl,
+        name = "mapToJDoubleArray",
+        cppType = "double",
+        jType = "jdouble",
+        jArrayType = "jdoubleArray",
+        jCreateArrayMethod = "NewDoubleArray",
+        jSetArrayMethod = "SetDoubleArrayRegion",
+    )
+    mapBoxedArrayToJvm(
+        isImpl = isImpl,
+        name = "mapToJBoxedDoubleArray",
+        cppType = "double",
+        indexVariable = "doubleIndex",
+        mappingMethod = { variable -> "mapToJDoubleBoxed(env, std::make_shared<double>( $variable ) )" }
+    )
+    mapBoxedArrayToJvm(
+        isImpl = isImpl,
+        name = "mapToJDoubleNullableArray",
+        cppType = "std::shared_ptr<double>",
+        indexVariable = "doubleIndex",
+        mappingMethod = { variable -> "mapToJDoubleBoxed(env, $variable )" }
+    )
 }

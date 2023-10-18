@@ -113,7 +113,7 @@ class BrooklynIrGenerationExtension(
                 .declareClassIndexStructure(declaration)
                 .initJniClassApi()
                 .deinitJniClassApi()
-                .mapJniClassApi(declaration)
+                .mapJniClass(declaration)
 
             gen.getOrCreate(
                 clId.mapperCppFile,
@@ -125,7 +125,7 @@ class BrooklynIrGenerationExtension(
                 .declareClassIndexField(declaration)
                 .initJniClassImpl(declaration)
                 .deinitJniClassImpl(declaration)
-                .mapJniClassImpl(declaration)
+                .mapJniClass(declaration, isImpl = true)
 
             gen.getOrCreate(clId.modelHeaderFile, headersInitBlock())
                 .declareClassModelStructure(declaration)
@@ -136,11 +136,13 @@ class BrooklynIrGenerationExtension(
             gen.getOrCreate(clId.mapperHeaderFile, headersInitBlock(namespaces = arrayOf(MAPPER)))
                 .header {
                     include(CommonNaming.commonClassesMapperHeader)
+                    include(clId.modelHeaderFile.path)
                 }
                 .namespaces(declaration.cppMappingNameSpace())
                 .declareClassIndexStructure(declaration)
                 .initJniClassApi()
                 .deinitJniClassApi()
+                .mapMirrorClass(declaration)
 
 
 
@@ -156,6 +158,8 @@ class BrooklynIrGenerationExtension(
                 .declareClassIndexField(declaration)
                 .initJniClassImpl(declaration)
                 .deinitJniClassImpl(declaration)
+                .mapMirrorClass(declaration, isImpl = true)
+
 
             gen.getOrCreate(clId.modelHeaderFile, headersInitBlock())
                 .header { include(CommonNaming.envHeader) }

@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.ir.types.*
 internal fun primitiveTypeMirrors() = arrayOf(
     CppTypeMirror(
         jniTypeCode = "Z",
-        cppTypeMirrorStr = "int",
+        cppSimpleTypeMirrorStr = "int",
         jniTypeStr = "jboolean",
         checkIrType = { it.isBoolean() },
         transformToJni = { variable -> "$variable ? 1 : 0 " },
@@ -19,7 +19,7 @@ internal fun primitiveTypeMirrors() = arrayOf(
     ),
     CppTypeMirror(
         jniTypeCode = "B",
-        cppTypeMirrorStr = "int",
+        cppSimpleTypeMirrorStr = "int",
         jniTypeStr = "jbyte",
         checkIrType = { it.isByte() },
         transformToJni = castType("jbyte"),
@@ -33,7 +33,7 @@ internal fun primitiveTypeMirrors() = arrayOf(
     ),
     CppTypeMirror(
         jniTypeCode = "C",
-        cppTypeMirrorStr = "char",
+        cppSimpleTypeMirrorStr = "char",
         jniTypeStr = "jchar",
         checkIrType = { it.isChar() },
         transformToJni = castType("jchar"),
@@ -47,7 +47,7 @@ internal fun primitiveTypeMirrors() = arrayOf(
     ),
     CppTypeMirror(
         jniTypeCode = "S",
-        cppTypeMirrorStr = "int",
+        cppSimpleTypeMirrorStr = "int",
         jniTypeStr = "jshort",
         checkIrType = { it.isShort() },
         transformToJni = castType("jshort"),
@@ -61,7 +61,7 @@ internal fun primitiveTypeMirrors() = arrayOf(
     ),
     CppTypeMirror(
         jniTypeCode = "I",
-        cppTypeMirrorStr = "int",
+        cppSimpleTypeMirrorStr = "int",
         jniTypeStr = "jint",
         checkIrType = { it.isInt() },
         transformToJni = castType("jint"),
@@ -75,7 +75,7 @@ internal fun primitiveTypeMirrors() = arrayOf(
     ),
     CppTypeMirror(
         jniTypeCode = "J",
-        cppTypeMirrorStr = "int64_t",
+        cppSimpleTypeMirrorStr = "int64_t",
         jniTypeStr = "jlong",
         checkIrType = { it.isLong() },
         transformToJni = castType("jlong"),
@@ -90,7 +90,7 @@ internal fun primitiveTypeMirrors() = arrayOf(
         ),
     CppTypeMirror(
         jniTypeCode = "F",
-        cppTypeMirrorStr = "float",
+        cppSimpleTypeMirrorStr = "float",
         jniTypeStr = "jfloat",
         checkIrType = { it.isFloat() },
         transformToJni = castType("jfloat"),
@@ -105,7 +105,7 @@ internal fun primitiveTypeMirrors() = arrayOf(
         ),
     CppTypeMirror(
         jniTypeCode = "D",
-        cppTypeMirrorStr = "double",
+        cppSimpleTypeMirrorStr = "double",
         jniTypeStr = "jdouble",
         checkIrType = { it.isDouble() },
         transformToJni = castType("jdouble"),

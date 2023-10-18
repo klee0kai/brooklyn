@@ -12,6 +12,9 @@ fun CodeBuilder.initStdTypes(isImpl: Boolean = false) = apply {
         body { statement(declare) }
         return@apply
     }
+    header {
+        statement("using namespace std")
+    }
     variables {
         line("struct SimpleIndexStructure {")
         statement("jclass cls")
@@ -27,6 +30,7 @@ fun CodeBuilder.initStdTypes(isImpl: Boolean = false) = apply {
         stdTypeIndexStructure("charIndex")
         stdTypeIndexStructure("shortIndex")
         stdTypeIndexStructure("byteIndex")
+        stdTypeIndexStructure("stringIndex")
     }
 
     body {
@@ -40,6 +44,7 @@ fun CodeBuilder.initStdTypes(isImpl: Boolean = false) = apply {
         charIndexInit()
         shortIndexInit()
         byteIndexInit()
+        stringIndexInit()
         statement("return 0")
         line("}")
     }
@@ -72,30 +77,51 @@ fun CodeBuilder.stdTypeMappers(isImpl: Boolean = false) = apply {
     body {
         mapBooleanFromJava(isImpl)
         mapBooleanToJava(isImpl)
+        mapBooleanArrayFromJava(isImpl)
+        mapBooleanArrayToJava(isImpl)
 
         mapIntegerFromJava(isImpl)
         mapIntegerToJava(isImpl)
+        mapIntegerArrayFromJava(isImpl)
+        mapIntegerArrayToJava(isImpl)
 
         mapLongFromJava(isImpl)
         mapLongToJava(isImpl)
+        mapLongArrayFromJava(isImpl)
+        mapLongArrayToJava(isImpl)
 
         mapFloatFromJava(isImpl)
         mapFloatToJava(isImpl)
+        mapFloatArrayFromJava(isImpl)
+        mapFloatArrayToJava(isImpl)
 
         mapDoubleFromJava(isImpl)
         mapDoubleToJava(isImpl)
+        mapDoubleArrayFromJava(isImpl)
+        mapDoubleArrayToJava(isImpl)
 
         mapCharFromJava(isImpl)
         mapCharToJava(isImpl)
+        mapCharArrayFromJava(isImpl)
+        mapCharArrayToJava(isImpl)
 
         mapShortFromJava(isImpl)
         mapShortToJava(isImpl)
+        mapShortArrayFromJava(isImpl)
+        mapShortArrayToJava(isImpl)
 
         mapByteFromJava(isImpl)
         mapByteToJava(isImpl)
+        mapByteArrayFromJava(isImpl)
+        mapByteArrayToJava(isImpl)
 
         mapFromJString(isImpl)
         mapToJString(isImpl)
+        mapFromJStringArray(isImpl)
+        mapFromJStringArrayNullable(isImpl)
+        mapToJStringArray(isImpl)
+        mapToJStringArrayNullable(isImpl)
+
     }
 }
 
