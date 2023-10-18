@@ -116,7 +116,7 @@ internal fun boxedArraysTypeMirrors() = arrayOf(
 
     //Char
     CppTypeMirror(
-        jniTypeCode = "[Ljava/lang/Char;",
+        jniTypeCode = "[Ljava/lang/Character;",
         cppSimpleTypeMirrorStr = "char",
         cppFullTypeMirror = "std::vector<char>",
         jniTypeStr = "jobjectArray",
@@ -125,7 +125,7 @@ internal fun boxedArraysTypeMirrors() = arrayOf(
         transformToJni = { variable -> "brooklyn::mapper::mapToJBoxedCharArray(env,  std::make_shared<std::vector<char>>( $variable ) ) " },
     ),
     CppTypeMirror(
-        jniTypeCode = "[Ljava/lang/Char;",
+        jniTypeCode = "[Ljava/lang/Character;",
         cppSimpleTypeMirrorStr = "char",
         cppFullTypeMirror = "std::shared_ptr<std::vector<char>>",
         jniTypeStr = "jobjectArray",
@@ -134,7 +134,7 @@ internal fun boxedArraysTypeMirrors() = arrayOf(
         transformToJni = { variable -> "brooklyn::mapper::mapToJBoxedCharArray(env, $variable ) " },
     ),
     CppTypeMirror(
-        jniTypeCode = "[Ljava/lang/Char;",
+        jniTypeCode = "[Ljava/lang/Character;",
         cppSimpleTypeMirrorStr = "char",
         cppFullTypeMirror = "std::vector<std::shared_ptr<char>>",
         jniTypeStr = "jobjectArray",
@@ -142,7 +142,7 @@ internal fun boxedArraysTypeMirrors() = arrayOf(
             type.isArray { argType ->
                 val argClass = argType.getClass() ?: return@isArray false
                 argClass.kotlinFqName.toString() in listOf(
-                    "java.lang.Char",
+                    "java.lang.Character",
                     "kotlin.Char",
                 )
             }
@@ -151,7 +151,7 @@ internal fun boxedArraysTypeMirrors() = arrayOf(
         transformToJni = { variable -> "brooklyn::mapper::mapToJCharNullableArray(env,  std::make_shared<std::vector<std::shared_ptr<char>>>(  $variable ) ) " },
     ),
     CppTypeMirror(
-        jniTypeCode = "[Ljava/lang/Char;",
+        jniTypeCode = "[Ljava/lang/Character;",
         cppSimpleTypeMirrorStr = "char",
         cppFullTypeMirror = "std::shared_ptr<std::vector<std::shared_ptr<char>>>",
         jniTypeStr = "jobjectArray",
@@ -159,7 +159,7 @@ internal fun boxedArraysTypeMirrors() = arrayOf(
             type.isNullableArray { argType ->
                 val argClass = argType.getClass() ?: return@isNullableArray false
                 argClass.kotlinFqName.toString() in listOf(
-                    "java.lang.Char",
+                    "java.lang.Character",
                     "kotlin.Char",
                 )
             }
