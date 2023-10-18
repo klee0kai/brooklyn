@@ -16,7 +16,7 @@ fun Poet.doubleIndexInit() = apply {
 
 
 fun Poet.mapDoubleFromJava(isImpl: Boolean = false) = apply {
-    val declare = "std::shared_ptr<double> mapFromJDouble(JNIEnv *env, jobject jValue) "
+    val declare = "std::shared_ptr<double> mapFromJDoubleBoxed(JNIEnv *env, jobject jValue) "
     if (!isImpl) {
         statement(declare)
         return@apply
@@ -29,7 +29,7 @@ fun Poet.mapDoubleFromJava(isImpl: Boolean = false) = apply {
 
 
 fun Poet.mapDoubleToJava(isImpl: Boolean = false) = apply {
-    val declare = "jobject mapToJDouble(JNIEnv *env, const std::shared_ptr<double>& valuePtr) "
+    val declare = "jobject mapToJDoubleBoxed(JNIEnv *env, const std::shared_ptr<double>& valuePtr) "
     if (!isImpl) {
         statement(declare)
         return@apply

@@ -16,7 +16,7 @@ fun Poet.shortIndexInit() = apply {
 
 
 fun Poet.mapShortFromJava(isImpl: Boolean = false) = apply {
-    val declare = "std::shared_ptr<int> mapFromJShort(JNIEnv *env, jobject jValue) "
+    val declare = "std::shared_ptr<int> mapFromJShortBoxed(JNIEnv *env, jobject jValue) "
     if (!isImpl) {
         statement(declare)
         return@apply
@@ -29,7 +29,7 @@ fun Poet.mapShortFromJava(isImpl: Boolean = false) = apply {
 
 
 fun Poet.mapShortToJava(isImpl: Boolean = false) = apply {
-    val declare = "jobject mapToJShort(JNIEnv *env, const std::shared_ptr<int>& valuePtr) "
+    val declare = "jobject mapToJShortBoxed(JNIEnv *env, const std::shared_ptr<int>& valuePtr) "
     if (!isImpl) {
         statement(declare)
         return@apply

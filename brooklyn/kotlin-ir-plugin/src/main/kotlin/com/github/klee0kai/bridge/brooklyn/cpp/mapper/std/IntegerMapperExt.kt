@@ -16,7 +16,7 @@ fun Poet.integerIndexInit() = apply {
 
 
 fun Poet.mapIntegerFromJava(isImpl: Boolean = false) = apply {
-    val declare = "std::shared_ptr<int> mapFromJInteger(JNIEnv *env, jobject jInt) "
+    val declare = "std::shared_ptr<int> mapFromJIntegerBoxed(JNIEnv *env, jobject jInt) "
     if (!isImpl) {
         statement(declare)
         return@apply
@@ -29,7 +29,7 @@ fun Poet.mapIntegerFromJava(isImpl: Boolean = false) = apply {
 
 
 fun Poet.mapIntegerToJava(isImpl: Boolean = false) = apply {
-    val declare = "jobject mapToJInteger(JNIEnv *env, const std::shared_ptr<int>& cppInt) "
+    val declare = "jobject mapToJIntegerBoxed(JNIEnv *env, const std::shared_ptr<int>& cppInt) "
     if (!isImpl) {
         statement(declare)
         return@apply

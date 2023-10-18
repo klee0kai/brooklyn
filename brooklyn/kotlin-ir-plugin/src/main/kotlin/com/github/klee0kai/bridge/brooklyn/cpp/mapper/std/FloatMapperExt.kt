@@ -16,7 +16,7 @@ fun Poet.floatIndexInit() = apply {
 
 
 fun Poet.mapFloatFromJava(isImpl: Boolean = false) = apply {
-    val declare = "std::shared_ptr<float> mapFromJFloat(JNIEnv *env, jobject jFloat) "
+    val declare = "std::shared_ptr<float> mapFromJFloatBoxed(JNIEnv *env, jobject jFloat) "
     if (!isImpl) {
         statement(declare)
         return@apply
@@ -29,7 +29,7 @@ fun Poet.mapFloatFromJava(isImpl: Boolean = false) = apply {
 
 
 fun Poet.mapFloatToJava(isImpl: Boolean = false) = apply {
-    val declare = "jobject mapToJFloat(JNIEnv *env, const std::shared_ptr<float>& valuePtr) "
+    val declare = "jobject mapToJFloatBoxed(JNIEnv *env, const std::shared_ptr<float>& valuePtr) "
     if (!isImpl) {
         statement(declare)
         return@apply

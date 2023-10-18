@@ -16,7 +16,7 @@ fun Poet.byteIndexInit() = apply {
 
 
 fun Poet.mapByteFromJava(isImpl: Boolean = false) = apply {
-    val declare = "std::shared_ptr<int> mapFromJByte(JNIEnv *env, jobject jValue) "
+    val declare = "std::shared_ptr<int> mapFromJByteBoxed(JNIEnv *env, jobject jValue) "
     if (!isImpl) {
         statement(declare)
         return@apply
@@ -29,7 +29,7 @@ fun Poet.mapByteFromJava(isImpl: Boolean = false) = apply {
 
 
 fun Poet.mapByteToJava(isImpl: Boolean = false) = apply {
-    val declare = "jobject mapToJByte(JNIEnv *env, const std::shared_ptr<int>& valuePtr) "
+    val declare = "jobject mapToJByteBoxed(JNIEnv *env, const std::shared_ptr<int>& valuePtr) "
     if (!isImpl) {
         statement(declare)
         return@apply

@@ -16,7 +16,7 @@ fun Poet.charIndexInit() = apply {
 
 
 fun Poet.mapCharFromJava(isImpl: Boolean = false) = apply {
-    val declare = "std::shared_ptr<char> mapFromJChar(JNIEnv *env, jobject jValue) "
+    val declare = "std::shared_ptr<char> mapFromJCharBoxed(JNIEnv *env, jobject jValue) "
     if (!isImpl) {
         statement(declare)
         return@apply
@@ -29,7 +29,7 @@ fun Poet.mapCharFromJava(isImpl: Boolean = false) = apply {
 
 
 fun Poet.mapCharToJava(isImpl: Boolean = false) = apply {
-    val declare = "jobject mapToJChar(JNIEnv *env, const std::shared_ptr<char>& valuePtr) "
+    val declare = "jobject mapToJCharBoxed(JNIEnv *env, const std::shared_ptr<char>& valuePtr) "
     if (!isImpl) {
         statement(declare)
         return@apply

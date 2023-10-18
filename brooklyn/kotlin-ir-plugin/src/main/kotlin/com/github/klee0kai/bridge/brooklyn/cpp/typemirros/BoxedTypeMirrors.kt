@@ -12,8 +12,8 @@ internal fun boxedTypeMirrors() = arrayOf(
                 "kotlin.Boolean",
             )
         },
-        transformToJni = { variable -> "brooklyn::mapper::mapToJBoolean(env,  $variable )" },
-        transformToCpp = { variable -> "brooklyn::mapper::mapFromJBoolean(env, $variable ) " },
+        transformToJni = { variable -> "brooklyn::mapper::mapToJBooleanBoxed(env,  $variable )" },
+        transformToCpp = { variable -> "brooklyn::mapper::mapFromJBooleanBoxed(env, $variable ) " },
     ),
     CppTypeMirror(
         jniTypeCode = "Ljava/lang/Integer;",
@@ -25,8 +25,8 @@ internal fun boxedTypeMirrors() = arrayOf(
                 "kotlin.Number",
             )
         },
-        transformToJni = { variable -> "brooklyn::mapper::mapToJInteger(env, $variable )" },
-        transformToCpp = { variable -> "brooklyn::mapper::mapFromJInteger(env, $variable ) " },
+        transformToJni = { variable -> "brooklyn::mapper::mapToJIntegerBoxed(env, $variable )" },
+        transformToCpp = { variable -> "brooklyn::mapper::mapFromJIntegerBoxed(env, $variable ) " },
     ),
     CppTypeMirror(
         jniTypeCode = "Ljava/lang/Long;",
@@ -37,8 +37,8 @@ internal fun boxedTypeMirrors() = arrayOf(
                 "kotlin.Long",
             )
         },
-        transformToJni = { variable -> "brooklyn::mapper::mapToJLong(env, $variable )" },
-        transformToCpp = { variable -> "brooklyn::mapper::mapFromJLong(env, $variable ) " },
+        transformToJni = { variable -> "brooklyn::mapper::mapToJLongBoxed(env, $variable )" },
+        transformToCpp = { variable -> "brooklyn::mapper::mapFromJLongBoxed(env, $variable ) " },
     ),
     CppTypeMirror(
         jniTypeCode = "Ljava/lang/Float;",
@@ -49,8 +49,8 @@ internal fun boxedTypeMirrors() = arrayOf(
                 "kotlin.Float",
             )
         },
-        transformToJni = { variable -> "brooklyn::mapper::mapToJFloat(env, $variable )" },
-        transformToCpp = { variable -> "brooklyn::mapper::mapFromJFloat(env, $variable ) " },
+        transformToJni = { variable -> "brooklyn::mapper::mapToJFloatBoxed(env, $variable )" },
+        transformToCpp = { variable -> "brooklyn::mapper::mapFromJFloatBoxed(env, $variable ) " },
     ),
     CppTypeMirror(
         jniTypeCode = "Ljava/lang/Double;",
@@ -61,8 +61,8 @@ internal fun boxedTypeMirrors() = arrayOf(
                 "kotlin.Double",
             )
         },
-        transformToJni = { variable -> "brooklyn::mapper::mapToJDouble(env, $variable )" },
-        transformToCpp = { variable -> "brooklyn::mapper::mapFromJDouble(env, $variable ) " },
+        transformToJni = { variable -> "brooklyn::mapper::mapToJDoubleBoxed(env, $variable )" },
+        transformToCpp = { variable -> "brooklyn::mapper::mapFromJDoubleBoxed(env, $variable ) " },
     ),
     CppTypeMirror(
         jniTypeCode = "Ljava/lang/Character;",
@@ -73,8 +73,8 @@ internal fun boxedTypeMirrors() = arrayOf(
                 "kotlin.Char",
             )
         },
-        transformToJni = { variable -> "brooklyn::mapper::mapToJChar(env, $variable )" },
-        transformToCpp = { variable -> "brooklyn::mapper::mapFromJChar(env, $variable ) " },
+        transformToJni = { variable -> "brooklyn::mapper::mapToJCharBoxed(env, $variable )" },
+        transformToCpp = { variable -> "brooklyn::mapper::mapFromJCharBoxed(env, $variable ) " },
     ),
     CppTypeMirror(
         jniTypeCode = "Ljava/lang/Short;",
@@ -85,8 +85,8 @@ internal fun boxedTypeMirrors() = arrayOf(
                 "kotlin.Short",
             )
         },
-        transformToJni = { variable -> "brooklyn::mapper::mapToJShort(env, $variable )" },
-        transformToCpp = { variable -> "brooklyn::mapper::mapFromJShort(env, $variable ) " },
+        transformToJni = { variable -> "brooklyn::mapper::mapToJShortBoxed(env, $variable )" },
+        transformToCpp = { variable -> "brooklyn::mapper::mapFromJShortBoxed(env, $variable ) " },
     ),
     CppTypeMirror(
         jniTypeCode = "Ljava/lang/Byte;",
@@ -97,8 +97,8 @@ internal fun boxedTypeMirrors() = arrayOf(
                 "kotlin.Byte",
             )
         },
-        transformToJni = { variable -> "brooklyn::mapper::mapToJByte(env, $variable )" },
-        transformToCpp = { variable -> "brooklyn::mapper::mapFromJByte(env, $variable ) " },
+        transformToJni = { variable -> "brooklyn::mapper::mapToJByteBoxed(env, $variable )" },
+        transformToCpp = { variable -> "brooklyn::mapper::mapFromJByteBoxed(env, $variable ) " },
     ),
 
     )

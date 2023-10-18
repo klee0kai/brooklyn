@@ -16,7 +16,7 @@ fun Poet.longIndexInit() = apply {
 
 
 fun Poet.mapLongFromJava(isImpl: Boolean = false) = apply {
-    val declare = "std::shared_ptr<int64_t> mapFromJLong(JNIEnv *env, jobject jLong) "
+    val declare = "std::shared_ptr<int64_t> mapFromJLongBoxed(JNIEnv *env, jobject jLong) "
     if (!isImpl) {
         statement(declare)
         return@apply
@@ -29,7 +29,7 @@ fun Poet.mapLongFromJava(isImpl: Boolean = false) = apply {
 
 
 fun Poet.mapLongToJava(isImpl: Boolean = false) = apply {
-    val declare = "jobject mapToJLong(JNIEnv *env, const std::shared_ptr<int64_t>& cppLong) "
+    val declare = "jobject mapToJLongBoxed(JNIEnv *env, const std::shared_ptr<int64_t>& cppLong) "
     if (!isImpl) {
         statement(declare)
         return@apply

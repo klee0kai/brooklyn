@@ -16,7 +16,7 @@ fun Poet.booleanIndexInit() = apply {
 
 
 fun Poet.mapBooleanFromJava(isImpl: Boolean = false) = apply {
-    val declare = "std::shared_ptr<int> mapFromJBoolean(JNIEnv *env, jobject jBoolean) "
+    val declare = "std::shared_ptr<int> mapFromJBooleanBoxed(JNIEnv *env, jobject jBoolean) "
     if (!isImpl) {
         statement(declare)
         return@apply
@@ -29,7 +29,7 @@ fun Poet.mapBooleanFromJava(isImpl: Boolean = false) = apply {
 
 
 fun Poet.mapBooleanToJava(isImpl: Boolean = false) = apply {
-    val declare = "jobject mapToJBoolean(JNIEnv *env, const std::shared_ptr<int>& cppBoolean) "
+    val declare = "jobject mapToJBooleanBoxed(JNIEnv *env, const std::shared_ptr<int>& cppBoolean) "
     if (!isImpl) {
         statement(declare)
         return@apply
