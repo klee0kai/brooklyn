@@ -40,20 +40,8 @@ fun Poet.mapCharToJava(isImpl: Boolean = false) = apply {
 }
 
 
-fun Poet.mapCharArrayFromJava(isImpl: Boolean = false) =
-    mapPrimitiveTypeToJvm(
-        isImpl = isImpl,
-        name = "mapFromJCharArray",
-        cppType = "char",
-        jType = "jchar",
-        jArrayType = "jcharArray",
-        jGetElementsMethod = "GetCharArrayElements",
-        jReleaseArrayMethod = "ReleaseCharArrayElements"
-    )
-
-
-fun Poet.mapCharArrayToJava(isImpl: Boolean = false) =
-    mapPrimitiveTypeFromJvm(
+fun Poet.mapCharArrayFromJava(isImpl: Boolean = false) =apply {
+    mapPrimitiveArrayFromJvm(
         isImpl = isImpl,
         name = "mapToJCharArray",
         cppType = "char",
@@ -62,3 +50,43 @@ fun Poet.mapCharArrayToJava(isImpl: Boolean = false) =
         jCreateArrayMethod = "NewCharArray",
         jSetArrayMethod = "SetCharArrayRegion",
     )
+    mapBoxedArrayFromJvm(
+        isImpl = isImpl,
+        name = "mapFromJBoxedCharArray",
+        cppType = "char",
+        mappingMethod = { variable -> "*mapFromJCharBoxed(env, $variable )" }
+    )
+    mapBoxedArrayFromJvm(
+        isImpl = isImpl,
+        name = "mapFromJCharNullableArray",
+        cppType = "std::shared_ptr<char>",
+        mappingMethod = { variable -> "mapFromJCharBoxed(env, $variable )" }
+    )
+}
+
+
+fun Poet.mapCharArrayToJava(isImpl: Boolean = false) =apply {
+    mapPrimitiveArrayToJvm(
+        isImpl = isImpl,
+        name = "mapFromJCharArray",
+        cppType = "char",
+        jType = "jchar",
+        jArrayType = "jcharArray",
+        jGetElementsMethod = "GetCharArrayElements",
+        jReleaseArrayMethod = "ReleaseCharArrayElements"
+    )
+    mapBoxedArrayToJvm(
+        isImpl = isImpl,
+        name = "mapToJBoxedCharArray",
+        cppType = "char",
+        indexVariable = "charIndex",
+        mappingMethod = { variable -> "mapToJCharBoxed(env, std::make_shared<char>( $variable ) )" }
+    )
+    mapBoxedArrayToJvm(
+        isImpl = isImpl,
+        name = "mapToJCharNullableArray",
+        cppType = "std::shared_ptr<char>",
+        indexVariable = "charIndex",
+        mappingMethod = { variable -> "mapToJCharBoxed(env, $variable )" }
+    )
+}

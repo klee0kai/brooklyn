@@ -40,20 +40,8 @@ fun Poet.mapIntegerToJava(isImpl: Boolean = false) = apply {
     line("}")
 }
 
-fun Poet.mapIntegerArrayFromJava(isImpl: Boolean = false) =
-    mapPrimitiveTypeToJvm(
-        isImpl = isImpl,
-        name = "mapFromJIntegerArray",
-        cppType = "int",
-        jType = "jint",
-        jArrayType = "jintArray",
-        jGetElementsMethod = "GetIntArrayElements",
-        jReleaseArrayMethod = "ReleaseIntArrayElements"
-    )
-
-
-fun Poet.mapIntegerArrayToJava(isImpl: Boolean = false) =
-    mapPrimitiveTypeFromJvm(
+fun Poet.mapIntegerArrayFromJava(isImpl: Boolean = false) =apply {
+    mapPrimitiveArrayFromJvm(
         isImpl = isImpl,
         name = "mapToJIntegerArray",
         cppType = "int",
@@ -62,3 +50,43 @@ fun Poet.mapIntegerArrayToJava(isImpl: Boolean = false) =
         jCreateArrayMethod = "NewIntArray",
         jSetArrayMethod = "SetIntArrayRegion",
     )
+    mapBoxedArrayFromJvm(
+        isImpl = isImpl,
+        name = "mapFromJBoxedIntegerArray",
+        cppType = "int",
+        mappingMethod = { variable -> "*mapFromJIntegerBoxed(env, $variable )" }
+    )
+    mapBoxedArrayFromJvm(
+        isImpl = isImpl,
+        name = "mapFromJIntegerNullableArray",
+        cppType = "std::shared_ptr<int>",
+        mappingMethod = { variable -> "mapFromJIntegerBoxed(env, $variable )" }
+    )
+}
+
+
+fun Poet.mapIntegerArrayToJava(isImpl: Boolean = false) =apply {
+    mapPrimitiveArrayToJvm(
+        isImpl = isImpl,
+        name = "mapFromJIntegerArray",
+        cppType = "int",
+        jType = "jint",
+        jArrayType = "jintArray",
+        jGetElementsMethod = "GetIntArrayElements",
+        jReleaseArrayMethod = "ReleaseIntArrayElements"
+    )
+    mapBoxedArrayToJvm(
+        isImpl = isImpl,
+        name = "mapToJBoxedIntegerArray",
+        cppType = "int",
+        indexVariable = "integerIndex",
+        mappingMethod = { variable -> "mapToJIntegerBoxed(env, std::make_shared<int>( $variable ) )" }
+    )
+    mapBoxedArrayToJvm(
+        isImpl = isImpl,
+        name = "mapToJIntegerNullableArray",
+        cppType = "std::shared_ptr<int>",
+        indexVariable = "integerIndex",
+        mappingMethod = { variable -> "mapToJIntegerBoxed(env, $variable )" }
+    )
+}

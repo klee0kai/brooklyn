@@ -40,20 +40,8 @@ fun Poet.mapShortToJava(isImpl: Boolean = false) = apply {
 }
 
 
-fun Poet.mapShortArrayFromJava(isImpl: Boolean = false) =
-    mapPrimitiveTypeToJvm(
-        isImpl = isImpl,
-        name = "mapFromJShortArray",
-        cppType = "int",
-        jType = "jshort",
-        jArrayType = "jshortArray",
-        jGetElementsMethod = "GetShortArrayElements",
-        jReleaseArrayMethod = "ReleaseShortArrayElements"
-    )
-
-
-fun Poet.mapShortArrayToJava(isImpl: Boolean = false) =
-    mapPrimitiveTypeFromJvm(
+fun Poet.mapShortArrayFromJava(isImpl: Boolean = false) =apply {
+    mapPrimitiveArrayFromJvm(
         isImpl = isImpl,
         name = "mapToJShortArray",
         cppType = "int",
@@ -62,3 +50,43 @@ fun Poet.mapShortArrayToJava(isImpl: Boolean = false) =
         jCreateArrayMethod = "NewShortArray",
         jSetArrayMethod = "SetShortArrayRegion",
     )
+    mapBoxedArrayFromJvm(
+        isImpl = isImpl,
+        name = "mapFromJBoxedShortArray",
+        cppType = "int",
+        mappingMethod = { variable -> "*mapFromJShortBoxed(env, $variable )" }
+    )
+    mapBoxedArrayFromJvm(
+        isImpl = isImpl,
+        name = "mapFromJShortNullableArray",
+        cppType = "std::shared_ptr<int>",
+        mappingMethod = { variable -> "mapFromJShortBoxed(env, $variable )" }
+    )
+}
+
+
+fun Poet.mapShortArrayToJava(isImpl: Boolean = false) =apply {
+    mapPrimitiveArrayToJvm(
+        isImpl = isImpl,
+        name = "mapFromJShortArray",
+        cppType = "int",
+        jType = "jshort",
+        jArrayType = "jshortArray",
+        jGetElementsMethod = "GetShortArrayElements",
+        jReleaseArrayMethod = "ReleaseShortArrayElements"
+    )
+    mapBoxedArrayToJvm(
+        isImpl = isImpl,
+        name = "mapToJBoxedShortArray",
+        cppType = "int",
+        indexVariable = "shortIndex",
+        mappingMethod = { variable -> "mapToJShortBoxed(env, std::make_shared<int>( $variable ) )" }
+    )
+    mapBoxedArrayToJvm(
+        isImpl = isImpl,
+        name = "mapToJShortNullableArray",
+        cppType = "std::shared_ptr<int>",
+        indexVariable = "shortIndex",
+        mappingMethod = { variable -> "mapToJShortBoxed(env, $variable )" }
+    )
+}

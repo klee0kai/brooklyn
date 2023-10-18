@@ -41,20 +41,8 @@ fun Poet.mapBooleanToJava(isImpl: Boolean = false) = apply {
 }
 
 
-fun Poet.mapBooleanArrayFromJava(isImpl: Boolean = false) =
-    mapPrimitiveTypeToJvm(
-        isImpl = isImpl,
-        name = "mapFromJBooleanArray",
-        cppType = "int",
-        jType = "jboolean",
-        jArrayType = "jbooleanArray",
-        jGetElementsMethod = "GetBooleanArrayElements",
-        jReleaseArrayMethod = "ReleaseBooleanArrayElements"
-    )
-
-
-fun Poet.mapBooleanArrayToJava(isImpl: Boolean = false) =
-    mapPrimitiveTypeFromJvm(
+fun Poet.mapBooleanArrayFromJava(isImpl: Boolean = false) = apply {
+    mapPrimitiveArrayFromJvm(
         isImpl = isImpl,
         name = "mapToJBooleanArray",
         cppType = "int",
@@ -63,9 +51,49 @@ fun Poet.mapBooleanArrayToJava(isImpl: Boolean = false) =
         jCreateArrayMethod = "NewBooleanArray",
         jSetArrayMethod = "SetBooleanArrayRegion",
     )
+    mapBoxedArrayFromJvm(
+        isImpl = isImpl,
+        name = "mapFromJBoxedBooleanArray",
+        cppType = "int",
+        mappingMethod = { variable -> "*mapFromJBooleanBoxed(env, $variable )" }
+    )
+    mapBoxedArrayFromJvm(
+        isImpl = isImpl,
+        name = "mapFromJBooleanNullableArray",
+        cppType = "std::shared_ptr<int>",
+        mappingMethod = { variable -> "mapFromJBooleanBoxed(env, $variable )" }
+    )
+}
 
 
-fun Poet.mapPrimitiveTypeToJvm(
+fun Poet.mapBooleanArrayToJava(isImpl: Boolean = false) = apply {
+    mapPrimitiveArrayToJvm(
+        isImpl = isImpl,
+        name = "mapFromJBooleanArray",
+        cppType = "int",
+        jType = "jboolean",
+        jArrayType = "jbooleanArray",
+        jGetElementsMethod = "GetBooleanArrayElements",
+        jReleaseArrayMethod = "ReleaseBooleanArrayElements"
+    )
+    mapBoxedArrayToJvm(
+        isImpl = isImpl,
+        name = "mapToJBoxedBooleanArray",
+        cppType = "int",
+        indexVariable = "booleanIndex",
+        mappingMethod = { variable -> "mapToJBooleanBoxed(env, std::make_shared<int>( $variable ) )" }
+    )
+    mapBoxedArrayToJvm(
+        isImpl = isImpl,
+        name = "mapToJBooleanNullableArray",
+        cppType = "std::shared_ptr<int>",
+        indexVariable = "booleanIndex",
+        mappingMethod = { variable -> "mapToJBooleanBoxed(env, $variable )" }
+    )
+}
+
+
+fun Poet.mapPrimitiveArrayToJvm(
     isImpl: Boolean,
     name: String,
     cppType: String,
@@ -94,7 +122,7 @@ fun Poet.mapPrimitiveTypeToJvm(
 }
 
 
-fun Poet.mapPrimitiveTypeFromJvm(
+fun Poet.mapPrimitiveArrayFromJvm(
     isImpl: Boolean,
     name: String,
     cppType: String,
@@ -118,6 +146,55 @@ fun Poet.mapPrimitiveTypeFromJvm(
     statement("$jArrayType jarray = env->$jCreateArrayMethod(len)")
     statement("env->$jSetArrayMethod(jarray, 0, len, tempArray)")
     statement("delete[] tempArray")
+    statement("return jarray")
+    line("}")
+}
+
+
+fun Poet.mapBoxedArrayFromJvm(
+    isImpl: Boolean,
+    name: String,
+    cppType: String,
+    mappingMethod: (variable: String) -> String,
+) = apply {
+    val declare =
+        "std::shared_ptr<std::vector<${cppType}>> ${name}(JNIEnv *env, const jobjectArray &jarray)"
+    if (!isImpl) {
+        statement(declare)
+        return@apply
+    }
+    line("$declare {")
+    statement("if (!jarray) return {}")
+    statement("int len = env->GetArrayLength(jarray)")
+    statement("auto array = std::vector<${cppType}>(len)")
+    line("for (int i = 0; i < len; i++) {")
+    statement("array[i] = ${mappingMethod.invoke(" env->GetObjectArrayElement(jarray, i)")}")
+    line("}")
+    statement("return std::make_shared<std::vector<${cppType}>>(array)")
+    line("}")
+}
+
+
+fun Poet.mapBoxedArrayToJvm(
+    isImpl: Boolean,
+    name: String,
+    cppType: String,
+    indexVariable: String,
+    mappingMethod: (variable: String) -> String,
+) = apply {
+    val declare =
+        "jobjectArray ${name}(JNIEnv *env, const std::shared_ptr<std::vector<${cppType}>> &array)"
+    if (!isImpl) {
+        statement(declare)
+        return@apply
+    }
+    line("$declare {")
+    statement("if (!array)return NULL")
+    statement("int len = array->size()")
+    statement("jobjectArray jarray = env->NewObjectArray(len, ${indexVariable}->cls, NULL)")
+    line("for (int i = 0; i < len; i++) {")
+    statement("env->SetObjectArrayElement(jarray, i, ${mappingMethod.invoke("(*array)[i] ) ")}")
+    line("}")
     statement("return jarray")
     line("}")
 }

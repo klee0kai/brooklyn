@@ -40,20 +40,8 @@ fun Poet.mapByteToJava(isImpl: Boolean = false) = apply {
 }
 
 
-fun Poet.mapByteArrayFromJava(isImpl: Boolean = false) =
-    mapPrimitiveTypeToJvm(
-        isImpl = isImpl,
-        name = "mapFromJByteArray",
-        cppType = "int",
-        jType = "jbyte",
-        jArrayType = "jbyteArray",
-        jGetElementsMethod = "GetByteArrayElements",
-        jReleaseArrayMethod = "ReleaseByteArrayElements"
-    )
-
-
-fun Poet.mapByteArrayToJava(isImpl: Boolean = false) =
-    mapPrimitiveTypeFromJvm(
+fun Poet.mapByteArrayFromJava(isImpl: Boolean = false) =apply {
+    mapPrimitiveArrayFromJvm(
         isImpl = isImpl,
         name = "mapToJByteArray",
         cppType = "int",
@@ -62,5 +50,45 @@ fun Poet.mapByteArrayToJava(isImpl: Boolean = false) =
         jCreateArrayMethod = "NewByteArray",
         jSetArrayMethod = "SetByteArrayRegion",
     )
+    mapBoxedArrayFromJvm(
+        isImpl = isImpl,
+        name = "mapFromJBoxedByteArray",
+        cppType = "int",
+        mappingMethod = { variable -> "*mapFromJByteBoxed(env, $variable )" }
+    )
+    mapBoxedArrayFromJvm(
+        isImpl = isImpl,
+        name = "mapFromJByteNullableArray",
+        cppType = "std::shared_ptr<int>",
+        mappingMethod = { variable -> "mapFromJByteBoxed(env, $variable )" }
+    )
+}
+
+
+fun Poet.mapByteArrayToJava(isImpl: Boolean = false) = apply {
+      mapPrimitiveArrayToJvm(
+        isImpl = isImpl,
+        name = "mapFromJByteArray",
+        cppType = "int",
+        jType = "jbyte",
+        jArrayType = "jbyteArray",
+        jGetElementsMethod = "GetByteArrayElements",
+        jReleaseArrayMethod = "ReleaseByteArrayElements"
+    )
+    mapBoxedArrayToJvm(
+        isImpl = isImpl,
+        name = "mapToJBoxedByteArray",
+        cppType = "int",
+        indexVariable = "byteIndex",
+        mappingMethod = { variable -> "mapToJByteBoxed(env, std::make_shared<int>( $variable ) )" }
+    )
+    mapBoxedArrayToJvm(
+        isImpl = isImpl,
+        name = "mapToJByteNullableArray",
+        cppType = "std::shared_ptr<int>",
+        indexVariable = "byteIndex",
+        mappingMethod = { variable -> "mapToJByteBoxed(env, $variable )" }
+    )
+}
 
 
