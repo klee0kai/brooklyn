@@ -42,12 +42,12 @@ fun Poet.mapFloatToJava(isImpl: Boolean = false) = apply {
 fun Poet.mapFloatArrayFromJava(isImpl: Boolean = false) = apply {
     mapPrimitiveArrayFromJvm(
         isImpl = isImpl,
-        name = "mapToJFloatArray",
+        name = "mapFromJFloatArray",
         cppType = "float",
         jType = "jfloat",
         jArrayType = "jfloatArray",
-        jCreateArrayMethod = "NewFloatArray",
-        jSetArrayMethod = "SetFloatArrayRegion",
+        jGetElementsMethod = "GetFloatArrayElements",
+        jReleaseArrayMethod = "ReleaseFloatArrayElements"
     )
     mapBoxedArrayFromJvm(
         isImpl = isImpl,
@@ -67,12 +67,12 @@ fun Poet.mapFloatArrayFromJava(isImpl: Boolean = false) = apply {
 fun Poet.mapFloatArrayToJava(isImpl: Boolean = false) = apply {
     mapPrimitiveArrayToJvm(
         isImpl = isImpl,
-        name = "mapFromJFloatArray",
+        name = "mapToJFloatArray",
         cppType = "float",
         jType = "jfloat",
         jArrayType = "jfloatArray",
-        jGetElementsMethod = "GetFloatArrayElements",
-        jReleaseArrayMethod = "ReleaseFloatArrayElements"
+        jCreateArrayMethod = "NewFloatArray",
+        jSetArrayMethod = "SetFloatArrayRegion",
     )
     mapBoxedArrayToJvm(
         isImpl = isImpl,

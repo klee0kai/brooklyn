@@ -44,12 +44,12 @@ fun Poet.mapDoubleToJava(isImpl: Boolean = false) = apply {
 fun Poet.mapDoubleArrayFromJava(isImpl: Boolean = false) =apply {
     mapPrimitiveArrayFromJvm(
         isImpl = isImpl,
-        name = "mapToJDoubleArray",
+        name = "mapFromJDoubleArray",
         cppType = "double",
         jType = "jdouble",
         jArrayType = "jdoubleArray",
-        jCreateArrayMethod = "NewDoubleArray",
-        jSetArrayMethod = "SetDoubleArrayRegion",
+        jGetElementsMethod = "GetDoubleArrayElements",
+        jReleaseArrayMethod = "ReleaseDoubleArrayElements"
     )
     mapBoxedArrayFromJvm(
         isImpl = isImpl,
@@ -69,12 +69,12 @@ fun Poet.mapDoubleArrayFromJava(isImpl: Boolean = false) =apply {
 fun Poet.mapDoubleArrayToJava(isImpl: Boolean = false) =apply {
     mapPrimitiveArrayToJvm(
         isImpl = isImpl,
-        name = "mapFromJDoubleArray",
+        name = "mapToJDoubleArray",
         cppType = "double",
         jType = "jdouble",
         jArrayType = "jdoubleArray",
-        jGetElementsMethod = "GetDoubleArrayElements",
-        jReleaseArrayMethod = "ReleaseDoubleArrayElements"
+        jCreateArrayMethod = "NewDoubleArray",
+        jSetArrayMethod = "SetDoubleArrayRegion",
     )
     mapBoxedArrayToJvm(
         isImpl = isImpl,

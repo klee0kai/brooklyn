@@ -44,12 +44,12 @@ fun Poet.mapBooleanToJava(isImpl: Boolean = false) = apply {
 fun Poet.mapBooleanArrayFromJava(isImpl: Boolean = false) = apply {
     mapPrimitiveArrayFromJvm(
         isImpl = isImpl,
-        name = "mapToJBooleanArray",
+        name = "mapFromJBooleanArray",
         cppType = "int",
         jType = "jboolean",
         jArrayType = "jbooleanArray",
-        jCreateArrayMethod = "NewBooleanArray",
-        jSetArrayMethod = "SetBooleanArrayRegion",
+        jGetElementsMethod = "GetBooleanArrayElements",
+        jReleaseArrayMethod = "ReleaseBooleanArrayElements"
     )
     mapBoxedArrayFromJvm(
         isImpl = isImpl,
@@ -69,12 +69,12 @@ fun Poet.mapBooleanArrayFromJava(isImpl: Boolean = false) = apply {
 fun Poet.mapBooleanArrayToJava(isImpl: Boolean = false) = apply {
     mapPrimitiveArrayToJvm(
         isImpl = isImpl,
-        name = "mapFromJBooleanArray",
+        name = "mapToJBooleanArray",
         cppType = "int",
         jType = "jboolean",
         jArrayType = "jbooleanArray",
-        jGetElementsMethod = "GetBooleanArrayElements",
-        jReleaseArrayMethod = "ReleaseBooleanArrayElements"
+        jCreateArrayMethod = "NewBooleanArray",
+        jSetArrayMethod = "SetBooleanArrayRegion",
     )
     mapBoxedArrayToJvm(
         isImpl = isImpl,
@@ -93,7 +93,7 @@ fun Poet.mapBooleanArrayToJava(isImpl: Boolean = false) = apply {
 }
 
 
-fun Poet.mapPrimitiveArrayToJvm(
+fun Poet.mapPrimitiveArrayFromJvm(
     isImpl: Boolean,
     name: String,
     cppType: String,
@@ -122,7 +122,7 @@ fun Poet.mapPrimitiveArrayToJvm(
 }
 
 
-fun Poet.mapPrimitiveArrayFromJvm(
+fun Poet.mapPrimitiveArrayToJvm(
     isImpl: Boolean,
     name: String,
     cppType: String,

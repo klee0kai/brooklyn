@@ -43,12 +43,12 @@ fun Poet.mapLongToJava(isImpl: Boolean = false) = apply {
 fun Poet.mapLongArrayFromJava(isImpl: Boolean = false) =apply {
     mapPrimitiveArrayFromJvm(
         isImpl = isImpl,
-        name = "mapToJLongArray",
+        name = "mapFromJLongArray",
         cppType = "int64_t",
         jType = "jlong",
         jArrayType = "jlongArray",
-        jCreateArrayMethod = "NewLongArray",
-        jSetArrayMethod = "SetLongArrayRegion",
+        jGetElementsMethod = "GetLongArrayElements",
+        jReleaseArrayMethod = "ReleaseLongArrayElements"
     )
     mapBoxedArrayFromJvm(
         isImpl = isImpl,
@@ -68,12 +68,12 @@ fun Poet.mapLongArrayFromJava(isImpl: Boolean = false) =apply {
 fun Poet.mapLongArrayToJava(isImpl: Boolean = false) =apply {
     mapPrimitiveArrayToJvm(
         isImpl = isImpl,
-        name = "mapFromJLongArray",
+        name = "mapToJLongArray",
         cppType = "int64_t",
         jType = "jlong",
         jArrayType = "jlongArray",
-        jGetElementsMethod = "GetLongArrayElements",
-        jReleaseArrayMethod = "ReleaseLongArrayElements"
+        jCreateArrayMethod = "NewLongArray",
+        jSetArrayMethod = "SetLongArrayRegion",
     )
     mapBoxedArrayToJvm(
         isImpl = isImpl,

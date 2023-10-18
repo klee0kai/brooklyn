@@ -43,12 +43,12 @@ fun Poet.mapCharToJava(isImpl: Boolean = false) = apply {
 fun Poet.mapCharArrayFromJava(isImpl: Boolean = false) =apply {
     mapPrimitiveArrayFromJvm(
         isImpl = isImpl,
-        name = "mapToJCharArray",
+        name = "mapFromJCharArray",
         cppType = "char",
         jType = "jchar",
         jArrayType = "jcharArray",
-        jCreateArrayMethod = "NewCharArray",
-        jSetArrayMethod = "SetCharArrayRegion",
+        jGetElementsMethod = "GetCharArrayElements",
+        jReleaseArrayMethod = "ReleaseCharArrayElements"
     )
     mapBoxedArrayFromJvm(
         isImpl = isImpl,
@@ -68,12 +68,12 @@ fun Poet.mapCharArrayFromJava(isImpl: Boolean = false) =apply {
 fun Poet.mapCharArrayToJava(isImpl: Boolean = false) =apply {
     mapPrimitiveArrayToJvm(
         isImpl = isImpl,
-        name = "mapFromJCharArray",
+        name = "mapToJCharArray",
         cppType = "char",
         jType = "jchar",
         jArrayType = "jcharArray",
-        jGetElementsMethod = "GetCharArrayElements",
-        jReleaseArrayMethod = "ReleaseCharArrayElements"
+        jCreateArrayMethod = "NewCharArray",
+        jSetArrayMethod = "SetCharArrayRegion",
     )
     mapBoxedArrayToJvm(
         isImpl = isImpl,

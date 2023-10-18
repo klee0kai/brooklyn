@@ -89,6 +89,7 @@ val allCppTypeMirrors: MutableList<CppTypeMirror> = mutableListOf(
     *primitiveArraysTypeMirrors(),
     *boxedTypeMirrors(),
     *stringsTypeMirror(),
+    *boxedArraysTypeMirrors(),
 )
 
 

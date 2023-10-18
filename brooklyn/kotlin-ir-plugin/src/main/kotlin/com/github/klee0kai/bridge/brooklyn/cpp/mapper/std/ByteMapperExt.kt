@@ -43,12 +43,12 @@ fun Poet.mapByteToJava(isImpl: Boolean = false) = apply {
 fun Poet.mapByteArrayFromJava(isImpl: Boolean = false) =apply {
     mapPrimitiveArrayFromJvm(
         isImpl = isImpl,
-        name = "mapToJByteArray",
+        name = "mapFromJByteArray",
         cppType = "int",
         jType = "jbyte",
         jArrayType = "jbyteArray",
-        jCreateArrayMethod = "NewByteArray",
-        jSetArrayMethod = "SetByteArrayRegion",
+        jGetElementsMethod = "GetByteArrayElements",
+        jReleaseArrayMethod = "ReleaseByteArrayElements"
     )
     mapBoxedArrayFromJvm(
         isImpl = isImpl,
@@ -66,14 +66,14 @@ fun Poet.mapByteArrayFromJava(isImpl: Boolean = false) =apply {
 
 
 fun Poet.mapByteArrayToJava(isImpl: Boolean = false) = apply {
-      mapPrimitiveArrayToJvm(
+    mapPrimitiveArrayToJvm(
         isImpl = isImpl,
-        name = "mapFromJByteArray",
+        name = "mapToJByteArray",
         cppType = "int",
         jType = "jbyte",
         jArrayType = "jbyteArray",
-        jGetElementsMethod = "GetByteArrayElements",
-        jReleaseArrayMethod = "ReleaseByteArrayElements"
+        jCreateArrayMethod = "NewByteArray",
+        jSetArrayMethod = "SetByteArrayRegion",
     )
     mapBoxedArrayToJvm(
         isImpl = isImpl,

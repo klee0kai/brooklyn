@@ -43,12 +43,12 @@ fun Poet.mapIntegerToJava(isImpl: Boolean = false) = apply {
 fun Poet.mapIntegerArrayFromJava(isImpl: Boolean = false) =apply {
     mapPrimitiveArrayFromJvm(
         isImpl = isImpl,
-        name = "mapToJIntegerArray",
+        name = "mapFromJIntegerArray",
         cppType = "int",
         jType = "jint",
         jArrayType = "jintArray",
-        jCreateArrayMethod = "NewIntArray",
-        jSetArrayMethod = "SetIntArrayRegion",
+        jGetElementsMethod = "GetIntArrayElements",
+        jReleaseArrayMethod = "ReleaseIntArrayElements"
     )
     mapBoxedArrayFromJvm(
         isImpl = isImpl,
@@ -68,12 +68,12 @@ fun Poet.mapIntegerArrayFromJava(isImpl: Boolean = false) =apply {
 fun Poet.mapIntegerArrayToJava(isImpl: Boolean = false) =apply {
     mapPrimitiveArrayToJvm(
         isImpl = isImpl,
-        name = "mapFromJIntegerArray",
+        name = "mapToJIntegerArray",
         cppType = "int",
         jType = "jint",
         jArrayType = "jintArray",
-        jGetElementsMethod = "GetIntArrayElements",
-        jReleaseArrayMethod = "ReleaseIntArrayElements"
+        jCreateArrayMethod = "NewIntArray",
+        jSetArrayMethod = "SetIntArrayRegion",
     )
     mapBoxedArrayToJvm(
         isImpl = isImpl,

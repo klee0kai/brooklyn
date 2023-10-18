@@ -43,12 +43,12 @@ fun Poet.mapShortToJava(isImpl: Boolean = false) = apply {
 fun Poet.mapShortArrayFromJava(isImpl: Boolean = false) =apply {
     mapPrimitiveArrayFromJvm(
         isImpl = isImpl,
-        name = "mapToJShortArray",
+        name = "mapFromJShortArray",
         cppType = "int",
         jType = "jshort",
         jArrayType = "jshortArray",
-        jCreateArrayMethod = "NewShortArray",
-        jSetArrayMethod = "SetShortArrayRegion",
+        jGetElementsMethod = "GetShortArrayElements",
+        jReleaseArrayMethod = "ReleaseShortArrayElements"
     )
     mapBoxedArrayFromJvm(
         isImpl = isImpl,
@@ -68,12 +68,12 @@ fun Poet.mapShortArrayFromJava(isImpl: Boolean = false) =apply {
 fun Poet.mapShortArrayToJava(isImpl: Boolean = false) =apply {
     mapPrimitiveArrayToJvm(
         isImpl = isImpl,
-        name = "mapFromJShortArray",
+        name = "mapToJShortArray",
         cppType = "int",
         jType = "jshort",
         jArrayType = "jshortArray",
-        jGetElementsMethod = "GetShortArrayElements",
-        jReleaseArrayMethod = "ReleaseShortArrayElements"
+        jCreateArrayMethod = "NewShortArray",
+        jSetArrayMethod = "SetShortArrayRegion",
     )
     mapBoxedArrayToJvm(
         isImpl = isImpl,
