@@ -108,10 +108,18 @@ int ComKlee0kaiExampleMirrorsSimpleJniMirror::incInCpp2() {
     return 1;
 }
 
-int ComKlee0kaiExampleMirrorsSimpleJniMirror::updateInCpp(const int &delta, const std::string &strDelta) {
+int ComKlee0kaiExampleMirrorsSimpleJniMirror::updateFromCpp(const int &delta, const std::string &strDelta) {
+    update(delta, strDelta);
+    return 1;
+}
+
+int ComKlee0kaiExampleMirrorsSimpleJniMirror::updateFromCppDirectly(const int &delta, const std::string &strDelta) {
+    setSomeInt(getSomeInt() + delta);
+    setSomeString(getSomeString() + strDelta);
     return 2;
 }
 
+
 int ComKlee0kaiExampleMirrorsSimpleJniMirror::objId() {
-    return ComKlee0kaiExampleMirrorsSimpleJniMirror::obJvmId();
+    return ComKlee0kaiExampleMirrorsSimpleJniMirror::getId();
 }

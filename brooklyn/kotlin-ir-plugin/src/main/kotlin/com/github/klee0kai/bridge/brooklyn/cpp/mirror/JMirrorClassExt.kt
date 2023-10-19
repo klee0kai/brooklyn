@@ -14,10 +14,7 @@ import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.isUnit
-import org.jetbrains.kotlin.ir.util.classId
-import org.jetbrains.kotlin.ir.util.constructors
-import org.jetbrains.kotlin.ir.util.functions
-import org.jetbrains.kotlin.ir.util.isObject
+import org.jetbrains.kotlin.ir.util.*
 
 fun CodeBuilder.declareClassMirror(jClass: IrClass) = apply {
     val usedTypes = mutableSetOf<IrType>()
@@ -47,6 +44,21 @@ fun CodeBuilder.declareClassMirror(jClass: IrClass) = apply {
                 post("static ")
             }
             statement("$returnType ${func.name}($args)")
+        }
+
+        jClass.properties.forEach { prop ->
+            if (prop.isExternal) return@forEach
+            val type = prop.jniType()
+                ?.cppFullTypeMirror
+                ?: return@forEach
+
+            if (jClass.isObject) post("static ")
+            statement("$type get${prop.nameUpperCase}()")
+
+
+            if (!prop.isVar) return@forEach
+            if (jClass.isObject) post("static ")
+            statement("void set${prop.nameUpperCase}( const ${type}& value )")
         }
 
         statement("~${clMirror}()")
@@ -190,6 +202,51 @@ fun CodeBuilder.implementClassMirror(jClass: IrClass) = apply {
             }
         }
 
+
+        jClass.properties.forEach { prop ->
+            if (prop.isExternal) return@forEach
+            val type = prop.jniType() ?: return@forEach
+
+            val extractMethod = if (jClass.isObject) {
+                type.extractFromStaticMethod
+            } else {
+                type.extractFromMethod
+            }
+            val callMethod = if (jClass.isObject) "CallStaticVoidMethod" else "CallVoidMethod"
+            val selfArg = if (jClass.isObject) "${mappingNamespace}::${indexField}->cls" else "jvmSelf"
+
+            line("${type.cppFullTypeMirror} ${clMirror}::get${prop.nameUpperCase}() {")
+            statement("JNIEnv* env = ${BROOKLYN}::env()")
+            post("return ")
+            statement(
+                type.transformToCpp.invoke(
+                    extractMethod.invoke(
+                        type = type,
+                        jvmObj = selfArg,
+                        fieldOrMethodId = "${mappingNamespace}::${indexField}->${prop.name}_getter",
+                        args = ""
+                    )
+                )
+            )
+            line("}")
+
+            if (!prop.isVar) return@forEach
+
+            line("void ${clMirror}::set${prop.nameUpperCase}( const ${type.cppFullTypeMirror}& value ) {")
+            statement("JNIEnv* env = ${BROOKLYN}::env()")
+
+            statement(
+                "env->${callMethod}(${
+                    listOf(
+                        selfArg,
+                        "${mappingNamespace}::${indexField}->${prop.name}_setter",
+                        type.transformToJni.invoke("value")
+                    ).joinArgs()
+                })"
+            )
+            line("}")
+        }
+
         line("${clMirror}::~${clMirror}() {")
         statement("(*owners)--")
         line("if (*owners <= 0 && jvmSelfRef) {")
@@ -227,4 +284,5 @@ fun IrType.jniTypeStr() =
         isUnit() -> "void"
         else -> jniType()?.jniTypeStr ?: "jobject"
     }
+
 

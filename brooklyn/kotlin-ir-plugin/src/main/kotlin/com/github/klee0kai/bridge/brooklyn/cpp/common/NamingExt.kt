@@ -1,5 +1,6 @@
 package com.github.klee0kai.bridge.brooklyn.cpp.common
 
+import org.jetbrains.kotlin.ir.declarations.IrDeclarationWithName
 import org.jetbrains.kotlin.name.ClassId
 import java.io.File
 
@@ -56,7 +57,7 @@ fun String.camelCase() = buildString {
 }
 
 
-fun String.firstCamelCase() = first().uppercaseChar() + substring(1)
+fun String.firstUppercase() = first().uppercaseChar() + substring(1)
 
 
 fun String.snakeCase(sep: String = "_") = buildString {
@@ -79,6 +80,9 @@ fun String.snakeCase(sep: String = "_") = buildString {
 
 private val ClassId.cppFilePrefix
     get() = "${packageFqName.toString().snakeCase()}_${shortClassName.toString().snakeCase()}"
+
+val IrDeclarationWithName.nameUpperCase get() = name.toString().firstUppercase()
+
 
 private fun String.trimSpecSymbols() =
     this.replace(".", "_").filter { it !in "<>" }

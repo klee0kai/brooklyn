@@ -19,7 +19,6 @@ class SimpleJniMirror {
         someString = s
     }
 
-
     fun inc() {
         someInt++
     }
@@ -29,13 +28,13 @@ class SimpleJniMirror {
         someString += strDelta
     }
 
-    fun obJvmId() = id
-
     external fun incInCpp()
 
     external fun incInCpp2(): Int
 
-    external fun updateInCpp(delta: Int, strDelta: String): Int
+    external fun updateFromCpp(delta: Int, strDelta: String): Int
+
+    external fun updateFromCppDirectly(delta: Int, strDelta: String): Int
 
     external fun objId(): Int
 

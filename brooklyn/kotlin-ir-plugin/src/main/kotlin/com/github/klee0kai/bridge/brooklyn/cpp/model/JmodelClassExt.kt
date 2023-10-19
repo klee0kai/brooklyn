@@ -12,12 +12,6 @@ fun CodeBuilder.declareClassModelStructure(jClass: IrClass) = apply {
     variables {
         lines(1)
         line("struct ${jClass.jniType()?.cppSimpleTypeMirrorStr ?: return@variables} {")
-        jClass.fields.forEach { field ->
-            field.type.jniType()?.cppFullTypeMirror?.let { cppType ->
-                statement("\t${cppType} ${field.name};")
-            }
-            usedTypes.add(field.type)
-        }
         jClass.properties.forEach { property ->
             val type = property.getter!!.returnType
             type.jniType()?.cppFullTypeMirror?.let { cppType ->

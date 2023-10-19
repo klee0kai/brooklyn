@@ -30,6 +30,35 @@ class MirrorTexts {
         assertEquals("from C++", simple.someString)
     }
 
+    @Test
+    fun updateFromCppTest() {
+        //given
+        val simple = SimpleJniMirror(2)
+        simple.someString = "some str"
+
+        //when
+        val result = simple.updateFromCpp(4, " update from cpp")
+
+        //then
+        assertEquals(1, result)
+        assertEquals(6, simple.someInt)
+        assertEquals("some str update from cpp", simple.someString)
+    }
+
+    @Test
+    fun updateFromCppDirectlyTest() {
+        //given
+        val simple = SimpleJniMirror(2)
+        simple.someString = "some str"
+
+        //when
+        val result = simple.updateFromCppDirectly(-4, " c++")
+
+        //then
+        assertEquals(2, result)
+        assertEquals(-2, simple.someInt)
+        assertEquals("some str c++", simple.someString)
+    }
 
     @Test
     fun updateInCppTest() {
