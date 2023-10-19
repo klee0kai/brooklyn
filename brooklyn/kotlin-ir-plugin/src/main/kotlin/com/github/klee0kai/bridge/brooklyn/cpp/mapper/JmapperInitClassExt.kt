@@ -5,6 +5,7 @@ import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.jniType
 import org.jetbrains.kotlin.backend.jvm.fullValueParameterList
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrFunction
+import org.jetbrains.kotlin.ir.declarations.IrMutableAnnotationContainer
 import org.jetbrains.kotlin.ir.types.IrSimpleType
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.classFqName
@@ -14,18 +15,20 @@ import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import kotlin.math.absoluteValue
 
-fun CodeBuilder.declareClassIndexStructure(jClass: IrClass) = apply {
+fun CodeBuilder.declareClassIndexStructure(jClass: IrClass, pojo: Boolean = false) = apply {
     variables {
         val clId = jClass.classId!!
         lines(1)
         line("struct ${clId.indexStructName} {")
         statement("jclass cls")
         jClass.properties.forEach { property ->
-            val annotations = property.annotations.isNotEmpty()
+            if (property.isIgnoringJni) return@forEach
             statement("\tjmethodID ${property.name}_getter = NULL")
             if (property.isVar) statement("\tjmethodID ${property.name}_setter = NULL")
         }
-        (jClass.constructors + jClass.functions).forEach { func ->
+        val methods = if (pojo) jClass.constructors else (jClass.constructors + jClass.functions)
+        methods.forEach { func ->
+            if (func.isIgnoringJni) return@forEach
             statement("\tjmethodID ${func.cppNameMirror} = NULL")
         }
         statement("}")
@@ -49,7 +52,7 @@ fun CodeBuilder.initJniClassApi() = apply {
     }
 }
 
-fun CodeBuilder.initJniClassImpl(jClass: IrClass) = apply {
+fun CodeBuilder.initJniClassImpl(jClass: IrClass, pojo: Boolean = false) = apply {
     body {
         lines(1)
         val clId = jClass.classId!!
@@ -59,6 +62,8 @@ fun CodeBuilder.initJniClassImpl(jClass: IrClass) = apply {
         statement("${clId.indexVariableName} = std::make_shared<${clId.indexStructName}>()")
         statement("${clId.indexVariableName}->cls = (jclass) env->NewGlobalRef( env->FindClass(\"$clPathName\") )")
         jClass.properties.forEach { property ->
+            if (property.isIgnoringJni) return@forEach
+
             val type = property.getter!!.returnType
             val jniTypeCode = type.jniType()?.jniTypeCode ?: return@forEach
 
@@ -79,7 +84,9 @@ fun CodeBuilder.initJniClassImpl(jClass: IrClass) = apply {
                 statement("if(!${clId.indexVariableName}->${property.name}_setter) return -1")
             }
         }
-        (jClass.constructors + jClass.functions).forEach { func ->
+        val methods = if (pojo) jClass.constructors else (jClass.constructors + jClass.functions)
+        methods.forEach { func ->
+            if (func.isIgnoringJni) return@forEach
             val argTypes = runCatching {
                 func.fullValueParameterList.joinToString("") { it.type.jniType()!!.jniTypeCode }
             }.getOrNull() ?: return@forEach
@@ -145,6 +152,11 @@ fun IrType.isClassType(signature: IdSignature.CommonSignature, nullable: Boolean
     return signature == classifier.signature ||
             classifier.owner.let { it is IrClass && it.hasFqNameEqualToSignature(signature) }
 }
+
+val IrMutableAnnotationContainer.isIgnoringJni
+    get() = annotations.any {
+        it.type.classFqName.toString() == "com.github.klee0kai.bridge.brooklyn.JniIgnore"
+    }
 
 private fun IrClass.hasFqNameEqualToSignature(signature: IdSignature.CommonSignature): Boolean =
     name.asString() == signature.shortName &&

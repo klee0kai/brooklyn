@@ -45,6 +45,7 @@ private fun Poet.mapFromJvm(jClass: IrClass, isImpl: Boolean = false) = apply {
     line("shared_ptr<$typeMirror> $cppObjectName = make_shared<$typeMirror>();")
 
     jClass.properties.forEach { property ->
+        if (property.isIgnoringJni) return@forEach
         val propertyTypeMirror = property.getter?.returnType?.jniType() ?: return@forEach
 
         val extractFromProperty = propertyTypeMirror.extractFromMethod.invoke(
@@ -88,6 +89,7 @@ private fun Poet.mapToJvm(jClass: IrClass, isImpl: Boolean = false) = apply {
     } else {
         statement("jobject $jvmObjectName = env->NewObject(${indexClVariable}->cls,${indexClVariable}->${constructor.cppNameMirror} )")
         jClass.properties.forEach { property ->
+            if (property.isIgnoringJni) return@forEach
             val propertyTypeMirror = property.getter?.returnType?.jniType() ?: return@forEach
 
             val transformToJni = propertyTypeMirror.transformToJni.invoke("${cppObjectName}->${property.name}")

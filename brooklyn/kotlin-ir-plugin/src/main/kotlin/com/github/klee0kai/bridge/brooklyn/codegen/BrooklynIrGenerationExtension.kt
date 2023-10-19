@@ -110,7 +110,7 @@ class BrooklynIrGenerationExtension(
                     include(declaration.classId!!.modelHeaderFile.path)
                 }
                 .namespaces(declaration.cppMappingNameSpace())
-                .declareClassIndexStructure(declaration)
+                .declareClassIndexStructure(declaration, pojo = true)
                 .initJniClassApi()
                 .deinitJniClassApi()
                 .mapJniClass(declaration)
@@ -119,11 +119,13 @@ class BrooklynIrGenerationExtension(
                 clId.mapperCppFile,
                 headersInitBlock(doubleImportCheck = false, namespaces = arrayOf(MAPPER))
             )
-                .header { include(clId.mapperHeaderFile.path) }
-                .header { include(CommonNaming.mapperHeader) }
+                .header {
+                    include(clId.mapperHeaderFile.path)
+                    include(CommonNaming.mapperHeader)
+                }
                 .namespaces(declaration.cppMappingNameSpace())
                 .declareClassIndexField(declaration)
-                .initJniClassImpl(declaration)
+                .initJniClassImpl(declaration, pojo = true)
                 .deinitJniClassImpl(declaration)
                 .mapJniClass(declaration, isImpl = true)
 
