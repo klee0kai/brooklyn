@@ -19,7 +19,6 @@ class SimpleJniMirror {
         someString = s
     }
 
-
     fun inc() {
         someInt++
     }
@@ -28,8 +27,6 @@ class SimpleJniMirror {
         someInt += delta
         someString += strDelta
     }
-
-    fun obJvmId() = id
 
     external fun incInCpp()
 

@@ -3,9 +3,11 @@ package com.github.klee0kai.bridge.brooklyn.cpp.typemirros
 import com.github.klee0kai.bridge.brooklyn.cpp.common.CommonNaming.BROOKLYN
 import com.github.klee0kai.bridge.brooklyn.cpp.common.CommonNaming.MAPPER
 import com.github.klee0kai.bridge.brooklyn.cpp.common.camelCase
-import com.github.klee0kai.bridge.brooklyn.cpp.common.firstCamelCase
+import com.github.klee0kai.bridge.brooklyn.cpp.common.firstUppercase
 import com.github.klee0kai.bridge.brooklyn.cpp.common.snakeCase
 import org.jetbrains.kotlin.ir.declarations.IrClass
+import org.jetbrains.kotlin.ir.declarations.IrField
+import org.jetbrains.kotlin.ir.declarations.IrProperty
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.classId
 import org.jetbrains.kotlin.ir.util.kotlinFqName
@@ -72,12 +74,16 @@ fun IrType.jniType(): CppTypeMirror? {
     }
 }
 
+fun IrProperty.jniType() = getter?.returnType?.jniType()
+
+fun IrField.jniType() = type.jniType()
+
 fun IrClass.jniType(nullable: Boolean = true): CppTypeMirror? =
     allCppTypeMirrors.firstOrNull { it.checkIrClass(this, nullable) }
 
 
 fun IrClass.cppModelMirror() = classId?.let { classId ->
-    "${classId.packageFqName}${classId.shortClassName}".camelCase().firstCamelCase()
+    "${classId.packageFqName}${classId.shortClassName}".camelCase().firstUppercase()
 }
 
 fun IrClass.cppMappingNameSpace() = cppModelMirror()?.let { "${it}_mapping" } ?: "mapping"

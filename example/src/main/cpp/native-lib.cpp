@@ -113,5 +113,5 @@ int ComKlee0kaiExampleMirrorsSimpleJniMirror::updateInCpp(const int &delta, cons
 }
 
 int ComKlee0kaiExampleMirrorsSimpleJniMirror::objId() {
-    return ComKlee0kaiExampleMirrorsSimpleJniMirror::obJvmId();
+    return ComKlee0kaiExampleMirrorsSimpleJniMirror::getId();
 }

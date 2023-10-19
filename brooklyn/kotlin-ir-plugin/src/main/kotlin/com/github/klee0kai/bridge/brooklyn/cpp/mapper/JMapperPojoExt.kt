@@ -10,7 +10,6 @@ import org.jetbrains.kotlin.backend.jvm.fullValueParameterList
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.util.classId
 import org.jetbrains.kotlin.ir.util.constructors
-import org.jetbrains.kotlin.ir.util.fields
 import org.jetbrains.kotlin.ir.util.properties
 
 fun CodeBuilder.mapJniClass(jClass: IrClass, isImpl: Boolean = false) = apply {
@@ -44,20 +43,6 @@ private fun Poet.mapFromJvm(jClass: IrClass, isImpl: Boolean = false) = apply {
     line("$declare {")
     statement("if (!$jvmObjectName) return  shared_ptr<${typeMirror}>() ")
     line("shared_ptr<$typeMirror> $cppObjectName = make_shared<$typeMirror>();")
-
-    jClass.fields.forEach { field ->
-        val fieldTypeMirror = field.type.jniType() ?: return@forEach
-
-        val extractFromField = fieldTypeMirror.extractFromField.invoke(
-            type = fieldTypeMirror,
-            jvmObj = jvmObjectName,
-            fieldOrMethodId = "${indexClVariable}->${field.name}",
-            args = "",
-        )
-
-        post(" $cppObjectName->${field.name} = ")
-        statement(fieldTypeMirror.transformToCpp.invoke(extractFromField))
-    }
 
     jClass.properties.forEach { property ->
         val propertyTypeMirror = property.getter?.returnType?.jniType() ?: return@forEach
@@ -102,18 +87,6 @@ private fun Poet.mapToJvm(jClass: IrClass, isImpl: Boolean = false) = apply {
         statement("return env->NewObject(${indexClVariable}->cls,${indexClVariable}->${constructor.cppNameMirror}, ${arguments})")
     } else {
         statement("jobject $jvmObjectName = env->NewObject(${indexClVariable}->cls,${indexClVariable}->${constructor.cppNameMirror} )")
-        jClass.fields.forEach { field ->
-            val fieldTypeMirror = field.type.jniType() ?: return@forEach
-
-            statement(
-                fieldTypeMirror.insertToField.invoke(
-                    variable = fieldTypeMirror.transformToJni.invoke("${cppObjectName}->${field.name}"),
-                    jvmObj = jvmObjectName,
-                    fieldOrMethodId = "${indexClVariable}->${field.name}"
-                )
-            )
-        }
-
         jClass.properties.forEach { property ->
             val propertyTypeMirror = property.getter?.returnType?.jniType() ?: return@forEach
 

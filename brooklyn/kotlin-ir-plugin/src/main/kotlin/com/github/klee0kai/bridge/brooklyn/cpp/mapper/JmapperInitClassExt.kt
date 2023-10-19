@@ -20,10 +20,8 @@ fun CodeBuilder.declareClassIndexStructure(jClass: IrClass) = apply {
         lines(1)
         line("struct ${clId.indexStructName} {")
         statement("jclass cls")
-        jClass.fields.forEach { field ->
-            statement("\tjfieldID ${field.name} = NULL")
-        }
         jClass.properties.forEach { property ->
+            val annotations = property.annotations.isNotEmpty()
             statement("\tjmethodID ${property.name}_getter = NULL")
             if (property.isVar) statement("\tjmethodID ${property.name}_setter = NULL")
         }
@@ -60,22 +58,13 @@ fun CodeBuilder.initJniClassImpl(jClass: IrClass) = apply {
         statement("if (${clId.indexVariableName}) return 0")
         statement("${clId.indexVariableName} = std::make_shared<${clId.indexStructName}>()")
         statement("${clId.indexVariableName}->cls = (jclass) env->NewGlobalRef( env->FindClass(\"$clPathName\") )")
-        jClass.fields.forEach { field ->
-            val jniTypeCode = field.type.jniType()?.jniTypeCode ?: return@forEach
-            post("${clId.indexVariableName}->${field.name} = env->GetFieldID(${clId.indexVariableName}->cls, ")
-            str(field.name.toString())
-            post(",")
-            str(jniTypeCode)
-            statement(")")
-            statement("if(!${clId.indexVariableName}->${field.name}) return -1")
-        }
         jClass.properties.forEach { property ->
             val type = property.getter!!.returnType
             val jniTypeCode = type.jniType()?.jniTypeCode ?: return@forEach
 
             //getter
             post("${clId.indexVariableName}->${property.name}_getter = env->GetMethodID(${clId.indexVariableName}->cls, ")
-            str("get${property.name.toString().firstCamelCase()}")
+            str("get${property.nameUpperCase}")
             post(", ")
             str("()${jniTypeCode}")
             statement(")")
@@ -83,7 +72,7 @@ fun CodeBuilder.initJniClassImpl(jClass: IrClass) = apply {
             //setter
             if (property.isVar) {
                 post("${clId.indexVariableName}->${property.name}_setter = env->GetMethodID(${clId.indexVariableName}->cls, ")
-                str("set${property.name.toString().firstCamelCase()}")
+                str("set${property.nameUpperCase}")
                 post(",")
                 post("\"(${jniTypeCode})V\"")
                 statement(")")
@@ -137,7 +126,7 @@ val ClassId.fullClassName
     get() = "${packageFqName}${shortClassName}"
 
 val ClassId.indexStructName
-    get() = "${fullClassName}IndexStructure".camelCase().firstCamelCase()
+    get() = "${fullClassName}IndexStructure".camelCase().firstUppercase()
 
 val ClassId.indexVariableName
     get() = "${fullClassName}Index".camelCase()
