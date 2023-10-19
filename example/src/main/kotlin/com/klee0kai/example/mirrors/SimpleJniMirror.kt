@@ -32,7 +32,9 @@ class SimpleJniMirror {
 
     external fun incInCpp2(): Int
 
-    external fun updateInCpp(delta: Int, strDelta: String): Int
+    external fun updateFromCpp(delta: Int, strDelta: String): Int
+
+    external fun updateFromCppDirectly(delta: Int, strDelta: String): Int
 
     external fun objId(): Int
 
