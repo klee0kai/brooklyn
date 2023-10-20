@@ -1,5 +1,6 @@
 package com.klee0kai.example.mirrors
 
+import com.github.klee0kai.bridge.brooklyn.JniIgnore
 import com.github.klee0kai.bridge.brooklyn.JniMirror
 import kotlin.random.Random
 
@@ -11,6 +12,11 @@ class SimpleJniMirror {
     var someInt: Int = 0
     var someString: String = ""
 
+    @JniIgnore
+    @get:JvmName("ignoreGetter")
+    val ignoreField: String get() = error("ignore")
+
+
     constructor(a: Int) {
         someInt = a
     }
@@ -18,6 +24,11 @@ class SimpleJniMirror {
     constructor(s: String) {
         someString = s
     }
+
+    @JniIgnore
+    constructor(float: Float, int: Int) {
+    }
+
 
     fun inc() {
         someInt++
@@ -27,6 +38,12 @@ class SimpleJniMirror {
         someInt += delta
         someString += strDelta
     }
+
+
+    @JniIgnore
+    @JvmName("ignoreMyMethod")
+    fun ignoreMethod(): Unit = error("ignore")
+
 
     external fun incInCpp()
 

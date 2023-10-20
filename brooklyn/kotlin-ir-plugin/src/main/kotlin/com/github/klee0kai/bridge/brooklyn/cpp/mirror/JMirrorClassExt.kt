@@ -5,6 +5,7 @@ import com.github.klee0kai.bridge.brooklyn.cpp.common.CommonNaming.BROOKLYN
 import com.github.klee0kai.bridge.brooklyn.cpp.common.CommonNaming.MAPPER
 import com.github.klee0kai.bridge.brooklyn.cpp.mapper.cppNameMirror
 import com.github.klee0kai.bridge.brooklyn.cpp.mapper.indexVariableName
+import com.github.klee0kai.bridge.brooklyn.cpp.mapper.isIgnoringJni
 import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.cppMappingNameSpace
 import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.cppModelMirror
 import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.jniType
@@ -29,6 +30,7 @@ fun CodeBuilder.declareClassMirror(jClass: IrClass) = apply {
         statement("${clMirror}(const ${clMirror}& other)")
 
         if (!jClass.isObject) jClass.constructors.forEach { func ->
+            if (func.isIgnoringJni) return@forEach
             val args = func.mirrorFuncArgs(env = true)?.joinToString(", ") ?: return@forEach
             usedTypes.addAll(func.allUsedTypes())
 
@@ -36,6 +38,7 @@ fun CodeBuilder.declareClassMirror(jClass: IrClass) = apply {
         }
 
         jClass.functions.forEach { func ->
+            if (func.isIgnoringJni) return@forEach
             val args = func.mirrorFuncArgs()?.joinToString(", ") ?: return@forEach
             val returnType = func.returnType.jniType()?.cppFullTypeMirror ?: "void"
             usedTypes.addAll(func.allUsedTypes())
@@ -47,7 +50,7 @@ fun CodeBuilder.declareClassMirror(jClass: IrClass) = apply {
         }
 
         jClass.properties.forEach { prop ->
-            if (prop.isExternal) return@forEach
+            if (prop.isExternal || prop.isIgnoringJni) return@forEach
             val type = prop.jniType()
                 ?.cppFullTypeMirror
                 ?: return@forEach
@@ -106,7 +109,7 @@ fun CodeBuilder.implementClassMirror(jClass: IrClass) = apply {
 
 
         if (!jClass.isObject) jClass.constructors.forEach { func ->
-            if (func.isExternal) return@forEach
+            if (func.isExternal || func.isIgnoringJni) return@forEach
             val args = func.mirrorFuncArgs(env = true)?.joinToString(", ") ?: return@forEach
             line("${clMirror}::${clMirror}($args) {")
 
@@ -127,7 +130,7 @@ fun CodeBuilder.implementClassMirror(jClass: IrClass) = apply {
         }
 
         jClass.functions.forEach { func ->
-            if (func.isExternal) return@forEach
+            if (func.isExternal || func.isIgnoringJni) return@forEach
             val argsDeclaration = func.mirrorFuncArgs()?.joinToString(", ") ?: return@forEach
             val returnType = func.returnType.jniType()
             val arguments = func.fullValueParameterList.joinToString(",\n ") { param ->
@@ -204,7 +207,7 @@ fun CodeBuilder.implementClassMirror(jClass: IrClass) = apply {
 
 
         jClass.properties.forEach { prop ->
-            if (prop.isExternal) return@forEach
+            if (prop.isExternal || prop.isIgnoringJni) return@forEach
             val type = prop.jniType() ?: return@forEach
 
             val extractMethod = if (jClass.isObject) {

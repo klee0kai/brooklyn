@@ -2,6 +2,7 @@ package com.github.klee0kai.bridge.brooklyn.cpp.mirror
 
 import com.github.klee0kai.bridge.brooklyn.cpp.common.*
 import com.github.klee0kai.bridge.brooklyn.cpp.common.CommonNaming.BROOKLYN
+import com.github.klee0kai.bridge.brooklyn.cpp.mapper.isIgnoringJni
 import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.cppModelMirror
 import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.jniType
 import org.jetbrains.kotlin.backend.jvm.fullValueParameterList
@@ -16,7 +17,7 @@ fun CodeBuilder.implMirrorInterface(jClass: IrClass) = apply {
     val clId = jClass.classId ?: return@apply
 
     jClass.functions.forEach { func ->
-        if (!func.isExternal) return@forEach
+        if (!func.isExternal || func.isIgnoringJni) return@forEach
         usedTypes.addAll(func.allUsedTypes())
 
         val mappedArgs = func.fullValueParameterList.map { arg ->
