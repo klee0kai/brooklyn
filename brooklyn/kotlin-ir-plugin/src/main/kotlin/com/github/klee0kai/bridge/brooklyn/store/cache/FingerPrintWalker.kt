@@ -1,4 +1,4 @@
-package com.github.klee0kai.bridge.brooklyn.cache
+package com.github.klee0kai.bridge.brooklyn.store.cache
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async

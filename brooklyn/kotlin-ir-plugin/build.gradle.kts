@@ -12,6 +12,9 @@ dependencies {
     kapt("com.google.auto.service:auto-service:1.0.1")
     compileOnly("com.google.auto.service:auto-service-annotations:1.0.1")
 
+    implementation("com.github.klee0kai.stone:kotlin_lib:1.0.3")
+    kapt("com.github.klee0kai.stone:stone_processor:1.0.3")
+
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:1.5.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf-jvm:1.5.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-cbor:1.5.0")

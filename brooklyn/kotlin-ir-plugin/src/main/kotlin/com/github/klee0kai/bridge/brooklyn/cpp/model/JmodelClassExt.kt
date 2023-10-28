@@ -4,7 +4,6 @@ import com.github.klee0kai.bridge.brooklyn.cpp.common.*
 import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.jniType
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.types.IrType
-import org.jetbrains.kotlin.ir.util.fields
 import org.jetbrains.kotlin.ir.util.properties
 
 fun CodeBuilder.declareClassModelStructure(jClass: IrClass) = apply {
