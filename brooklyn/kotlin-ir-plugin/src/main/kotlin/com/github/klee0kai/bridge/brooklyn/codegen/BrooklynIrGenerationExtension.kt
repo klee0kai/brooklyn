@@ -1,5 +1,7 @@
 package com.github.klee0kai.bridge.brooklyn.codegen
 
+import com.github.klee0kai.bridge.brooklyn.cache.CacheStore
+import com.github.klee0kai.bridge.brooklyn.cache.minus
 import com.github.klee0kai.bridge.brooklyn.cmake.cmakeLib
 import com.github.klee0kai.bridge.brooklyn.cpp.common.*
 import com.github.klee0kai.bridge.brooklyn.cpp.common.CommonNaming.BROOKLYN
@@ -15,10 +17,12 @@ import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.addSupportedMirrorClas
 import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.addSupportedPojoClass
 import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.allCppTypeMirrors
 import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.cppMappingNameSpace
+import kotlinx.coroutines.runBlocking
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
+import org.jetbrains.kotlin.ir.declarations.path
 import org.jetbrains.kotlin.ir.util.classId
 import org.jetbrains.kotlin.ir.visitors.acceptVoid
 import java.io.File
@@ -26,7 +30,8 @@ import java.lang.ref.WeakReference
 
 class BrooklynIrGenerationExtension(
     private val messageCollector: MessageCollector,
-    private val outDirFile: String
+    private val outDirFile: String,
+    private val cachePath: String,
 ) : IrGenerationExtension {
 
     private fun headersInitBlock(
@@ -37,12 +42,19 @@ class BrooklynIrGenerationExtension(
         namespaces(BROOKLYN, *namespaces)
     }
 
-    override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
+
+    override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext): Unit = runBlocking {
         pluginContextRef = WeakReference(pluginContext)
         File(outDirFile).deleteRecursively()
+        val cacheStore = CacheStore(cachePath)
+        val oldFingerPrint = cacheStore.loadAndResetProjectFingerPrint()
+        val newFingerPrint = cacheStore.calcProjectFingerPrint(moduleFragment.files.map { File(it.path) })
+        val diff = newFingerPrint - oldFingerPrint
 
         val headerCreator = KotlinVisitor()
-        moduleFragment.files.forEach { it.acceptVoid(headerCreator) }
+        moduleFragment.files.forEach { file ->
+            file.acceptVoid(headerCreator)
+        }
 
 
         headerCreator.pojoJniClasses.forEach {
@@ -234,6 +246,8 @@ class BrooklynIrGenerationExtension(
             )
             .gen(sym = "#")
 
+
+        cacheStore.save(newFingerPrint)
     }
 
     companion object {

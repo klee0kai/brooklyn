@@ -6,6 +6,7 @@ import org.jetbrains.kotlin.backend.jvm.codegen.AnnotationCodegen.Companion.anno
 import org.jetbrains.kotlin.descriptors.runtime.structure.classId
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.IrClass
+import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.util.classId
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
@@ -16,6 +17,10 @@ class KotlinVisitor : IrElementVisitorVoid {
 
     val pojoJniClasses = mutableListOf<IrClass>()
     val mirrorJniClasses = mutableListOf<IrClass>()
+
+    override fun visitFile(declaration: IrFile) {
+        super.visitFile(declaration)
+    }
 
 
     override fun visitElement(element: IrElement) = element.acceptChildrenVoid(this)

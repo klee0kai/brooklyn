@@ -13,7 +13,9 @@ import org.jetbrains.kotlin.config.CompilerConfiguration
 @AutoService(ComponentRegistrar::class)
 class BrooklynComponentRegistrar @JvmOverloads constructor(
     private val outDirFile: String = "",
+    private val cacheFilePath: String = "",
 ) : ComponentRegistrar {
+
 
     override fun registerProjectComponents(
         project: MockProject,
@@ -21,15 +23,22 @@ class BrooklynComponentRegistrar @JvmOverloads constructor(
     ) {
         val messageCollector = configuration.get(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY, MessageCollector.NONE)
         val outDirFileConf = configuration.get(BrooklynCommandLineProcessor.ARG_OUT_DIR, outDirFile)
+        val cacheFilePathConf = configuration.get(BrooklynCommandLineProcessor.ARG_CACHE_FILE, cacheFilePath)
 
         if (outDirFileConf.isBlank()) {
             messageCollector.report(CompilerMessageSeverity.ERROR, "Out directory is null")
             return
         }
 
+        if (cacheFilePathConf.isBlank()) {
+            messageCollector.report(CompilerMessageSeverity.ERROR, "cache file path")
+            return
+        }
+
         IrGenerationExtension.registerExtension(
             project,
-            BrooklynIrGenerationExtension(messageCollector, outDirFileConf)
+            BrooklynIrGenerationExtension(messageCollector, outDirFileConf, cacheFilePathConf)
         )
     }
 }
+
