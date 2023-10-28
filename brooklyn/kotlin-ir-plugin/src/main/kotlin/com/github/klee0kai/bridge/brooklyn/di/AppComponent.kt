@@ -1,6 +1,7 @@
 package com.github.klee0kai.bridge.brooklyn.di
 
 import com.github.klee0kai.bridge.brooklyn.codegen.KotlinVisitor
+import com.github.klee0kai.bridge.brooklyn.controllers.CacheController
 import com.github.klee0kai.bridge.brooklyn.cpp.common.CppBuildersCollection
 import com.github.klee0kai.bridge.brooklyn.model.AppConfig
 import com.github.klee0kai.bridge.brooklyn.store.cache.CacheStore
@@ -48,5 +49,7 @@ interface AppComponent {
     fun kotlinVisitorLazy(): Lazy<KotlinVisitor>
 
     fun cppBuilderLazy(): Lazy<CppBuildersCollection>
+
+    fun cacheControllerLazy(): Lazy<CacheController>
 
 }

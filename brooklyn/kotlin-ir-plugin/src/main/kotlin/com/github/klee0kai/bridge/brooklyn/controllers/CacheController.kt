@@ -1,9 +1,7 @@
 package com.github.klee0kai.bridge.brooklyn.controllers
 
 import com.github.klee0kai.bridge.brooklyn.di.DI
-import com.github.klee0kai.bridge.brooklyn.store.cache.ProjectDiff
 import com.github.klee0kai.bridge.brooklyn.store.cache.ProjectFingerPrint
-import com.github.klee0kai.bridge.brooklyn.store.cache.minus
 import org.jetbrains.kotlin.ir.declarations.path
 import java.io.File
 
@@ -19,21 +17,36 @@ class CacheController {
 
     private var newFingerPrint: ProjectFingerPrint? = null
 
-    var cacheDiff: ProjectDiff? = null
-        private set
-
+    private var cacheDiff: Set<String>? = null
 
     suspend fun calcDiff() {
         oldFingerPrint = cacheStore.loadAndResetProjectFingerPrint()
         newFingerPrint = cacheStore.calcProjectFingerPrint(project.files.map { File(it.path) })
-        cacheDiff = newFingerPrint!! - oldFingerPrint
+        calcCachedFiles()
 
         // delete non cached files
-        File(config.outDirFile).deleteRecursively()
+        project.files.forEach { file ->
+            if (!isCached(file.path)) {
+                File(file.path).deleteRecursively()
+            }
+        }
     }
 
     suspend fun saveFingerPrint() {
         cacheStore.save(newFingerPrint!!)
     }
+
+    fun isCached(path: String) = cacheDiff?.contains(path) ?: false
+
+    private fun calcCachedFiles() {
+        val cachedFiles2 = oldFingerPrint?.cachedFiles?.groupBy { it.path } ?: emptyMap()
+        cacheDiff = newFingerPrint?.cachedFiles?.filter { file ->
+            cachedFiles2[file.path]?.any { it.hash == file.hash } ?: false
+        }
+            ?.map { it.path }
+            ?.toSet()
+            ?: emptySet()
+    }
+
 
 }

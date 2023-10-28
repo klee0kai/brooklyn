@@ -22,12 +22,3 @@ data class ProjectDiff(
     val nonChangedFiles: Set<File>
 )
 
-operator fun ProjectFingerPrint.minus(fingerPrint: ProjectFingerPrint?): ProjectDiff {
-    val cachedFiles2 = fingerPrint?.cachedFiles?.groupBy { it.path } ?: emptyMap()
-    return cachedFiles.filter { file ->
-        cachedFiles2[file.path]?.any { it.hash == file.hash } ?: false
-    }
-        .map { File(it.path) }
-        .toSet()
-        .let { ProjectDiff(it) }
-}
