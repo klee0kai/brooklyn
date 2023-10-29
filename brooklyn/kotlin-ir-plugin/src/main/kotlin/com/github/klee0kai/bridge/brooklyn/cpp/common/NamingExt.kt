@@ -97,9 +97,17 @@ fun String.snakeCase(sep: String = "_") = buildString {
 
 private val ClassId.cppFilePrefix
     get() = "${croppedPackageName.snakeCase()}_${shortClassName.toString().snakeCase()}"
+        .trimFirstSpecSymbol()
 
 val IrDeclarationWithName.nameUpperCase get() = name.toString().firstUppercase()
+
+fun String.trimFirstSpecSymbol(): String {
+    return if (startsWith("_") || startsWith("."))
+        return substring(1)
+    else this
+}
 
 
 private fun String.trimSpecSymbols() =
     this.replace(".", "_").filter { it !in "<>" }
+
