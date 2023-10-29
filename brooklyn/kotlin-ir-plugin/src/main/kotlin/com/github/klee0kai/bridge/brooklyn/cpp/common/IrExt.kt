@@ -30,7 +30,7 @@ val ClassId.croppedPackageName: String
 
 
 val ClassId.fullClassName
-    get() = "${packageFqName}${shortClassName}"
+    get() = "${packageFqName}.${shortClassName}"
 
 val ClassId.croppedFullName
     get() = "${croppedPackageName}${shortClassName}"

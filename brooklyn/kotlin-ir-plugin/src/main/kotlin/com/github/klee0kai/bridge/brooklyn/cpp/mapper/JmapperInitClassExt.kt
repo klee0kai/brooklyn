@@ -13,12 +13,13 @@ fun CodeBuilder.declareClassIndexStructure(jClass: IrClass, pojo: Boolean = fals
     variables {
         val clId = jClass.classId!!
         lines(1)
+        comment("indexstructure: ${jClass.classId?.fullClassName}")
         line("struct ${clId.indexStructName} {")
         statement("jclass cls")
         jClass.properties.forEach { property ->
             if (property.isIgnoringJni) return@forEach
             statement("\tjmethodID ${property.name}_getter = NULL")
-            if (property.isVar) statement("\tjmethodID ${property.name}_setter = NULL")
+            if (!pojo && property.isVar) statement("\tjmethodID ${property.name}_setter = NULL")
         }
         val methods = if (pojo) jClass.constructors else (jClass.constructors + jClass.functions)
         methods.forEach { func ->
@@ -35,6 +36,29 @@ fun CodeBuilder.declareClassIndexField(jClass: IrClass) = apply {
     variables {
         val clId = jClass.classId!!
         statement("std::shared_ptr<${clId.indexStructName}> ${clId.indexVariableName} = {}")
+    }
+}
+
+fun CodeBuilder.declareClassNamingStructure(jClass: IrClass, pojo: Boolean = false) = apply {
+    variables {
+        val clId = jClass.classId!!
+        lines(1)
+        comment("namingstructure: ${jClass.classId?.fullClassName}")
+        line("struct ${clId.namingStructName} {")
+        statement("std::string cls")
+        jClass.properties.forEach { property ->
+            if (property.isIgnoringJni) return@forEach
+            statement("\tjmethodID ${property.name}_getter = NULL")
+            if (!pojo && property.isVar) statement("\tjmethodID ${property.name}_setter = NULL")
+        }
+        val methods = if (pojo) jClass.constructors else (jClass.constructors + jClass.functions)
+        methods.forEach { func ->
+            if (func.isIgnoringJni) return@forEach
+            statement("\tjmethodID ${func.cppNameMirror} = NULL")
+        }
+        statement("}")
+
+        statement("extern std::shared_ptr<${clId.indexStructName}> ${clId.indexVariableName}")
     }
 }
 
@@ -69,7 +93,7 @@ fun CodeBuilder.initJniClassImpl(jClass: IrClass, pojo: Boolean = false) = apply
             statement(")")
             statement("if(!${clId.indexVariableName}->${property.name}_getter) return -1")
             //setter
-            if (property.isVar) {
+            if (!pojo && property.isVar) {
                 post("${clId.indexVariableName}->${property.name}_setter = env->GetMethodID(${clId.indexVariableName}->cls, ")
                 str("set${property.nameUpperCase}")
                 post(",")

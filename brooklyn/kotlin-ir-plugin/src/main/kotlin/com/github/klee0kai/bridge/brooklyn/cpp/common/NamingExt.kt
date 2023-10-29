@@ -49,6 +49,9 @@ val ClassId.interfaceCppFile
 val ClassId.indexStructName
     get() = "${croppedFullName}IndexStructure".camelCase().firstUppercase()
 
+val ClassId.namingStructName
+    get() = "${croppedFullName}NamingStructure".camelCase().firstUppercase()
+
 val ClassId.indexVariableName
     get() = "${croppedFullName}Index".camelCase()
 

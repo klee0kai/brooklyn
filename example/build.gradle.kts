@@ -1,4 +1,5 @@
 import com.android.build.gradle.internal.tasks.factory.dependsOn
+import proguard.gradle.ProGuardTask
 
 plugins {
     kotlin("jvm")
@@ -13,6 +14,7 @@ sourceSets {
     main {
         brooklyn {
             enabled = true
+            cacheFile = null
         }
     }
 }
@@ -20,6 +22,41 @@ sourceSets {
 buildConfig {
     buildConfigField("String", "NATIVE_LIB_PATH", "\"${File(buildDir, "libs/libnative_lib.so").absolutePath}\"")
 }
+
+val packingTest = tasks.register<Jar>("jarMain") {
+    description = "Build jar artifact"
+    dependsOn(tasks.findByName("classes"))
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    manifest {
+        attributes["Implementation-Title"] = "Obfuscated simple jar application"
+        attributes["Main-Class"] = "com.klee0kai.example.Main"
+    }
+    baseName = project.name + "-packed"
+    println("conf: ${configurations.compileClasspath.get().map { it.path }}")
+    from(
+        configurations.compileClasspath.get().map {
+            if (it.isDirectory) it else zipTree(it)
+        }
+    )
+    from(sourceSets.main.get().output)
+}
+
+val obfuscateTask = tasks.register<ProGuardTask>("obfuscate") {
+    description = "Obfuscate generated jar file"
+    dontwarn()
+    dependsOn(packingTest)
+
+    configuration("proguard-rules.pro")
+    injars(files("build/libs/example-packed.jar"))
+    outjars(files("build/libs/example-obfuscated.jar"))
+    printmapping("build/libs/example-obfuscated.map")
+}
+
+tasks.getByName("assemble") {
+    dependsOn(obfuscateTask)
+}
+
 
 crosscompile {
     bashBuild("native-lib") {
@@ -42,8 +79,15 @@ crosscompile {
     }
 }
 
+
+
 tasks.getByName<Test>("test") {
+    dependsOn(obfuscateTask)
     useJUnitPlatform()
+
+    val mainFiles = sourceSets.main.get().output.files
+    classpath = classpath.filter { !mainFiles.contains(it) }
+    classpath += files("build/libs/example-obfuscated.jar")
 }
 
 

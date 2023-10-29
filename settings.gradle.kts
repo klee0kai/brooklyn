@@ -29,6 +29,7 @@ buildscript {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.21")
         classpath("org.jetbrains.kotlin:kotlin-serialization:1.7.21")
         classpath("com.github.klee0kai:crosscompile:0.0.1")
+        classpath("com.guardsquare:proguard-gradle:7.4.0")
     }
 }
 

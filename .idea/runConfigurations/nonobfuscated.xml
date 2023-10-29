@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="nonobfuscated" type="JarApplication">
+    <option name="JAR_PATH" value="$PROJECT_DIR$/example/build/libs/example-packed.jar" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+    <option name="ALTERNATIVE_JRE_PATH" />
+    <method v="2">
+      <option name="Gradle.BeforeRunTask" enabled="true" tasks="obfuscate" externalProjectPath="$PROJECT_DIR$/example" vmOptions="" scriptParameters="" />
+    </method>
+  </configuration>
+</component>
