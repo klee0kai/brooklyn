@@ -38,6 +38,7 @@ class MirrorsGenController {
                     }
                     .namespaces(declaration.cppMappingNameSpace())
                     .declareClassIndexStructure(declaration)
+                    .declareClassNamingStructure(declaration)
                     .initJniClassApi()
                     .deinitJniClassApi()
                     .mapMirrorClass(declaration)
@@ -53,6 +54,7 @@ class MirrorsGenController {
                     }
                     .namespaces(declaration.cppMappingNameSpace())
                     .declareClassIndexField(declaration)
+                    .declareClassNamingField(declaration)
                     .initJniClassImpl(declaration)
                     .deinitJniClassImpl(declaration)
                     .mapMirrorClass(declaration, isImpl = true)

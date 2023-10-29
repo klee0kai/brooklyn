@@ -49,11 +49,14 @@ val ClassId.interfaceCppFile
 val ClassId.indexStructName
     get() = "${croppedFullName}IndexStructure".camelCase().firstUppercase()
 
+val ClassId.indexVariableName
+    get() = "${croppedFullName}Index".camelCase().firstLowercase()
+
 val ClassId.namingStructName
     get() = "${croppedFullName}NamingStructure".camelCase().firstUppercase()
 
-val ClassId.indexVariableName
-    get() = "${croppedFullName}Index".camelCase()
+val ClassId.namingVariableName
+    get() = "${croppedFullName}Naming".camelCase().firstLowercase()
 
 val IrFunction.cppNameMirror
     get() = "$name${
@@ -78,6 +81,8 @@ fun String.camelCase() = buildString {
 
 
 fun String.firstUppercase() = first().uppercaseChar() + substring(1)
+
+fun String.firstLowercase() = first().lowercase() + substring(1)
 
 
 fun String.snakeCase(sep: String = "_") = buildString {

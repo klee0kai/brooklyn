@@ -85,9 +85,9 @@ tasks.getByName<Test>("test") {
     dependsOn(obfuscateTask)
     useJUnitPlatform()
 
-    val mainFiles = sourceSets.main.get().output.files
-    classpath = classpath.filter { !mainFiles.contains(it) }
-    classpath += files("build/libs/example-obfuscated.jar")
+//    val mainFiles = sourceSets.main.get().output.files
+//    classpath = classpath.filter { !mainFiles.contains(it) }
+//    classpath += files("build/libs/example-obfuscated.jar")
 }
 
 

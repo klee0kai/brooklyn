@@ -55,6 +55,7 @@ class ModelsGenController {
                     }
                     .namespaces(declaration.cppMappingNameSpace())
                     .declareClassIndexStructure(declaration, pojo = true)
+                    .declareClassNamingStructure(declaration, pojo = true)
                     .initJniClassApi()
                     .deinitJniClassApi()
                     .mapJniClass(declaration)
@@ -70,6 +71,7 @@ class ModelsGenController {
                     }
                     .namespaces(declaration.cppMappingNameSpace())
                     .declareClassIndexField(declaration)
+                    .declareClassNamingField(declaration, pojo = true)
                     .initJniClassImpl(declaration, pojo = true)
                     .deinitJniClassImpl(declaration)
                     .mapJniClass(declaration, isImpl = true)

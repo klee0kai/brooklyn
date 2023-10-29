@@ -13,7 +13,6 @@ fun CodeBuilder.declareClassIndexStructure(jClass: IrClass, pojo: Boolean = fals
     variables {
         val clId = jClass.classId!!
         lines(1)
-        comment("indexstructure: ${jClass.classId?.fullClassName}")
         line("struct ${clId.indexStructName} {")
         statement("jclass cls")
         jClass.properties.forEach { property ->
@@ -43,22 +42,48 @@ fun CodeBuilder.declareClassNamingStructure(jClass: IrClass, pojo: Boolean = fal
     variables {
         val clId = jClass.classId!!
         lines(1)
-        comment("namingstructure: ${jClass.classId?.fullClassName}")
         line("struct ${clId.namingStructName} {")
         statement("std::string cls")
         jClass.properties.forEach { property ->
             if (property.isIgnoringJni) return@forEach
-            statement("\tjmethodID ${property.name}_getter = NULL")
-            if (!pojo && property.isVar) statement("\tjmethodID ${property.name}_setter = NULL")
+            statement("\tstd::string ${property.name}_getter")
+            if (!pojo && property.isVar) statement("\tstd::string ${property.name}_setter")
         }
         val methods = if (pojo) jClass.constructors else (jClass.constructors + jClass.functions)
         methods.forEach { func ->
             if (func.isIgnoringJni) return@forEach
-            statement("\tjmethodID ${func.cppNameMirror} = NULL")
+            statement("\tstd::string ${func.cppNameMirror}")
         }
         statement("}")
 
-        statement("extern std::shared_ptr<${clId.indexStructName}> ${clId.indexVariableName}")
+        statement("extern ${clId.namingStructName} ${clId.namingVariableName}")
+    }
+}
+
+fun CodeBuilder.declareClassNamingField(jClass: IrClass, pojo: Boolean = false) = apply {
+    variables {
+        val clId = jClass.classId!!
+        val clPathName = "${clId.packageFqName}/${clId.shortClassName}".snakeCase("/")
+        comment("namingstructure: ${jClass.classId?.fullClassName};")
+
+        val fieldInits = buildList<String> {
+            add(".cls = \"${clPathName}\"")
+            jClass.properties.forEach { property ->
+                if (property.isIgnoringJni) return@forEach
+                add(".${property.name}_getter = \"get${property.nameUpperCase}\"")
+                if (!pojo && property.isVar) add(".${property.name}_setter = \"set${property.nameUpperCase}\"")
+            }
+            val methods = if (pojo) jClass.constructors else (jClass.constructors + jClass.functions)
+            methods.forEach { func ->
+                if (func.isIgnoringJni) return@forEach
+                add(".${func.cppNameMirror} = \"${func.name}\"")
+            }
+        }
+
+        line("${clId.namingStructName} ${clId.namingVariableName} = {")
+        line(fieldInits.joinToString(",\n"))
+        statement("}")
+        comment("namingstructurefinish: ${jClass.classId?.fullClassName};")
     }
 }
 
@@ -74,7 +99,7 @@ fun CodeBuilder.initJniClassImpl(jClass: IrClass, pojo: Boolean = false) = apply
     body {
         lines(1)
         val clId = jClass.classId!!
-        val clPathName = "${clId.croppedPackageName}/${clId.shortClassName}".snakeCase("/")
+        val clPathName = "${clId.packageFqName}/${clId.shortClassName}".snakeCase("/")
         line("int init(JNIEnv *env) {")
         statement("if (${clId.indexVariableName}) return 0")
         statement("${clId.indexVariableName} = std::make_shared<${clId.indexStructName}>()")
