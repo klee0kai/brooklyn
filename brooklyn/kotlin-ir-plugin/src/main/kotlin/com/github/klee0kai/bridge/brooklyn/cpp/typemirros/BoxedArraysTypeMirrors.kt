@@ -1,5 +1,7 @@
 package com.github.klee0kai.bridge.brooklyn.cpp.typemirros
 
+import com.github.klee0kai.bridge.brooklyn.cpp.common.isArray
+import com.github.klee0kai.bridge.brooklyn.cpp.common.isNullableArray
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.kotlinFqName
 

@@ -1,6 +1,9 @@
 package com.github.klee0kai.bridge.brooklyn.cpp.typemirros
 
-import org.jetbrains.kotlin.ir.types.*
+import com.github.klee0kai.bridge.brooklyn.cpp.common.isArray
+import com.github.klee0kai.bridge.brooklyn.cpp.common.isNullableArray
+import org.jetbrains.kotlin.ir.types.getClass
+import org.jetbrains.kotlin.ir.types.isNullable
 import org.jetbrains.kotlin.ir.util.kotlinFqName
 
 internal fun stringsTypeMirror() = arrayOf(
@@ -122,26 +125,3 @@ fun extractJniString(method: String) = ExtractJniType { type, jvmObj, fieldOrMet
 }
 
 
-fun IrType.isNullableArray(argTypeCheck: (IrType) -> Boolean): Boolean {
-    return if (isNullableArray()) {
-        val argType = (this as? IrSimpleType)
-            ?.arguments
-            ?.getOrNull(0)
-            ?.typeOrNull
-            ?: return false
-
-        return argTypeCheck.invoke(argType)
-    } else false
-}
-
-
-fun IrType.isArray(argTypeCheck: (IrType) -> Boolean): Boolean {
-    return if (isArray()) {
-        val argType = (this as? IrSimpleType)
-            ?.arguments
-            ?.getOrNull(0)
-            ?.typeOrNull
-            ?: return false
-        return argTypeCheck.invoke(argType)
-    } else false
-}

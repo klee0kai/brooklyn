@@ -15,6 +15,8 @@ abstract class BrooklynSourceSet @Inject constructor(
 
     var outDir: File? = null
 
+    var cacheFile: File? = null
+
     override fun getName(): String = this.name
 
     override fun getDisplayName(): String = this.name

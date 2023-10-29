@@ -3,18 +3,13 @@ package com.github.klee0kai.bridge.brooklyn.cpp.mirror
 import com.github.klee0kai.bridge.brooklyn.cpp.common.*
 import com.github.klee0kai.bridge.brooklyn.cpp.common.CommonNaming.BROOKLYN
 import com.github.klee0kai.bridge.brooklyn.cpp.common.CommonNaming.MAPPER
-import com.github.klee0kai.bridge.brooklyn.cpp.mapper.cppNameMirror
-import com.github.klee0kai.bridge.brooklyn.cpp.mapper.indexVariableName
-import com.github.klee0kai.bridge.brooklyn.cpp.mapper.isIgnoringJni
 import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.cppMappingNameSpace
 import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.cppModelMirror
 import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.jniType
 import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.joinArgs
 import org.jetbrains.kotlin.backend.jvm.fullValueParameterList
 import org.jetbrains.kotlin.ir.declarations.IrClass
-import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.types.IrType
-import org.jetbrains.kotlin.ir.types.isUnit
 import org.jetbrains.kotlin.ir.util.*
 
 fun CodeBuilder.declareClassMirror(jClass: IrClass) = apply {
@@ -269,23 +264,5 @@ fun CodeBuilder.implementClassMirror(jClass: IrClass) = apply {
         }
     }
 }
-
-
-fun IrFunction.mirrorFuncArgs(env: Boolean = false) = runCatching {
-    fullValueParameterList.map {
-        "const ${it.type.jniType()!!.cppFullTypeMirror}& ${it.name}"
-    }
-}.getOrNull()
-
-
-fun IrFunction.allUsedTypes(): List<IrType> =
-    listOf(returnType) + fullValueParameterList.map { it.type }
-
-
-fun IrType.jniTypeStr() =
-    when {
-        isUnit() -> "void"
-        else -> jniType()?.jniTypeStr ?: "jobject"
-    }
 
 

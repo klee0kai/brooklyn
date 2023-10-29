@@ -2,7 +2,6 @@ package com.github.klee0kai.bridge.brooklyn.cpp.mirror
 
 import com.github.klee0kai.bridge.brooklyn.cpp.common.*
 import com.github.klee0kai.bridge.brooklyn.cpp.common.CommonNaming.BROOKLYN
-import com.github.klee0kai.bridge.brooklyn.cpp.mapper.isIgnoringJni
 import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.cppModelMirror
 import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.jniType
 import org.jetbrains.kotlin.backend.jvm.fullValueParameterList

@@ -1,9 +1,6 @@
 package com.github.klee0kai.bridge.brooklyn.cpp.mapper
 
-import com.github.klee0kai.bridge.brooklyn.cpp.common.CodeBuilder
-import com.github.klee0kai.bridge.brooklyn.cpp.common.line
-import com.github.klee0kai.bridge.brooklyn.cpp.common.lines
-import com.github.klee0kai.bridge.brooklyn.cpp.common.statement
+import com.github.klee0kai.bridge.brooklyn.cpp.common.*
 import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.jniType
 import com.github.klee0kai.bridge.brooklyn.poet.Poet
 import org.jetbrains.kotlin.ir.declarations.IrClass

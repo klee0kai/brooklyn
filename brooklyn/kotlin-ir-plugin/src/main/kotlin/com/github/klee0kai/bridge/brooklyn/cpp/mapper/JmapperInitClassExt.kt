@@ -4,16 +4,10 @@ import com.github.klee0kai.bridge.brooklyn.cpp.common.*
 import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.jniType
 import org.jetbrains.kotlin.backend.jvm.fullValueParameterList
 import org.jetbrains.kotlin.ir.declarations.IrClass
-import org.jetbrains.kotlin.ir.declarations.IrFunction
-import org.jetbrains.kotlin.ir.declarations.IrMutableAnnotationContainer
-import org.jetbrains.kotlin.ir.types.IrSimpleType
-import org.jetbrains.kotlin.ir.types.IrType
-import org.jetbrains.kotlin.ir.types.classFqName
-import org.jetbrains.kotlin.ir.types.isMarkedNullable
-import org.jetbrains.kotlin.ir.util.*
-import org.jetbrains.kotlin.name.ClassId
-import org.jetbrains.kotlin.name.FqName
-import kotlin.math.absoluteValue
+import org.jetbrains.kotlin.ir.util.classId
+import org.jetbrains.kotlin.ir.util.constructors
+import org.jetbrains.kotlin.ir.util.functions
+import org.jetbrains.kotlin.ir.util.properties
 
 fun CodeBuilder.declareClassIndexStructure(jClass: IrClass, pojo: Boolean = false) = apply {
     variables {
@@ -128,36 +122,3 @@ fun CodeBuilder.deinitJniClassImpl(jClass: IrClass) = apply {
     }
 }
 
-
-val ClassId.fullClassName
-    get() = "${packageFqName}${shortClassName}"
-
-val ClassId.indexStructName
-    get() = "${fullClassName}IndexStructure".camelCase().firstUppercase()
-
-val ClassId.indexVariableName
-    get() = "${fullClassName}Index".camelCase()
-
-val IrFunction.cppNameMirror
-    get() = "$name${
-        fullValueParameterList.map { it.type.classFqName to it.isVararg }.hashCode().absoluteValue
-    }".camelCase()
-
-val IrFunction.isConstructor
-    get() = name.toString() == "<init>"
-
-fun IrType.isClassType(signature: IdSignature.CommonSignature, nullable: Boolean? = null): Boolean {
-    if (this !is IrSimpleType) return false
-    if (nullable != null && this.isMarkedNullable() != nullable) return false
-    return signature == classifier.signature ||
-            classifier.owner.let { it is IrClass && it.hasFqNameEqualToSignature(signature) }
-}
-
-val IrMutableAnnotationContainer.isIgnoringJni
-    get() = annotations.any {
-        it.type.classFqName.toString() == "com.github.klee0kai.bridge.brooklyn.JniIgnore"
-    }
-
-private fun IrClass.hasFqNameEqualToSignature(signature: IdSignature.CommonSignature): Boolean =
-    name.asString() == signature.shortName &&
-            hasEqualFqName(FqName("${signature.packageFqName}.${signature.declarationFqName}"))

@@ -27,6 +27,7 @@ class BrooklynGradlePlugin : KotlinCompilerPluginSupportPlugin {
                 project.objects
             )
             extension.outDir = File(project.buildDir, "generated/sources/brooklyn/${sourceSet.name}")
+            extension.cacheFile = File(project.buildDir, "generated/sources/brooklyn/${sourceSet.name}/cache.bin")
         }
     }
 
@@ -55,6 +56,9 @@ class BrooklynGradlePlugin : KotlinCompilerPluginSupportPlugin {
             buildList {
                 brooklynSourceSet?.outDir?.path?.let { path ->
                     add(SubpluginOption(key = "outDir", value = path))
+                }
+                brooklynSourceSet?.cacheFile?.path?.let { path ->
+                    add(SubpluginOption(key = "cacheFile", value = path))
                 }
             }
         }
