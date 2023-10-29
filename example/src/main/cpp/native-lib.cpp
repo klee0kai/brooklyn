@@ -4,10 +4,10 @@
 
 using namespace brooklyn;
 
-std::shared_ptr<ComKlee0kaiExampleMirrorsSimpleJniMirror> simpleMirror = {};
+std::shared_ptr<MirrorsSimpleJniMirror> simpleMirror = {};
 
-ComKlee0kaiExampleModelSimple
-brooklyn::ComKlee0kaiExampleEngineSimpleJniEngine::copySimple(const brooklyn::ComKlee0kaiExampleModelSimple &simple) {
+ModelSimple
+brooklyn::EngineSimpleJniEngine::copySimple(const brooklyn::ModelSimple &simple) {
     auto simple2 = simple;
     simple2.age++;
     simple2.address += "from c++";
@@ -15,111 +15,111 @@ brooklyn::ComKlee0kaiExampleEngineSimpleJniEngine::copySimple(const brooklyn::Co
     return simple2;
 }
 
-ComKlee0kaiExampleModelNullableTypePojo brooklyn::ComKlee0kaiExampleEngineSimpleJniEngine::copyNullableType(
-        const brooklyn::ComKlee0kaiExampleModelNullableTypePojo &simple) {
+ModelNullableTypePojo brooklyn::EngineSimpleJniEngine::copyNullableType(
+        const brooklyn::ModelNullableTypePojo &simple) {
     return simple;
 }
 
-ComKlee0kaiExampleMirrorsSimpleJniMirror ComKlee0kaiExampleEngineSimpleJniEngine::createSimpleMirror1() {
-    return ComKlee0kaiExampleMirrorsSimpleJniMirror(41);
+MirrorsSimpleJniMirror EngineSimpleJniEngine::createSimpleMirror1() {
+    return MirrorsSimpleJniMirror(41);
 }
 
-ComKlee0kaiExampleMirrorsSimpleJniMirror ComKlee0kaiExampleEngineSimpleJniEngine::createSimpleMirror2() {
-    auto simpleMirror = ComKlee0kaiExampleMirrorsSimpleJniMirror("created from c++");
+MirrorsSimpleJniMirror EngineSimpleJniEngine::createSimpleMirror2() {
+    auto simpleMirror = MirrorsSimpleJniMirror("created from c++");
     //transfer of possession
     auto mirror2 = simpleMirror;
-    auto mirror3 = ComKlee0kaiExampleMirrorsSimpleJniMirror(mirror2);
+    auto mirror3 = MirrorsSimpleJniMirror(mirror2);
     return mirror3;
 }
 
-std::vector<ComKlee0kaiExampleModelSimple>
-ComKlee0kaiExampleEngineSimpleJniEngine::copyArray(const std::vector<ComKlee0kaiExampleModelSimple> &simpleArray) {
-    auto simpleArray2 = std::vector<ComKlee0kaiExampleModelSimple>(simpleArray.size());
+std::vector<ModelSimple>
+EngineSimpleJniEngine::copyArray(const std::vector<ModelSimple> &simpleArray) {
+    auto simpleArray2 = std::vector<ModelSimple>(simpleArray.size());
     std::copy(simpleArray.begin(), simpleArray.end(), simpleArray2.begin());
     return simpleArray2;
 }
 
-std::shared_ptr<std::vector<ComKlee0kaiExampleModelSimple>> ComKlee0kaiExampleEngineSimpleJniEngine::copyArray2(
-        const std::shared_ptr<std::vector<ComKlee0kaiExampleModelSimple>> &simpleArray) {
+std::shared_ptr<std::vector<ModelSimple>> EngineSimpleJniEngine::copyArray2(
+        const std::shared_ptr<std::vector<ModelSimple>> &simpleArray) {
     return simpleArray;
 }
 
-std::vector<std::shared_ptr<ComKlee0kaiExampleModelSimple>> ComKlee0kaiExampleEngineSimpleJniEngine::copyArray3(
-        const std::vector<std::shared_ptr<ComKlee0kaiExampleModelSimple>> &simpleArray) {
+std::vector<std::shared_ptr<ModelSimple>> EngineSimpleJniEngine::copyArray3(
+        const std::vector<std::shared_ptr<ModelSimple>> &simpleArray) {
     return simpleArray;
 }
 
-std::shared_ptr<std::vector<std::shared_ptr<ComKlee0kaiExampleModelSimple>>>
-ComKlee0kaiExampleEngineSimpleJniEngine::copyArray4(
-        const std::shared_ptr<std::vector<std::shared_ptr<ComKlee0kaiExampleModelSimple>>> &simpleArray) {
-    return simpleArray;
-}
-
-
-std::vector<ComKlee0kaiExampleMirrorsSimpleJniMirror> ComKlee0kaiExampleEngineSimpleJniEngine::copyMirrorArray(
-        const std::vector<ComKlee0kaiExampleMirrorsSimpleJniMirror> &simpleArray) {
-    return simpleArray;
-}
-
-std::shared_ptr<std::vector<ComKlee0kaiExampleMirrorsSimpleJniMirror>>
-ComKlee0kaiExampleEngineSimpleJniEngine::copyMirrorArray2(
-        const std::shared_ptr<std::vector<ComKlee0kaiExampleMirrorsSimpleJniMirror>> &simpleArray) {
-    return simpleArray;
-}
-
-std::vector<std::shared_ptr<ComKlee0kaiExampleMirrorsSimpleJniMirror>>
-ComKlee0kaiExampleEngineSimpleJniEngine::copyMirrorArray3(
-        const std::vector<std::shared_ptr<ComKlee0kaiExampleMirrorsSimpleJniMirror>> &simpleArray) {
-    return simpleArray;
-}
-
-std::shared_ptr<std::vector<std::shared_ptr<ComKlee0kaiExampleMirrorsSimpleJniMirror>>>
-ComKlee0kaiExampleEngineSimpleJniEngine::copyMirrorArray4(
-        const std::shared_ptr<std::vector<std::shared_ptr<ComKlee0kaiExampleMirrorsSimpleJniMirror>>> &simpleArray) {
+std::shared_ptr<std::vector<std::shared_ptr<ModelSimple>>>
+EngineSimpleJniEngine::copyArray4(
+        const std::shared_ptr<std::vector<std::shared_ptr<ModelSimple>>> &simpleArray) {
     return simpleArray;
 }
 
 
-ComKlee0kaiExampleModelArraysModel
-ComKlee0kaiExampleEngineSimpleJniEngine::copyArrayModel(const brooklyn::ComKlee0kaiExampleModelArraysModel &arrays) {
+std::vector<MirrorsSimpleJniMirror> EngineSimpleJniEngine::copyMirrorArray(
+        const std::vector<MirrorsSimpleJniMirror> &simpleArray) {
+    return simpleArray;
+}
+
+std::shared_ptr<std::vector<MirrorsSimpleJniMirror>>
+EngineSimpleJniEngine::copyMirrorArray2(
+        const std::shared_ptr<std::vector<MirrorsSimpleJniMirror>> &simpleArray) {
+    return simpleArray;
+}
+
+std::vector<std::shared_ptr<MirrorsSimpleJniMirror>>
+EngineSimpleJniEngine::copyMirrorArray3(
+        const std::vector<std::shared_ptr<MirrorsSimpleJniMirror>> &simpleArray) {
+    return simpleArray;
+}
+
+std::shared_ptr<std::vector<std::shared_ptr<MirrorsSimpleJniMirror>>>
+EngineSimpleJniEngine::copyMirrorArray4(
+        const std::shared_ptr<std::vector<std::shared_ptr<MirrorsSimpleJniMirror>>> &simpleArray) {
+    return simpleArray;
+}
+
+
+ModelArraysModel
+EngineSimpleJniEngine::copyArrayModel(const brooklyn::ModelArraysModel &arrays) {
     return arrays;
 }
 
-ComKlee0kaiExampleModelBoxedArraysModel ComKlee0kaiExampleEngineSimpleJniEngine::copyBoxedArrayModel(
-        const brooklyn::ComKlee0kaiExampleModelBoxedArraysModel &arrays) {
+ModelBoxedArraysModel EngineSimpleJniEngine::copyBoxedArrayModel(
+        const brooklyn::ModelBoxedArraysModel &arrays) {
     return arrays;
 }
 
-void ComKlee0kaiExampleEngineSimpleJniEngine::holdSimpleMirror(
-        const brooklyn::ComKlee0kaiExampleMirrorsSimpleJniMirror &simple) {
-    simpleMirror = std::make_shared<ComKlee0kaiExampleMirrorsSimpleJniMirror>(simple);
+void EngineSimpleJniEngine::holdSimpleMirror(
+        const brooklyn::MirrorsSimpleJniMirror &simple) {
+    simpleMirror = std::make_shared<MirrorsSimpleJniMirror>(simple);
 }
 
-void ComKlee0kaiExampleEngineSimpleJniEngine::unHoldSimpleMirror() {
+void EngineSimpleJniEngine::unHoldSimpleMirror() {
     simpleMirror.reset();
 }
 
-void ComKlee0kaiExampleMirrorsSimpleJniMirror::incInCpp() {
+void MirrorsSimpleJniMirror::incInCpp() {
     inc();
 }
 
-int ComKlee0kaiExampleMirrorsSimpleJniMirror::incInCpp2() {
+int MirrorsSimpleJniMirror::incInCpp2() {
     update(2, "from C++");
     return 1;
 }
 
-int ComKlee0kaiExampleMirrorsSimpleJniMirror::updateFromCpp(const int &delta, const std::string &strDelta) {
+int MirrorsSimpleJniMirror::updateFromCpp(const int &delta, const std::string &strDelta) {
     update(delta, strDelta);
     return 1;
 }
 
-int ComKlee0kaiExampleMirrorsSimpleJniMirror::updateFromCppDirectly(const int &delta, const std::string &strDelta) {
+int MirrorsSimpleJniMirror::updateFromCppDirectly(const int &delta, const std::string &strDelta) {
     setSomeInt(getSomeInt() + delta);
     setSomeString(getSomeString() + strDelta);
     return 2;
 }
 
 
-int ComKlee0kaiExampleMirrorsSimpleJniMirror::objId() {
-    return ComKlee0kaiExampleMirrorsSimpleJniMirror::getId();
+int MirrorsSimpleJniMirror::objId() {
+    return MirrorsSimpleJniMirror::getId();
 }
