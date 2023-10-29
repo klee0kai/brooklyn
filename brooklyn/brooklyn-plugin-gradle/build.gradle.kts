@@ -2,6 +2,7 @@ plugins {
     kotlin("jvm")
     id("java-gradle-plugin")
     id("com.github.gmazzo.buildconfig")
+    id("com.gradle.plugin-publish") version "1.0.0"
 }
 
 dependencies {
@@ -9,7 +10,7 @@ dependencies {
 }
 
 buildConfig {
-    val project = project(":kotlin-ir-plugin")
+    val project = project(":brooklyn-plugin")
     packageName(project.group.toString())
     buildConfigField("String", "KOTLIN_PLUGIN_ID", "\"${rootProject.extra["name"]}\"")
     buildConfigField("String", "KOTLIN_PLUGIN_GROUP", "\"${project.group}\"")
@@ -19,7 +20,7 @@ buildConfig {
 
 gradlePlugin {
     plugins {
-        create("kotlinIrPluginTemplate") {
+        create("brooklyn") {
             id = rootProject.extra["name"].toString()
             displayName = rootProject.extra["displayName"].toString()
             description = rootProject.extra["description"].toString()

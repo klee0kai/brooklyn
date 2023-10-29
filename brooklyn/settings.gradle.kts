@@ -1,3 +1,3 @@
-include(":kotlin-ir-plugin-gradle")
-include(":kotlin-ir-plugin")
+include(":brooklyn-plugin-gradle")
+include(":brooklyn-plugin")
 include(":annotations")
