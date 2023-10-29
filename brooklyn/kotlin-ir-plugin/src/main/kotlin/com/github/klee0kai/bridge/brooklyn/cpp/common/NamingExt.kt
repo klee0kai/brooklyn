@@ -4,7 +4,6 @@ import org.jetbrains.kotlin.backend.jvm.fullValueParameterList
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationWithName
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.types.classFqName
-import org.jetbrains.kotlin.ir.util.isVararg
 import org.jetbrains.kotlin.name.ClassId
 import java.io.File
 import kotlin.math.absoluteValue
@@ -60,7 +59,9 @@ val ClassId.namingVariableName
 
 val IrFunction.cppNameMirror
     get() = "$name${
-        fullValueParameterList.map { it.type.classFqName to it.isVararg }.hashCode().absoluteValue
+        fullValueParameterList.map {
+            it.type.classFqName?.asString() ?: ""
+        }.hashCode().absoluteValue
     }".camelCase()
 
 

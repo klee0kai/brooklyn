@@ -1,4 +1,5 @@
 import com.android.build.gradle.internal.tasks.factory.dependsOn
+import com.github.klee0kai.bridge.brooklyn.BrooklynProguardTask
 import proguard.gradle.ProGuardTask
 
 plugins {
@@ -26,14 +27,13 @@ buildConfig {
 val packingTest = tasks.register<Jar>("jarMain") {
     description = "Build jar artifact"
     dependsOn(tasks.findByName("classes"))
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
 
     manifest {
         attributes["Implementation-Title"] = "Obfuscated simple jar application"
         attributes["Main-Class"] = "com.klee0kai.example.Main"
     }
     baseName = project.name + "-packed"
-    println("conf: ${configurations.compileClasspath.get().map { it.path }}")
     from(
         configurations.compileClasspath.get().map {
             if (it.isDirectory) it else zipTree(it)
@@ -51,6 +51,12 @@ val obfuscateTask = tasks.register<ProGuardTask>("obfuscate") {
     injars(files("build/libs/example-packed.jar"))
     outjars(files("build/libs/example-obfuscated.jar"))
     printmapping("build/libs/example-obfuscated.map")
+}
+
+
+val brooklynProGuardTask = tasks.register<BrooklynProguardTask>("brooklyn_obfuscated") {
+    proguardMapFile = obfuscateTask.get().printMappingFile?.path
+    brooklynOutDir = sourceSets.main.get().brooklyn.outDir?.path
 }
 
 tasks.getByName("assemble") {
