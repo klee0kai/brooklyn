@@ -11,9 +11,6 @@ interface ControllersModule {
     fun cacheController(): CacheController
 
     @Provide(cache = Provide.CacheType.Soft)
-    fun kotlinTypesController(): KotlinTypesController
-
-    @Provide(cache = Provide.CacheType.Soft)
     fun commonGenController(): CommonGenController
 
     @Provide(cache = Provide.CacheType.Soft)

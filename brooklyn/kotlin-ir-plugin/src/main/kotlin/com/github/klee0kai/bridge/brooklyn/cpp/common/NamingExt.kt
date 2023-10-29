@@ -1,8 +1,13 @@
 package com.github.klee0kai.bridge.brooklyn.cpp.common
 
+import org.jetbrains.kotlin.backend.jvm.fullValueParameterList
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationWithName
+import org.jetbrains.kotlin.ir.declarations.IrFunction
+import org.jetbrains.kotlin.ir.types.classFqName
+import org.jetbrains.kotlin.ir.util.isVararg
 import org.jetbrains.kotlin.name.ClassId
 import java.io.File
+import kotlin.math.absoluteValue
 
 object CommonNaming {
     const val BROOKLYN = "brooklyn"
@@ -39,6 +44,18 @@ val ClassId.modelCppFile
 
 val ClassId.interfaceCppFile
     get() = File("mirror", "${cppFilePrefix}_interface.cpp")
+
+
+val ClassId.indexStructName
+    get() = "${fullClassName}IndexStructure".camelCase().firstUppercase()
+
+val ClassId.indexVariableName
+    get() = "${fullClassName}Index".camelCase()
+
+val IrFunction.cppNameMirror
+    get() = "$name${
+        fullValueParameterList.map { it.type.classFqName to it.isVararg }.hashCode().absoluteValue
+    }".camelCase()
 
 
 fun String.camelCase() = buildString {

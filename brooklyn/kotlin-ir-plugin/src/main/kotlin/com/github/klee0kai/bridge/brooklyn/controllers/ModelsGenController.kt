@@ -10,21 +10,23 @@ import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.cppMappingNameSpace
 import com.github.klee0kai.bridge.brooklyn.di.DI
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.jetbrains.kotlin.ir.declarations.path
 import org.jetbrains.kotlin.ir.util.classId
+import org.jetbrains.kotlin.ir.util.file
 
 class ModelsGenController {
 
     private val defDispatcher = DI.dispatchersModule().defaultDispatcher()
 
-    private val headerCreator by DI.kotlinVisitorLazy()
+    private val brooklynTypes by DI.brooklynTypes()
 
     private val gen by DI.cppBuilderLazy()
 
     suspend fun gen() = withContext(defDispatcher) {
         gen.getOrCreate(CommonNaming.modelHeader)
             .header {
-                headerCreator.pojoJniClasses.forEach { include(it.classId!!.modelHeaderFile.path) }
-                headerCreator.mirrorJniClasses.forEach { include(it.classId!!.modelHeaderFile.path) }
+                brooklynTypes.pojoJniClasses.forEach { include(it.classId!!.modelHeaderFile.path) }
+                brooklynTypes.mirrorJniClasses.forEach { include(it.classId!!.modelHeaderFile.path) }
             }
 
         gen.getOrCreate(CommonNaming.modelCpp)
@@ -38,10 +40,15 @@ class ModelsGenController {
             .deInitBrooklyn(isImpl = true)
 
 
-        headerCreator.pojoJniClasses.forEach { declaration ->
+        brooklynTypes.nonCachedPojoJniClasses.forEach { declaration ->
+            val srcFile = declaration.file.path
             launch {
                 val clId = declaration.classId!!
-                gen.getOrCreate(clId.mapperHeaderFile, headersInitBlock(namespaces = arrayOf(CommonNaming.MAPPER)))
+                gen.getOrCreate(
+                    clId.mapperHeaderFile,
+                    srcFile = srcFile,
+                    initBlock = headersInitBlock(namespaces = arrayOf(CommonNaming.MAPPER))
+                )
                     .header {
                         include(CommonNaming.commonClassesMapperHeader)
                         include(declaration.classId!!.modelHeaderFile.path)
@@ -54,7 +61,8 @@ class ModelsGenController {
 
                 gen.getOrCreate(
                     clId.mapperCppFile,
-                    headersInitBlock(doubleImportCheck = false, namespaces = arrayOf(CommonNaming.MAPPER))
+                    srcFile = srcFile,
+                    initBlock = headersInitBlock(doubleImportCheck = false, namespaces = arrayOf(CommonNaming.MAPPER))
                 )
                     .header {
                         include(clId.mapperHeaderFile.path)
@@ -66,7 +74,11 @@ class ModelsGenController {
                     .deinitJniClassImpl(declaration)
                     .mapJniClass(declaration, isImpl = true)
 
-                gen.getOrCreate(clId.modelHeaderFile, headersInitBlock())
+                gen.getOrCreate(
+                    clId.modelHeaderFile,
+                    srcFile = srcFile,
+                    initBlock = headersInitBlock()
+                )
                     .declareClassModelStructure(declaration)
             }
         }

@@ -10,21 +10,28 @@ import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.cppMappingNameSpace
 import com.github.klee0kai.bridge.brooklyn.di.DI
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.jetbrains.kotlin.ir.declarations.path
 import org.jetbrains.kotlin.ir.util.classId
+import org.jetbrains.kotlin.ir.util.file
 
 class MirrorsGenController {
 
     private val defDispatcher = DI.dispatchersModule().defaultDispatcher()
 
-    private val headerCreator by DI.kotlinVisitorLazy()
+    private val brooklynTypes by DI.brooklynTypes()
 
     private val gen by DI.cppBuilderLazy()
 
     suspend fun gen() = withContext(defDispatcher) {
-        headerCreator.mirrorJniClasses.forEach { declaration ->
+        brooklynTypes.nonCachedMirrorJniClasses.forEach { declaration ->
+            val srcFile = declaration.file.path
             launch {
                 val clId = declaration.classId!!
-                gen.getOrCreate(clId.mapperHeaderFile, headersInitBlock(namespaces = arrayOf(CommonNaming.MAPPER)))
+                gen.getOrCreate(
+                    clId.mapperHeaderFile,
+                    srcFile = srcFile,
+                    initBlock = headersInitBlock(namespaces = arrayOf(CommonNaming.MAPPER))
+                )
                     .header {
                         include(CommonNaming.commonClassesMapperHeader)
                         include(clId.modelHeaderFile.path)
@@ -37,7 +44,8 @@ class MirrorsGenController {
 
                 gen.getOrCreate(
                     clId.mapperCppFile,
-                    headersInitBlock(doubleImportCheck = false, namespaces = arrayOf(CommonNaming.MAPPER))
+                    srcFile = srcFile,
+                    initBlock = headersInitBlock(doubleImportCheck = false, namespaces = arrayOf(CommonNaming.MAPPER))
                 )
                     .header {
                         include(clId.mapperHeaderFile.path)
@@ -50,12 +58,19 @@ class MirrorsGenController {
                     .mapMirrorClass(declaration, isImpl = true)
 
 
-                gen.getOrCreate(clId.modelHeaderFile, headersInitBlock())
+                gen.getOrCreate(
+                    clId.modelHeaderFile,
+                    srcFile = srcFile,
+                    initBlock = headersInitBlock()
+                )
                     .header { include(CommonNaming.envHeader) }
                     .declareClassMirror(declaration)
 
-
-                gen.getOrCreate(clId.modelCppFile, headersInitBlock(doubleImportCheck = false))
+                gen.getOrCreate(
+                    clId.modelCppFile,
+                    srcFile = srcFile,
+                    initBlock = headersInitBlock(doubleImportCheck = false)
+                )
                     .header {
                         include(clId.modelHeaderFile.path)
                         include(clId.mapperHeaderFile.path)
@@ -63,7 +78,10 @@ class MirrorsGenController {
                     }
                     .implementClassMirror(declaration)
 
-                gen.getOrCreate(clId.interfaceCppFile)
+                gen.getOrCreate(
+                    clId.interfaceCppFile,
+                    srcFile = srcFile,
+                )
                     .header {
                         include(clId.modelHeaderFile.path)
                         include(clId.mapperHeaderFile.path)

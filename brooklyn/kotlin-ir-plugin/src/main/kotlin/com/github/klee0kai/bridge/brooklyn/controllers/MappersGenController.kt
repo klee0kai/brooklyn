@@ -19,7 +19,7 @@ class MappersGenController {
 
     private val defDispatcher = DI.dispatchersModule().defaultDispatcher()
 
-    private val headerCreator by DI.kotlinVisitorLazy()
+    private val booklynTypes by DI.brooklynTypes()
 
     private val gen by DI.cppBuilderLazy()
 
@@ -42,7 +42,7 @@ class MappersGenController {
         gen.getOrCreate(CommonNaming.mapperHeader, headersInitBlock(namespaces = arrayOf(CommonNaming.MAPPER)))
             .header {
                 include(CommonNaming.commonClassesMapperHeader)
-                headerCreator.pojoJniClasses.forEach { include(it.classId!!.mapperHeaderFile.path) }
+                booklynTypes.pojoJniClasses.forEach { include(it.classId!!.mapperHeaderFile.path) }
             }
             .initAllApi()
             .deinitAllApi()
@@ -52,8 +52,8 @@ class MappersGenController {
             CommonNaming.mapperCpp,
             headersInitBlock(doubleImportCheck = false, namespaces = arrayOf(CommonNaming.MAPPER))
         )
-            .initAllImpl(headerCreator.pojoJniClasses + headerCreator.mirrorJniClasses)
-            .deinitAllImpl(headerCreator.pojoJniClasses + headerCreator.mirrorJniClasses)
+            .initAllImpl(booklynTypes.pojoJniClasses + booklynTypes.mirrorJniClasses)
+            .deinitAllImpl(booklynTypes.pojoJniClasses + booklynTypes.mirrorJniClasses)
 
 
     }

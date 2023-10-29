@@ -1,7 +1,6 @@
-package com.github.klee0kai.bridge.brooklyn.store.cache
+package com.github.klee0kai.bridge.brooklyn.model
 
 import kotlinx.serialization.Serializable
-import java.io.File
 
 const val PROJECT_FINGERPRINT_VERSION = 0
 
@@ -11,14 +10,17 @@ data class CachedFile(
     val hash: Int,
 )
 
+@Serializable
+data class InOutFilePair(
+    val inFile: String?,
+    val outFile: String,
+)
 
 @Serializable
 data class ProjectFingerPrint(
     val version: Int = PROJECT_FINGERPRINT_VERSION,
-    val cachedFiles: List<CachedFile>
+    val cachedFiles: List<CachedFile> = emptyList(),
+    val inOutFiles: List<InOutFilePair> = emptyList()
 )
 
-data class ProjectDiff(
-    val nonChangedFiles: Set<File>
-)
 

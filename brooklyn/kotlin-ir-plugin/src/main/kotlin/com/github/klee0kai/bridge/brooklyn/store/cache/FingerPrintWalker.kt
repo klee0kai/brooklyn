@@ -1,5 +1,6 @@
 package com.github.klee0kai.bridge.brooklyn.store.cache
 
+import com.github.klee0kai.bridge.brooklyn.model.CachedFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext

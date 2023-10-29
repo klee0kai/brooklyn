@@ -1,6 +1,7 @@
 package com.github.klee0kai.bridge.brooklyn.cpp.common
 
 import com.github.klee0kai.bridge.brooklyn.di.DI
+import com.github.klee0kai.bridge.brooklyn.model.InOutFilePair
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -15,16 +16,22 @@ class CppBuildersCollection(
 
     val files get() = builders.keys
 
-    @Synchronized
-    fun getOrCreate(fileName: String, initBlock: CodeBuilder.() -> Unit = {}): CodeBuilder {
-        val file = File(outDir, fileName)
-        if (!builders.contains(file)) builders.putIfAbsent(file, CodeBuilder(file).apply(initBlock))
-        return builders[file]!!
-    }
+    val inOutFiles = mutableListOf<InOutFilePair>()
 
     @Synchronized
-    fun getOrCreate(relativeFile: File, initBlock: CodeBuilder.() -> Unit = {}): CodeBuilder {
+    fun getOrCreate(
+        relativeFile: String,
+        initBlock: CodeBuilder.() -> Unit = {}
+    ): CodeBuilder = getOrCreate(File(relativeFile), srcFile = null, initBlock = initBlock)
+
+    @Synchronized
+    fun getOrCreate(
+        relativeFile: File,
+        srcFile: String? = null,
+        initBlock: CodeBuilder.() -> Unit = {}
+    ): CodeBuilder {
         val file = File(outDir, relativeFile.path)
+        inOutFiles.add(InOutFilePair(inFile = srcFile, outFile = file.path))
         if (!builders.contains(file)) builders.putIfAbsent(file, CodeBuilder(file).apply(initBlock))
         return builders[file]!!
     }

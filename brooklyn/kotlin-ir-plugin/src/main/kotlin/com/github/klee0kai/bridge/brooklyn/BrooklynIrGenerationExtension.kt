@@ -5,17 +5,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
-import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 
-class BrooklynIrGenerationExtension(
-    private val messageCollector: MessageCollector,
-    private val outDirFile: String,
-    private val cachePath: String,
-) : IrGenerationExtension {
+class BrooklynIrGenerationExtension : IrGenerationExtension {
 
     private val cacheController by lazy { DI.controllerModule().cacheController() }
-    private val kotlinTypeController by lazy { DI.controllerModule().kotlinTypesController() }
+    private val brooklynTypes by DI.brooklynTypes()
     private val commonGenController by lazy { DI.controllerModule().commonGenController() }
     private val indexGenController by lazy { DI.controllerModule().indexGenController() }
     private val mappingGenController by lazy { DI.controllerModule().mapperGenController() }
@@ -33,7 +28,7 @@ class BrooklynIrGenerationExtension(
         cacheController.calcDiff()
 
         // collect support types
-        kotlinTypeController.process()
+        brooklynTypes.process()
 
         // create
         launch {
@@ -51,7 +46,7 @@ class BrooklynIrGenerationExtension(
         cmakeGenController.gen()
 
         // save fingerprint
-        cacheController.saveFingerPrint()
+        cacheController.saveFingerPrint(gen.inOutFiles)
 
     }
 

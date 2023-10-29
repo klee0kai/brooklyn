@@ -1,13 +1,13 @@
 package com.github.klee0kai.bridge.brooklyn.controllers
 
+import com.github.klee0kai.bridge.brooklyn.cpp.common.brooklynSrcFiles
 import com.github.klee0kai.bridge.brooklyn.di.DI
-import com.github.klee0kai.bridge.brooklyn.store.cache.ProjectFingerPrint
+import com.github.klee0kai.bridge.brooklyn.model.InOutFilePair
+import com.github.klee0kai.bridge.brooklyn.model.ProjectFingerPrint
 import org.jetbrains.kotlin.ir.declarations.path
 import java.io.File
 
 class CacheController {
-
-    private val config by lazy { DI.config() }
 
     private val project by lazy { DI.project() }
 
@@ -21,18 +21,22 @@ class CacheController {
 
     suspend fun calcDiff() {
         oldFingerPrint = cacheStore.loadAndResetProjectFingerPrint()
-        newFingerPrint = cacheStore.calcProjectFingerPrint(project.files.map { File(it.path) })
+        newFingerPrint = cacheStore.calcProjectFingerPrint(
+            sourceFiles = project.brooklynSrcFiles
+                .map { File(it.path) }
+        )
         calcCachedFiles()
 
         // delete non cached files
-        project.files.forEach { file ->
-            if (!isCached(file.path)) {
-                File(file.path).deleteRecursively()
+        oldFingerPrint?.inOutFiles?.forEach { (inFile, outFile) ->
+            if (inFile == null || !isCached(inFile)) {
+                File(outFile).deleteRecursively()
             }
         }
     }
 
-    suspend fun saveFingerPrint() {
+    suspend fun saveFingerPrint(inOutFiles: List<InOutFilePair>) {
+        newFingerPrint = newFingerPrint!!.copy(inOutFiles = inOutFiles)
         cacheStore.save(newFingerPrint!!)
     }
 
@@ -50,3 +54,4 @@ class CacheController {
 
 
 }
+

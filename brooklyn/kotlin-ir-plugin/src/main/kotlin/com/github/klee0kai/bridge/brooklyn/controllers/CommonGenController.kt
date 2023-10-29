@@ -12,13 +12,13 @@ class CommonGenController {
     private val gen by DI.cppBuilderLazy()
 
     suspend fun gen() = withContext(defDispatcher) {
-        gen.getOrCreate(fileName = CommonNaming.brooklynHeader)
+        gen.getOrCreate(relativeFile = CommonNaming.brooklynHeader)
             .allJniHeaders()
             .include(CommonNaming.mapperHeader)
             .include(CommonNaming.modelHeader)
             .include(CommonNaming.envHeader)
 
-        gen.getOrCreate(fileName = CommonNaming.brooklynInternalHeader)
+        gen.getOrCreate(relativeFile = CommonNaming.brooklynInternalHeader)
             .allJniHeaders()
 
         gen.getOrCreate(CommonNaming.envHeader, headersInitBlock())

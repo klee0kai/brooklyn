@@ -1,5 +1,7 @@
 package com.github.klee0kai.bridge.brooklyn.store.cache
 
+import com.github.klee0kai.bridge.brooklyn.model.PROJECT_FINGERPRINT_VERSION
+import com.github.klee0kai.bridge.brooklyn.model.ProjectFingerPrint
 import kotlinx.serialization.decodeFromByteArray
 import kotlinx.serialization.encodeToByteArray
 import kotlinx.serialization.protobuf.ProtoBuf
@@ -25,7 +27,7 @@ class CacheStore(
             }
             fingerPrint
         }
-        File(cacheFilePath).deleteOnExit()
+        File(cacheFilePath).deleteRecursively()
         return result.getOrNull()
     }
 

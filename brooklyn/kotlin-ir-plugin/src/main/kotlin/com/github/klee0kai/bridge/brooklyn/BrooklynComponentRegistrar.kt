@@ -46,7 +46,7 @@ class BrooklynComponentRegistrar @JvmOverloads constructor(
 
         IrGenerationExtension.registerExtension(
             project,
-            BrooklynIrGenerationExtension(messageCollector, outDirFileConf, cacheFilePathConf)
+            BrooklynIrGenerationExtension()
         )
     }
 }
