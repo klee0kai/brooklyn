@@ -11,6 +11,8 @@ class CacheController {
 
     private val project by lazy { DI.project() }
 
+    private val config by lazy { DI.config() }
+
     private val cacheStore by DI.cacheStoreLazy()
 
     private var oldFingerPrint: ProjectFingerPrint? = null
@@ -28,10 +30,14 @@ class CacheController {
         calcCachedFiles()
 
         // delete non cached files
-        oldFingerPrint?.inOutFiles?.forEach { (inFile, outFile) ->
-            if (inFile == null || !isCached(inFile)) {
-                File(outFile).deleteRecursively()
+        if (oldFingerPrint != null) {
+            oldFingerPrint?.inOutFiles?.forEach { (inFile, outFile) ->
+                if (inFile == null || !isCached(inFile)) {
+                    File(outFile).deleteRecursively()
+                }
             }
+        } else {
+            File(config.outDirFile).deleteRecursively()
         }
     }
 

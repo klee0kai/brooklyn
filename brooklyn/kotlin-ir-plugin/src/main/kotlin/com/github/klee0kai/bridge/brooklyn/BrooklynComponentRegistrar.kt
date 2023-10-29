@@ -27,12 +27,7 @@ class BrooklynComponentRegistrar @JvmOverloads constructor(
         val cacheFilePathConf = configuration.get(BrooklynCommandLineProcessor.ARG_CACHE_FILE, cacheFilePath)
 
         if (outDirFileConf.isBlank()) {
-            messageCollector.report(CompilerMessageSeverity.ERROR, "Out directory is null")
-            return
-        }
-
-        if (cacheFilePathConf.isBlank()) {
-            messageCollector.report(CompilerMessageSeverity.ERROR, "cache file path")
+            messageCollector.report(CompilerMessageSeverity.ERROR, "Brooklyn: Out directory is null")
             return
         }
 
