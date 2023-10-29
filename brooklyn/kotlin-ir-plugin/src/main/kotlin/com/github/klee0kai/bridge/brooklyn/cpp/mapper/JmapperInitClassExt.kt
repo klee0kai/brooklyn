@@ -4,6 +4,7 @@ import com.github.klee0kai.bridge.brooklyn.cpp.common.*
 import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.jniType
 import org.jetbrains.kotlin.backend.jvm.fullValueParameterList
 import org.jetbrains.kotlin.ir.declarations.IrClass
+import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.util.classId
 import org.jetbrains.kotlin.ir.util.constructors
 import org.jetbrains.kotlin.ir.util.functions
@@ -43,16 +44,16 @@ fun CodeBuilder.declareClassNamingStructure(jClass: IrClass, pojo: Boolean = fal
         val clId = jClass.classId!!
         lines(1)
         line("struct ${clId.namingStructName} {")
-        statement("std::string cls")
+        statement("const char * cls")
         jClass.properties.forEach { property ->
             if (property.isIgnoringJni) return@forEach
-            statement("\tstd::string ${property.name}_getter")
-            if (!pojo && property.isVar) statement("\tstd::string ${property.name}_setter")
+            statement("const char * ${property.name}_getter")
+            if (!pojo && property.isVar) statement("const char * ${property.name}_setter")
         }
         val methods = if (pojo) jClass.constructors else (jClass.constructors + jClass.functions)
         methods.forEach { func ->
             if (func.isIgnoringJni) return@forEach
-            statement("\tstd::string ${func.cppNameMirror}")
+            statement("const char * ${func.cppNameMirror}")
         }
         statement("}")
 
@@ -96,14 +97,15 @@ fun CodeBuilder.initJniClassApi() = apply {
 }
 
 fun CodeBuilder.initJniClassImpl(jClass: IrClass, pojo: Boolean = false) = apply {
+    val usedTypes = mutableSetOf<IrType>()
+
     body {
         lines(1)
         val clId = jClass.classId!!
-        val clPathName = "${clId.packageFqName}/${clId.shortClassName}".snakeCase("/")
         line("int init(JNIEnv *env) {")
         statement("if (${clId.indexVariableName}) return 0")
         statement("${clId.indexVariableName} = std::make_shared<${clId.indexStructName}>()")
-        statement("${clId.indexVariableName}->cls = (jclass) env->NewGlobalRef( env->FindClass(\"$clPathName\") )")
+        statement("${clId.indexVariableName}->cls = (jclass) env->NewGlobalRef( env->FindClass(${clId.namingVariableName}.cls) )")
         jClass.properties.forEach { property ->
             if (property.isIgnoringJni) return@forEach
 
@@ -111,18 +113,14 @@ fun CodeBuilder.initJniClassImpl(jClass: IrClass, pojo: Boolean = false) = apply
             val jniTypeCode = type.jniType()?.jniTypeCode ?: return@forEach
 
             //getter
-            post("${clId.indexVariableName}->${property.name}_getter = env->GetMethodID(${clId.indexVariableName}->cls, ")
-            str("get${property.nameUpperCase}")
-            post(", ")
-            str("()${jniTypeCode}")
+            post("${clId.indexVariableName}->${property.name}_getter = env->GetMethodID(${clId.indexVariableName}->cls, ${clId.namingVariableName}.${property.name}_getter, ")
+            post("( std::string() + \"()${jniTypeCode}\" ).c_str()")
             statement(")")
             statement("if(!${clId.indexVariableName}->${property.name}_getter) return -1")
             //setter
             if (!pojo && property.isVar) {
-                post("${clId.indexVariableName}->${property.name}_setter = env->GetMethodID(${clId.indexVariableName}->cls, ")
-                str("set${property.nameUpperCase}")
-                post(",")
-                post("\"(${jniTypeCode})V\"")
+                post("${clId.indexVariableName}->${property.name}_setter = env->GetMethodID(${clId.indexVariableName}->cls, ${clId.namingVariableName}.${property.name}_setter, ")
+                post("( std::string() + \"(${jniTypeCode})V\" ).c_str()")
                 statement(")")
                 statement("if(!${clId.indexVariableName}->${property.name}_setter) return -1")
             }
@@ -130,6 +128,7 @@ fun CodeBuilder.initJniClassImpl(jClass: IrClass, pojo: Boolean = false) = apply
         val methods = if (pojo) jClass.constructors else (jClass.constructors + jClass.functions)
         methods.forEach { func ->
             if (func.isIgnoringJni) return@forEach
+            usedTypes.addAll(func.allUsedTypes())
             val argTypes = runCatching {
                 func.fullValueParameterList.joinToString("") { it.type.jniType()!!.jniTypeCode }
             }.getOrNull() ?: return@forEach
@@ -138,16 +137,22 @@ fun CodeBuilder.initJniClassImpl(jClass: IrClass, pojo: Boolean = false) = apply
             }.getOrNull() ?: "V"
 
 
-            post("${clId.indexVariableName}->${func.cppNameMirror} = env->GetMethodID(${clId.indexVariableName}->cls, ")
-            str(func.name.toString())
-            post(", ")
-            post("\"(${argTypes})${returnType}\"")
+            post("${clId.indexVariableName}->${func.cppNameMirror} = env->GetMethodID(${clId.indexVariableName}->cls, ${clId.namingVariableName}.${func.cppNameMirror}, ")
+            post("( std::string() + \"(${argTypes})${returnType}\" ).c_str() ")
             statement(")")
             statement("if(!${clId.indexVariableName}->${func.cppNameMirror}) return -1")
         }
 
         statement("return 0")
         line("}")
+    }
+
+    header {
+        usedTypes.mapNotNull { type ->
+            type.jniType()?.classId
+        }.toSet().forEach { classId ->
+            include(classId.mapperHeaderFile.path)
+        }
     }
 }
 

@@ -5,13 +5,12 @@ import com.github.klee0kai.bridge.brooklyn.cpp.common.CommonNaming.MAPPER
 import com.github.klee0kai.bridge.brooklyn.cpp.common.camelCase
 import com.github.klee0kai.bridge.brooklyn.cpp.common.croppedPackageName
 import com.github.klee0kai.bridge.brooklyn.cpp.common.firstUppercase
-import com.github.klee0kai.bridge.brooklyn.cpp.common.snakeCase
+import com.github.klee0kai.bridge.brooklyn.cpp.common.namingVariableName
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrField
 import org.jetbrains.kotlin.ir.declarations.IrProperty
 import org.jetbrains.kotlin.ir.types.*
 import org.jetbrains.kotlin.ir.util.classId
-import org.jetbrains.kotlin.ir.util.kotlinFqName
 import org.jetbrains.kotlin.name.ClassId
 
 fun interface ExtractJniType {
@@ -118,7 +117,7 @@ fun MutableList<CppTypeMirror>.addSupportedPojoClass(clazz: IrClass) {
     val namespace = clazz.cppMappingNameSpace()
     add(
         CppTypeMirror(
-            jniTypeCode = "L${clazz.kotlinFqName.toString().snakeCase("/")};",
+            jniTypeCode = "L\"+${BROOKLYN}::${MAPPER}::${clazz.cppMappingNameSpace()}::${classId.namingVariableName}.cls +\";",
             cppSimpleTypeMirrorStr = cppModelMirror,
             jniTypeStr = "jobject",
             classId = classId,
@@ -129,7 +128,7 @@ fun MutableList<CppTypeMirror>.addSupportedPojoClass(clazz: IrClass) {
     )
     add(
         CppTypeMirror(
-            jniTypeCode = "L${clazz.kotlinFqName.toString().snakeCase("/")};",
+            jniTypeCode = "L\"+${BROOKLYN}::${MAPPER}::${clazz.cppMappingNameSpace()}::${classId.namingVariableName}.cls +\";",
             cppSimpleTypeMirrorStr = cppModelMirror,
             cppFullTypeMirror = "std::shared_ptr<${cppModelMirror}>",
             jniTypeStr = "jobject",
@@ -141,7 +140,7 @@ fun MutableList<CppTypeMirror>.addSupportedPojoClass(clazz: IrClass) {
     )
     add(
         CppTypeMirror(
-            jniTypeCode = "[L${clazz.kotlinFqName.toString().snakeCase("/")};",
+            jniTypeCode = "[L\"+${BROOKLYN}::${MAPPER}::${clazz.cppMappingNameSpace()}::${classId.namingVariableName}.cls +\";",
             cppSimpleTypeMirrorStr = cppModelMirror,
             cppFullTypeMirror = "std::vector<${cppModelMirror}>",
             jniTypeStr = "jobjectArray",
@@ -164,7 +163,7 @@ fun MutableList<CppTypeMirror>.addSupportedPojoClass(clazz: IrClass) {
     )
     add(
         CppTypeMirror(
-            jniTypeCode = "[L${clazz.kotlinFqName.toString().snakeCase("/")};",
+            jniTypeCode = "[L\"+${BROOKLYN}::${MAPPER}::${clazz.cppMappingNameSpace()}::${classId.namingVariableName}.cls +\";",
             cppSimpleTypeMirrorStr = cppModelMirror,
             cppFullTypeMirror = "std::shared_ptr<std::vector<${cppModelMirror}>>",
             jniTypeStr = "jobjectArray",
@@ -187,7 +186,7 @@ fun MutableList<CppTypeMirror>.addSupportedPojoClass(clazz: IrClass) {
     )
     add(
         CppTypeMirror(
-            jniTypeCode = "[L${clazz.kotlinFqName.toString().snakeCase("/")};",
+            jniTypeCode = "[L\"+${BROOKLYN}::${MAPPER}::${clazz.cppMappingNameSpace()}::${classId.namingVariableName}.cls +\";",
             cppSimpleTypeMirrorStr = cppModelMirror,
             cppFullTypeMirror = "std::vector<std::shared_ptr<${cppModelMirror}>>",
             jniTypeStr = "jobjectArray",
@@ -209,7 +208,7 @@ fun MutableList<CppTypeMirror>.addSupportedPojoClass(clazz: IrClass) {
     )
     add(
         CppTypeMirror(
-            jniTypeCode = "[L${clazz.kotlinFqName.toString().snakeCase("/")};",
+            jniTypeCode = "[L\"+${BROOKLYN}::${MAPPER}::${clazz.cppMappingNameSpace()}::${classId.namingVariableName}.cls +\";",
             cppSimpleTypeMirrorStr = cppModelMirror,
             cppFullTypeMirror = "std::shared_ptr<std::vector<std::shared_ptr<${cppModelMirror}>>>",
             jniTypeStr = "jobjectArray",
@@ -238,7 +237,8 @@ fun MutableList<CppTypeMirror>.addSupportedMirrorClass(clazz: IrClass) {
     val namespace = clazz.cppMappingNameSpace()
     add(
         CppTypeMirror(
-            jniTypeCode = "L${clazz.kotlinFqName.toString().snakeCase("/")};",
+            jniTypeCode = "L\"+${BROOKLYN}::${MAPPER}::${clazz.cppMappingNameSpace()}::${classId.namingVariableName}.cls +\";",
+
             cppSimpleTypeMirrorStr = cppModelMirror,
             jniTypeStr = "jobject",
             classId = classId,
@@ -249,7 +249,8 @@ fun MutableList<CppTypeMirror>.addSupportedMirrorClass(clazz: IrClass) {
     )
     add(
         CppTypeMirror(
-            jniTypeCode = "L${clazz.kotlinFqName.toString().snakeCase("/")};",
+            jniTypeCode = "L\"+${BROOKLYN}::${MAPPER}::${clazz.cppMappingNameSpace()}::${classId.namingVariableName}.cls +\";",
+
             cppSimpleTypeMirrorStr = cppModelMirror,
             cppFullTypeMirror = "std::shared_ptr<${cppModelMirror}>",
             jniTypeStr = "jobject",
@@ -261,7 +262,7 @@ fun MutableList<CppTypeMirror>.addSupportedMirrorClass(clazz: IrClass) {
     )
     add(
         CppTypeMirror(
-            jniTypeCode = "[L${clazz.kotlinFqName.toString().snakeCase("/")};",
+            jniTypeCode = "[L\"+${BROOKLYN}::${MAPPER}::${clazz.cppMappingNameSpace()}::${classId.namingVariableName}.cls +\";",
             cppSimpleTypeMirrorStr = cppModelMirror,
             cppFullTypeMirror = "std::vector<${cppModelMirror}>",
             jniTypeStr = "jobjectArray",
@@ -284,7 +285,7 @@ fun MutableList<CppTypeMirror>.addSupportedMirrorClass(clazz: IrClass) {
     )
     add(
         CppTypeMirror(
-            jniTypeCode = "[L${clazz.kotlinFqName.toString().snakeCase("/")};",
+            jniTypeCode = "[L\"+${BROOKLYN}::${MAPPER}::${clazz.cppMappingNameSpace()}::${classId.namingVariableName}.cls +\";",
             cppSimpleTypeMirrorStr = cppModelMirror,
             cppFullTypeMirror = "std::shared_ptr<std::vector<${cppModelMirror}>>",
             jniTypeStr = "jobjectArray",
@@ -307,7 +308,7 @@ fun MutableList<CppTypeMirror>.addSupportedMirrorClass(clazz: IrClass) {
     )
     add(
         CppTypeMirror(
-            jniTypeCode = "[L${clazz.kotlinFqName.toString().snakeCase("/")};",
+            jniTypeCode = "[L\"+${BROOKLYN}::${MAPPER}::${clazz.cppMappingNameSpace()}::${classId.namingVariableName}.cls +\";",
             cppSimpleTypeMirrorStr = cppModelMirror,
             cppFullTypeMirror = "std::vector<std::shared_ptr<${cppModelMirror}>>",
             jniTypeStr = "jobjectArray",
@@ -329,7 +330,7 @@ fun MutableList<CppTypeMirror>.addSupportedMirrorClass(clazz: IrClass) {
     )
     add(
         CppTypeMirror(
-            jniTypeCode = "[L${clazz.kotlinFqName.toString().snakeCase("/")};",
+            jniTypeCode = "[L\"+${BROOKLYN}::${MAPPER}::${clazz.cppMappingNameSpace()}::${classId.namingVariableName}.cls +\";",
             cppSimpleTypeMirrorStr = cppModelMirror,
             cppFullTypeMirror = "std::shared_ptr<std::vector<std::shared_ptr<${cppModelMirror}>>>",
             jniTypeStr = "jobjectArray",
