@@ -13,19 +13,20 @@ class CmakeGenController {
 
     private val config by lazy { DI.config() }
 
-    private val gen by DI.cppBuilderLazy()
-
     suspend fun gen() = withContext(defDispatcher) {
+       val cppFiles =  File(config.outDirFile).walkTopDown()
+            .filter { it.extension.endsWith("cpp") }
+
         CodeBuilder(File(config.outDirFile, CommonNaming.findBrooklynCmake))
             .cmakeLib(
                 libName = CommonNaming.BROOKLYN,
                 rootDir = config.outDirFile,
-                src = gen.files
-                    .filter { it.extension.endsWith("cpp") }
+                src = cppFiles
                     .map { it.absolutePath }
+                    .toList()
             )
             .gen(sym = "#")
-
     }
+
 
 }
