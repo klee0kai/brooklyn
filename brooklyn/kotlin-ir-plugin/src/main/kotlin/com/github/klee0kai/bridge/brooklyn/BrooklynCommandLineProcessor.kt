@@ -12,9 +12,11 @@ class BrooklynCommandLineProcessor : CommandLineProcessor {
     companion object {
         private const val OUT_DIR = "outDir"
         private const val CACHE_FILE = "cacheFile"
+        private const val GROUP = "group"
 
         val ARG_OUT_DIR = CompilerConfigurationKey<String>(OUT_DIR)
         val ARG_CACHE_FILE = CompilerConfigurationKey<String>(CACHE_FILE)
+        val ARG_GROUP = CompilerConfigurationKey<String>(GROUP)
     }
 
     override val pluginId: String = BuildConfig.KOTLIN_PLUGIN_ID
@@ -32,6 +34,12 @@ class BrooklynCommandLineProcessor : CommandLineProcessor {
             description = "Cache file path",
             required = false,
         ),
+        CliOption(
+            optionName = GROUP,
+            valueDescription = "string",
+            description = "java project group",
+            required = false,
+        ),
     )
 
     override fun processOption(
@@ -42,6 +50,7 @@ class BrooklynCommandLineProcessor : CommandLineProcessor {
         return when (option.optionName) {
             OUT_DIR -> configuration.put(ARG_OUT_DIR, value)
             CACHE_FILE -> configuration.put(ARG_CACHE_FILE, value)
+            GROUP -> configuration.put(ARG_GROUP, value)
             else -> throw IllegalArgumentException("Unexpected config option ${option.optionName}")
         }
     }

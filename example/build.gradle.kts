@@ -7,6 +7,8 @@ plugins {
     id("com.github.gmazzo.buildconfig") version ("3.1.0")
 }
 
+group = "com.klee0kai.example"
+
 sourceSets {
     main {
         brooklyn {

@@ -1,6 +1,5 @@
 package com.klee0kai.example.engine
 
-import BrooklynBridge.example.BuildConfig
 import com.github.klee0kai.bridge.brooklyn.Brooklyn
 import com.github.klee0kai.bridge.brooklyn.JniMirror
 import com.klee0kai.example.mirrors.SimpleJniMirror
@@ -8,6 +7,7 @@ import com.klee0kai.example.model.ArraysModel
 import com.klee0kai.example.model.BoxedArraysModel
 import com.klee0kai.example.model.NullableTypePojo
 import com.klee0kai.example.model.Simple
+import com.klee_kai.example.example.BuildConfig
 
 @JniMirror
 object SimpleJniEngine {

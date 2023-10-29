@@ -3,6 +3,7 @@ package com.github.klee0kai.bridge.brooklyn.cpp.typemirros
 import com.github.klee0kai.bridge.brooklyn.cpp.common.CommonNaming.BROOKLYN
 import com.github.klee0kai.bridge.brooklyn.cpp.common.CommonNaming.MAPPER
 import com.github.klee0kai.bridge.brooklyn.cpp.common.camelCase
+import com.github.klee0kai.bridge.brooklyn.cpp.common.croppedPackageName
 import com.github.klee0kai.bridge.brooklyn.cpp.common.firstUppercase
 import com.github.klee0kai.bridge.brooklyn.cpp.common.snakeCase
 import org.jetbrains.kotlin.ir.declarations.IrClass
@@ -83,7 +84,7 @@ fun IrClass.jniType(nullable: Boolean = true): CppTypeMirror? =
 
 
 fun IrClass.cppModelMirror() = classId?.let { classId ->
-    "${classId.packageFqName}${classId.shortClassName}".camelCase().firstUppercase()
+    "${classId.croppedPackageName}${classId.shortClassName}".camelCase().firstUppercase()
 }
 
 fun IrClass.cppMappingNameSpace() = cppModelMirror()?.let { "${it}_mapping" } ?: "mapping"
