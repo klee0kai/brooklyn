@@ -15,6 +15,7 @@ import org.jetbrains.kotlin.config.CompilerConfiguration
 class BrooklynComponentRegistrar @JvmOverloads constructor(
     private val outDirFile: String = "",
     private val cacheFilePath: String = "",
+    private val group: String = ""
 ) : ComponentRegistrar {
 
 
@@ -25,6 +26,7 @@ class BrooklynComponentRegistrar @JvmOverloads constructor(
         val messageCollector = configuration.get(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY, MessageCollector.NONE)
         val outDirFileConf = configuration.get(BrooklynCommandLineProcessor.ARG_OUT_DIR, outDirFile)
         val cacheFilePathConf = configuration.get(BrooklynCommandLineProcessor.ARG_CACHE_FILE, cacheFilePath)
+        val groupConf = configuration.get(BrooklynCommandLineProcessor.ARG_GROUP, group)
 
         if (outDirFileConf.isBlank()) {
             messageCollector.report(CompilerMessageSeverity.ERROR, "Brooklyn: Out directory is null")
@@ -36,6 +38,7 @@ class BrooklynComponentRegistrar @JvmOverloads constructor(
             AppConfig(
                 outDirFile = outDirFileConf,
                 cacheFilePath = cacheFilePathConf,
+                group = groupConf
             )
         )
 

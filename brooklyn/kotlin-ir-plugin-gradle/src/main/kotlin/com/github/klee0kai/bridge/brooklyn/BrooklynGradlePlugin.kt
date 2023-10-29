@@ -12,7 +12,6 @@ import java.io.File
 
 class BrooklynGradlePlugin : KotlinCompilerPluginSupportPlugin {
 
-
     override fun apply(target: Project): Unit = with(target) {
         extensions.extraProperties.properties
         dependencies.add(
@@ -28,6 +27,7 @@ class BrooklynGradlePlugin : KotlinCompilerPluginSupportPlugin {
             )
             extension.outDir = File(project.buildDir, "generated/sources/brooklyn/${sourceSet.name}")
             extension.cacheFile = File(project.buildDir, "generated/sources/brooklyn/${sourceSet.name}/cache.bin")
+            extension.group = project.group.toString()
         }
     }
 
@@ -59,6 +59,9 @@ class BrooklynGradlePlugin : KotlinCompilerPluginSupportPlugin {
                 }
                 brooklynSourceSet?.cacheFile?.path?.let { path ->
                     add(SubpluginOption(key = "cacheFile", value = path))
+                }
+                brooklynSourceSet?.group?.let { group ->
+                    add(SubpluginOption(key = "group", value = group))
                 }
             }
         }
