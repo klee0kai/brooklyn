@@ -70,11 +70,10 @@ class BrooklynGradlePlugin : KotlinCompilerPluginSupportPlugin {
 
 private fun KotlinCompilation<*>.sourceSet(): SourceSet? =
     target.project.extensions
-        .getByType(SourceSetContainer::class.java)
-        .first { sourceSet -> sourceSet.name == defaultSourceSet.name }
+        .findByType(SourceSetContainer::class.java)
+        ?.firstOrNull { sourceSet -> sourceSet.name == defaultSourceSet.name }
 
 private fun KotlinCompilation<*>.findBrooklynSourceSet(): BrooklynSourceSet? =
     sourceSet()
         ?.extensions
-        ?.getByType(BrooklynSourceSet::class.java)
-
+        ?.findByType(BrooklynSourceSet::class.java)
