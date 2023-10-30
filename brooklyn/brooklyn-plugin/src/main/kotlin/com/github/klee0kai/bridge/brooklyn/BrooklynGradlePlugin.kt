@@ -2,8 +2,6 @@ package com.github.klee0kai.bridge.brooklyn
 
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
-import org.gradle.api.tasks.SourceSet
-import org.gradle.api.tasks.SourceSetContainer
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilerPluginSupportPlugin
 import org.jetbrains.kotlin.gradle.plugin.SubpluginArtifact
@@ -12,29 +10,24 @@ import java.io.File
 
 class BrooklynGradlePlugin : KotlinCompilerPluginSupportPlugin {
 
+    private var extension: BrooklynPluginExtension? = null
+
     override fun apply(target: Project): Unit = with(target) {
         extensions.extraProperties.properties
         dependencies.add(
             "implementation",
             "${BuildConfig.KOTLIN_PLUGIN_GROUP}:annotations:${BuildConfig.KOTLIN_PLUGIN_VERSION}"
         )
-        extensions.getByType(SourceSetContainer::class.java).forEach { sourceSet ->
-            val extension = sourceSet.extensions.create(
-                "brooklyn",
-                BrooklynSourceSet::class.java,
-                "${sourceSet.name} Brooklyn source set",
-                project.objects
-            )
-            extension.outDir = File(project.buildDir, "generated/sources/brooklyn/${sourceSet.name}")
-            extension.cacheFile = File(project.buildDir, "generated/sources/brooklyn/${sourceSet.name}/cache.bin")
-            extension.group = null
-        }
+
+        extension = extensions.create("brooklyn", BrooklynPluginExtension::class.java)
+        extension?.outDir = File(project.buildDir, "generated/sources/brooklyn")
+        extension?.cacheFile = File(project.buildDir, "generated/sources/brooklyn/cache.bin")
+        extension?.group = null
     }
 
 
     override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean {
-        val brooklynSourceSet = kotlinCompilation.findBrooklynSourceSet()
-        return brooklynSourceSet?.enabled == true
+        return extension?.enabled == true
     }
 
     override fun getCompilerPluginId(): String = BuildConfig.KOTLIN_PLUGIN_ID
@@ -50,15 +43,15 @@ class BrooklynGradlePlugin : KotlinCompilerPluginSupportPlugin {
         kotlinCompilation: KotlinCompilation<*>
     ): Provider<List<SubpluginOption>> {
         val project = kotlinCompilation.target.project
-        val brooklynSourceSet = kotlinCompilation.findBrooklynSourceSet()
+        val brooklynExtension = extension ?: return project.provider { emptyList() }
 
-        val group = brooklynSourceSet?.group ?: project.group.toString()
+        val group = brooklynExtension.group ?: project.group.toString()
         return project.provider {
             buildList {
-                brooklynSourceSet?.outDir?.path?.let { path ->
+                brooklynExtension.outDir?.path?.let { path ->
                     add(SubpluginOption(key = "outDir", value = path))
                 }
-                brooklynSourceSet?.cacheFile?.path?.let { path ->
+                brooklynExtension.cacheFile?.path?.let { path ->
                     add(SubpluginOption(key = "cacheFile", value = path))
                 }
                 add(SubpluginOption(key = "group", value = group))
@@ -67,13 +60,3 @@ class BrooklynGradlePlugin : KotlinCompilerPluginSupportPlugin {
     }
 }
 
-
-private fun KotlinCompilation<*>.sourceSet(): SourceSet? =
-    target.project.extensions
-        .findByType(SourceSetContainer::class.java)
-        ?.firstOrNull { sourceSet -> sourceSet.name == defaultSourceSet.name }
-
-private fun KotlinCompilation<*>.findBrooklynSourceSet(): BrooklynSourceSet? =
-    sourceSet()
-        ?.extensions
-        ?.findByType(BrooklynSourceSet::class.java)

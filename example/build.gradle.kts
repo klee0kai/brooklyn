@@ -9,12 +9,8 @@ plugins {
 
 group = "com.klee0kai.example"
 
-sourceSets {
-    main {
-        brooklyn {
-            enabled = true
-        }
-    }
+brooklyn {
+    enabled = true
 }
 
 buildConfig {
