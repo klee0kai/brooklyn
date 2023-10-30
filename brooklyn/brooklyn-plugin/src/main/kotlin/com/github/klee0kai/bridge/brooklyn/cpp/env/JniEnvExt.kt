@@ -84,7 +84,11 @@ fun CodeBuilder.attachEnv(isImpl: Boolean = false) = apply {
 
     statement("int getEnvStat = g_vm->GetEnv((void **) &g_env, JNI_VERSION_1_6)")
     line("if (getEnvStat == JNI_EDETACHED) {")
+    line("#ifdef __ANDROID__")
     statement("int attachResult = g_vm->AttachCurrentThread((JNIEnv **) &g_env, NULL) != 0")
+    line("#else")
+    statement("int attachResult = g_vm->AttachCurrentThread((void **) &g_env, NULL) != 0")
+    line("#endif")
     statement("if (attachResult != 0)return attachResult")
     statement("envs[id] = EnvBind{ .attached = 1, .env =g_env } ")
     line("} else if (getEnvStat == JNI_OK) { ")
