@@ -27,7 +27,7 @@ class BrooklynGradlePlugin : KotlinCompilerPluginSupportPlugin {
 
 
     override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean {
-        return extension?.enabled == true
+        return extension != null
     }
 
     override fun getCompilerPluginId(): String = BuildConfig.KOTLIN_PLUGIN_ID

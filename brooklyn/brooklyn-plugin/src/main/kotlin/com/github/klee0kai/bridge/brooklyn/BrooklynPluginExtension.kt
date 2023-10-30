@@ -4,8 +4,6 @@ import java.io.File
 
 abstract class BrooklynPluginExtension {
 
-    var enabled: Boolean = false
-
     var outDir: File? = null
 
     var cacheFile: File? = null
