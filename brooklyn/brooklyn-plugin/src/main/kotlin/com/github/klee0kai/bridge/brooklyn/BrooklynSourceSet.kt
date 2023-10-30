@@ -23,5 +23,4 @@ abstract class BrooklynSourceSet @Inject constructor(
 
     override fun getDisplayName(): String = this.name
 
-
 }

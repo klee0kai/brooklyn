@@ -2,7 +2,7 @@ import com.android.build.gradle.internal.tasks.factory.dependsOn
 
 plugins {
     kotlin("jvm")
-    id("brooklyn")
+    id("brooklyn-plugin")
     id("klee0kai-crosscompile")
     id("com.github.gmazzo.buildconfig") version ("3.1.0")
 }

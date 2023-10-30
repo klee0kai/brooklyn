@@ -1,5 +1,7 @@
 jdk:
   - openjdk11
 install:
+  - echo "publish brooklyn annotations"
+  - ./gradlew :brooklyn:annotations:publishToMavenLocal
   - echo "publish brooklyn gradle plugin"
-  - ./gradlew :brooklyn:brooklyn-plugin-gradle:publishToMavenLocal
+  - ./gradlew :brooklyn:brooklyn-plugin:publishToMavenLocal
