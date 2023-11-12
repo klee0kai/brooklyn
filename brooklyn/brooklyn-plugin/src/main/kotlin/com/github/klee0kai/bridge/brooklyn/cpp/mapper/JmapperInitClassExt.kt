@@ -50,7 +50,7 @@ fun CodeBuilder.initJniClassImpl(jClass: IrClass, pojo: Boolean = false) = apply
     body {
         lines(1)
         val clId = jClass.classId!!
-        val clPathName = "${clId.croppedPackageName}/${clId.shortClassName}".snakeCase("/")
+        val clPathName = "${clId.packageFqName}/${clId.shortClassName}".snakeCase("/")
         line("int init(JNIEnv *env) {")
         statement("if (${clId.indexVariableName}) return 0")
         statement("${clId.indexVariableName} = std::make_shared<${clId.indexStructName}>()")

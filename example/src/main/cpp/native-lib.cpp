@@ -16,7 +16,7 @@ brooklyn::EngineSimpleJniEngine::copySimple(const brooklyn::ModelSimple &simple)
 }
 
 ModelNullableTypePojo brooklyn::EngineSimpleJniEngine::copyNullableType(
-        const brooklyn::ModelNullableTypePojo &simple) {
+        const ModelNullableTypePojo &simple) {
     return simple;
 }
 
@@ -81,17 +81,17 @@ EngineSimpleJniEngine::copyMirrorArray4(
 
 
 ModelArraysModel
-EngineSimpleJniEngine::copyArrayModel(const brooklyn::ModelArraysModel &arrays) {
+EngineSimpleJniEngine::copyArrayModel(const ModelArraysModel &arrays) {
     return arrays;
 }
 
 ModelBoxedArraysModel EngineSimpleJniEngine::copyBoxedArrayModel(
-        const brooklyn::ModelBoxedArraysModel &arrays) {
+        const ModelBoxedArraysModel &arrays) {
     return arrays;
 }
 
 void EngineSimpleJniEngine::holdSimpleMirror(
-        const brooklyn::MirrorsSimpleJniMirror &simple) {
+        const MirrorsSimpleJniMirror &simple) {
     simpleMirror = std::make_shared<MirrorsSimpleJniMirror>(simple);
 }
 
