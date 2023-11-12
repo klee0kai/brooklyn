@@ -45,8 +45,10 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Publish maven local
-        run: ./gradlew publishToMavenLocal
+      - name: Publish Annotations
+        run: ./gradlew :brooklyn:annotations:publishToMavenLocal
+      - name: Publish Plugin
+        run: ./gradlew :brooklyn:brooklyn-plugin:publishToMavenLocal
 
       - name: Upload changes artifacts
         uses: actions/upload-artifact@v3
