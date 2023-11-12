@@ -2,6 +2,8 @@
 
 Kotlin bridge to C++ over jni.
 
+![](./.idea/brooklyn_bridge_poster.png)
+
 ## Quick Start 
 
 This project runs as a gradle plugin. 
