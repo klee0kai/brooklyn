@@ -1,6 +1,6 @@
 ## Brooklyn Bridge
 
-Kotlin (java) bridge to C++ over jni.
+Kotlin bridge to C++ over jni.
 
 ## Quick Start 
 
