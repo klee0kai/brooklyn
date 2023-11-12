@@ -99,6 +99,14 @@ void EngineSimpleJniEngine::unHoldSimpleMirror() {
     simpleMirror.reset();
 }
 
+void EngineSimpleJniEngine::setCounterTo102() {
+    MirrorsJniCounter::setCount(102);
+}
+
+void EngineSimpleJniEngine::counterIncrement() {
+    MirrorsJniCounter::inc();
+}
+
 void MirrorsSimpleJniMirror::incInCpp() {
     inc();
 }
@@ -123,3 +131,4 @@ int MirrorsSimpleJniMirror::updateFromCppDirectly(const int &delta, const std::s
 int MirrorsSimpleJniMirror::objId() {
     return MirrorsSimpleJniMirror::getId();
 }
+

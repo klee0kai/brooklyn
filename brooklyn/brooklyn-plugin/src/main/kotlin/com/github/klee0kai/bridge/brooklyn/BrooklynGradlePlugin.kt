@@ -20,6 +20,8 @@ class BrooklynGradlePlugin : KotlinCompilerPluginSupportPlugin {
         )
 
         extension = extensions.create("brooklyn", BrooklynPluginExtension::class.java)
+        extension?.outDir = File("brooklyn")
+        extension?.cacheFile = File("brooklyn/cache.bin")
         extension?.group = null
     }
 
@@ -44,14 +46,14 @@ class BrooklynGradlePlugin : KotlinCompilerPluginSupportPlugin {
         val brooklynExtension = extension ?: return project.provider { emptyList() }
 
         val sourceSetGenerated = File(project.buildDir, "generated/sources/${kotlinCompilation.defaultSourceSet.name}")
-        val outDir = File(sourceSetGenerated, extension?.outDir?.path ?: "brooklyn")
-        val cacheFile = File(sourceSetGenerated, extension?.cacheFile?.path ?: "brooklyn/cache.bin")
+        val outDir = extension?.outDir?.path?.let { File(sourceSetGenerated, it) }
+        val cacheFile = extension?.cacheFile?.path?.let { File(sourceSetGenerated, it) }
 
         val group = brooklynExtension.group ?: project.group.toString()
         return project.provider {
             buildList {
-                add(SubpluginOption(key = "outDir", value = outDir.path))
-                add(SubpluginOption(key = "cacheFile", value = cacheFile.path))
+                outDir?.let { add(SubpluginOption(key = "outDir", value = outDir.path)) }
+                cacheFile?.let { add(SubpluginOption(key = "cacheFile", value = cacheFile.path)) }
                 add(SubpluginOption(key = "group", value = group))
             }
         }

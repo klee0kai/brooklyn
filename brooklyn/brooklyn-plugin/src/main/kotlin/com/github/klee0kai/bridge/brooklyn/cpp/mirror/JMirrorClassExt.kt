@@ -21,8 +21,10 @@ fun CodeBuilder.declareClassMirror(jClass: IrClass) = apply {
         line("class $clMirror {")
         line("public: ")
 
-        statement("${clMirror}(jobject jvmSelf)")
-        statement("${clMirror}(const ${clMirror}& other)")
+        if (!jClass.isObject) {
+            statement("${clMirror}(jobject jvmSelf)")
+            statement("${clMirror}(const ${clMirror}& other)")
+        }
 
         if (!jClass.isObject) jClass.constructors.forEach { func ->
             if (func.isIgnoringJni) return@forEach
@@ -59,12 +61,19 @@ fun CodeBuilder.declareClassMirror(jClass: IrClass) = apply {
             statement("void set${prop.nameUpperCase}( const ${type}& value )")
         }
 
-        statement("~${clMirror}()")
-        line("jobject jvmObject() { return jvmSelf; }")
-        line("private: ")
-        statement("jobject jvmSelf")
-        statement("jobject jvmSelfRef")
-        statement("std::shared_ptr<int> owners")
+        if (!jClass.isObject) {
+            statement("~${clMirror}()")
+            statement("jobject jvmObject()")
+            line("private: ")
+            statement("jobject jvmSelf")
+            statement("jobject jvmSelfRef")
+            statement("std::shared_ptr<int> owners")
+        } else {
+            statement("static jobject jvmObject()")
+            line("private: ")
+            statement("static jobject jvmSelf ")
+            statement("static jobject jvmSelfRef ")
+        }
         statement("}")
     }
 
@@ -91,37 +100,42 @@ fun CodeBuilder.implementClassMirror(jClass: IrClass) = apply {
         val indexField = jClass.classId!!.indexVariableName
         lines(1)
 
-        line("${clMirror}::${clMirror}(jobject jvmSelf) {")
-        statement("owners = std::make_shared<int>(1)")
-        statement("JNIEnv* env = ${BROOKLYN}::env()")
-        statement("${clMirror}::jvmSelf = jvmSelf")
-        statement("${clMirror}::jvmSelfRef = env->NewGlobalRef(jvmSelf)")
-        line("}")
 
-        line("${clMirror}::${clMirror}(const ${clMirror}& other) : jvmSelf(other.jvmSelf), jvmSelfRef(other.jvmSelfRef), owners(other.owners) {")
-        statement("(*owners)++")
-        line("}")
-
-
-        if (!jClass.isObject) jClass.constructors.forEach { func ->
-            if (func.isExternal || func.isIgnoringJni) return@forEach
-            val args = func.mirrorFuncArgs(env = true)?.joinToString(", ") ?: return@forEach
-            line("${clMirror}::${clMirror}($args) {")
-
-            val arguments = func.fullValueParameterList.joinToString("") { param ->
-                val fieldTypeMirror = param.type.jniType() ?: return@joinToString ""
-                ",\n " + fieldTypeMirror.transformToJni.invoke("${param.name}")
-            }
+        if (!jClass.isObject) {
+            line("${clMirror}::${clMirror}(jobject jvmSelf) {")
             statement("owners = std::make_shared<int>(1)")
             statement("JNIEnv* env = ${BROOKLYN}::env()")
-            statement(
-                "${clMirror}::jvmSelf = env->NewObject( " +
-                        "${mappingNamespace}::${indexField}->cls, " +
-                        "${mappingNamespace}::${indexField}->${func.cppNameMirror} " +
-                        "$arguments )"
-            )
+            statement("${clMirror}::jvmSelf = jvmSelf")
             statement("${clMirror}::jvmSelfRef = env->NewGlobalRef(jvmSelf)")
             line("}")
+
+            line("${clMirror}::${clMirror}(const ${clMirror}& other) : jvmSelf(other.jvmSelf), jvmSelfRef(other.jvmSelfRef), owners(other.owners) {")
+            statement("(*owners)++")
+            line("}")
+
+            jClass.constructors.forEach { func ->
+                if (func.isExternal || func.isIgnoringJni) return@forEach
+                val args = func.mirrorFuncArgs(env = true)?.joinToString(", ") ?: return@forEach
+                line("${clMirror}::${clMirror}($args) {")
+
+                val arguments = func.fullValueParameterList.joinToString("") { param ->
+                    val fieldTypeMirror = param.type.jniType() ?: return@joinToString ""
+                    ",\n " + fieldTypeMirror.transformToJni.invoke("${param.name}")
+                }
+                statement("owners = std::make_shared<int>(1)")
+                statement("JNIEnv* env = ${BROOKLYN}::env()")
+                statement(
+                    "${clMirror}::jvmSelf = env->NewObject( " +
+                            "${mappingNamespace}::${indexField}->cls, " +
+                            "${mappingNamespace}::${indexField}->${func.cppNameMirror} " +
+                            "$arguments )"
+                )
+                statement("${clMirror}::jvmSelfRef = env->NewGlobalRef(jvmSelf)")
+                line("}")
+            }
+        } else {
+            statement("jobject ${clMirror}::jvmSelf = NULL")
+            statement("jobject ${clMirror}::jvmSelfRef = NULL")
         }
 
         jClass.functions.forEach { func ->
@@ -134,38 +148,6 @@ fun CodeBuilder.implementClassMirror(jClass: IrClass) = apply {
             }
 
             when {
-                jClass.isObject && returnType != null -> {
-                    line("${returnType.cppFullTypeMirror} ${clMirror}::${func.name}($argsDeclaration) {")
-                    statement("JNIEnv* env = ${BROOKLYN}::env()")
-                    post("return ")
-                    statement(
-                        returnType.transformToCpp.invoke(
-                            returnType.extractFromStaticMethod.invoke(
-                                type = returnType,
-                                jvmObj = "${mappingNamespace}::${indexField}->cls",
-                                fieldOrMethodId = "${mappingNamespace}::${indexField}->${func.cppNameMirror} ",
-                                args = arguments
-                            )
-                        )
-                    )
-                    line("}")
-                }
-
-                jClass.isObject -> {
-                    line("void ${clMirror}::${func.name}($argsDeclaration) {")
-                    statement("JNIEnv* env = ${BROOKLYN}::env()")
-                    statement(
-                        "env->CallStaticVoidMethod(${
-                            listOf(
-                                "${mappingNamespace}::${indexField}->cls",
-                                "${mappingNamespace}::${indexField}->${func.cppNameMirror}",
-                                arguments
-                            ).joinArgs()
-                        })"
-                    )
-                    line("}")
-                }
-
                 returnType != null -> {
                     line("${returnType.cppFullTypeMirror} ${clMirror}::${func.name}($argsDeclaration) {")
                     statement("JNIEnv* env = ${BROOKLYN}::env()")
@@ -174,7 +156,7 @@ fun CodeBuilder.implementClassMirror(jClass: IrClass) = apply {
                         returnType.transformToCpp.invoke(
                             returnType.extractFromMethod.invoke(
                                 type = returnType,
-                                jvmObj = "jvmSelf",
+                                jvmObj = "jvmObject()",
                                 fieldOrMethodId = "${mappingNamespace}::${indexField}->${func.cppNameMirror} ",
                                 args = arguments
                             )
@@ -189,7 +171,7 @@ fun CodeBuilder.implementClassMirror(jClass: IrClass) = apply {
                     statement(
                         "env->CallVoidMethod(${
                             listOf(
-                                "jvmSelf",
+                                "jvmObject()",
                                 "${mappingNamespace}::${indexField}->${func.cppNameMirror}",
                                 arguments
                             ).joinArgs()
@@ -205,22 +187,14 @@ fun CodeBuilder.implementClassMirror(jClass: IrClass) = apply {
             if (prop.isExternal || prop.isIgnoringJni) return@forEach
             val type = prop.jniType() ?: return@forEach
 
-            val extractMethod = if (jClass.isObject) {
-                type.extractFromStaticMethod
-            } else {
-                type.extractFromMethod
-            }
-            val callMethod = if (jClass.isObject) "CallStaticVoidMethod" else "CallVoidMethod"
-            val selfArg = if (jClass.isObject) "${mappingNamespace}::${indexField}->cls" else "jvmSelf"
-
             line("${type.cppFullTypeMirror} ${clMirror}::get${prop.nameUpperCase}() {")
             statement("JNIEnv* env = ${BROOKLYN}::env()")
             post("return ")
             statement(
                 type.transformToCpp.invoke(
-                    extractMethod.invoke(
+                    type.extractFromMethod.invoke(
                         type = type,
-                        jvmObj = selfArg,
+                        jvmObj = "jvmObject()",
                         fieldOrMethodId = "${mappingNamespace}::${indexField}->${prop.name}_getter",
                         args = ""
                     )
@@ -234,9 +208,9 @@ fun CodeBuilder.implementClassMirror(jClass: IrClass) = apply {
             statement("JNIEnv* env = ${BROOKLYN}::env()")
 
             statement(
-                "env->${callMethod}(${
+                "env->CallVoidMethod(${
                     listOf(
-                        selfArg,
+                        "jvmObject()",
                         "${mappingNamespace}::${indexField}->${prop.name}_setter",
                         type.transformToJni.invoke("value")
                     ).joinArgs()
@@ -245,14 +219,31 @@ fun CodeBuilder.implementClassMirror(jClass: IrClass) = apply {
             line("}")
         }
 
-        line("${clMirror}::~${clMirror}() {")
-        statement("(*owners)--")
-        line("if (*owners <= 0 && jvmSelfRef) {")
-        statement(" ${BROOKLYN}::env()->DeleteGlobalRef(jvmSelfRef)")
-        statement("jvmSelfRef = NULL")
-        statement("jvmSelf = NULL")
-        line("}")
-        line("}")
+        if (jClass.isObject) {
+            line(" jobject ${clMirror}::jvmObject() {")
+            statement("if (jvmSelf) return jvmSelf")
+            statement("JNIEnv* env = ${BROOKLYN}::env()")
+            statement(
+                "jvmSelf = env->GetStaticObjectField(" +
+                        "${jClass.cppMappingNameSpace()}::${jClass.classId!!.indexVariableName}->cls, " +
+                        "${jClass.cppMappingNameSpace()}::${jClass.classId!!.indexVariableName}->instance)"
+            )
+            statement("jvmSelfRef = env->NewGlobalRef(jvmSelf)")
+            statement("return jvmSelf")
+            line("}")
+        } else {
+            line("jobject ${clMirror}::jvmObject() { return jvmSelf; }")
+            line("${clMirror}::~${clMirror}() {")
+            statement("(*owners)--")
+            line("if (*owners <= 0 && jvmSelfRef) {")
+            statement(" ${BROOKLYN}::env()->DeleteGlobalRef(jvmSelfRef)")
+            statement("jvmSelfRef = NULL")
+            statement("jvmSelf = NULL")
+            line("}")
+            line("}")
+        }
+
+
     }
 
 
