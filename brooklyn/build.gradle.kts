@@ -1,6 +1,5 @@
 buildscript {
     extra["group"] = "com.github.klee0kai.bridge.brooklyn"
-    extra["name"] = "brooklyn"
     extra["displayName"] = "Brooklyn Bridge"
     extra["description"] = "Compile plugin to generate C++ code for jni"
     extra["version"] = "0.0.1"
