@@ -1,8 +1,8 @@
 ## Brooklyn Bridge
 
-[![](https://github.com/klee0kai/brooklyn_bridge/actions/workflows/deploy_dev.yml/badge.svg)](https://github.com/klee0kai/brooklyn_bridge/actions/workflows/deploy_dev.yml)
+[![](https://github.com/klee0kai/brooklyn/actions/workflows/deploy_dev.yml/badge.svg)](https://github.com/klee0kai/brooklyn/actions/workflows/deploy_dev.yml)
 [![](https://img.shields.io/badge/license-GNU_GPLv3-blue.svg?style=flat-square)](./LICENSE)
-[![](https://jitpack.io/v/brooklyn_bridge/stone.svg)](https://jitpack.io/#klee0kai/brooklyn_bridge)
+[![](https://jitpack.io/v/klee0kai/brooklyn.svg)](https://jitpack.io/#klee0kai/brooklyn)
 
 Kotlin bridge to C++ over jni.
 
