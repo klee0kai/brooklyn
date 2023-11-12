@@ -32,12 +32,7 @@ fun CodeBuilder.implMirrorInterface(jClass: IrClass) = apply {
                     "${func.name} ("
         )
         line("JNIEnv *env, ")
-        if (jClass.isObject) {
-            //static method
-            line("jclass jClass")
-        } else {
-            line("jobject jObject")
-        }
+        line("jobject jObject")
         func.fullValueParameterList.forEach { arg ->
             post(", ")
             line("${arg.type.jniTypeStr()} ${arg.name}")

@@ -42,4 +42,7 @@ object SimpleJniEngine {
 
     external fun unHoldSimpleMirror()
 
+    external fun setCounterTo102()
+    external fun counterIncrement()
+
 }

@@ -4,10 +4,7 @@ import com.github.klee0kai.bridge.brooklyn.cpp.common.*
 import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.jniType
 import org.jetbrains.kotlin.backend.jvm.fullValueParameterList
 import org.jetbrains.kotlin.ir.declarations.IrClass
-import org.jetbrains.kotlin.ir.util.classId
-import org.jetbrains.kotlin.ir.util.constructors
-import org.jetbrains.kotlin.ir.util.functions
-import org.jetbrains.kotlin.ir.util.properties
+import org.jetbrains.kotlin.ir.util.*
 
 fun CodeBuilder.declareClassIndexStructure(jClass: IrClass, pojo: Boolean = false) = apply {
     variables {
@@ -15,6 +12,7 @@ fun CodeBuilder.declareClassIndexStructure(jClass: IrClass, pojo: Boolean = fals
         lines(1)
         line("struct ${clId.indexStructName} {")
         statement("jclass cls")
+        if (jClass.isObject && !pojo) statement("jfieldID instance = NULL");
         jClass.properties.forEach { property ->
             if (property.isIgnoringJni) return@forEach
             statement("\tjmethodID ${property.name}_getter = NULL")
@@ -55,6 +53,10 @@ fun CodeBuilder.initJniClassImpl(jClass: IrClass, pojo: Boolean = false) = apply
         statement("if (${clId.indexVariableName}) return 0")
         statement("${clId.indexVariableName} = std::make_shared<${clId.indexStructName}>()")
         statement("${clId.indexVariableName}->cls = (jclass) env->NewGlobalRef( env->FindClass(\"$clPathName\") )")
+        if (jClass.isObject && !pojo) {
+            statement("${clId.indexVariableName}->instance = env->GetStaticFieldID(${clId.indexVariableName}->cls, \"INSTANCE\", \"L$clPathName;\")")
+        }
+
         jClass.properties.forEach { property ->
             if (property.isIgnoringJni) return@forEach
 

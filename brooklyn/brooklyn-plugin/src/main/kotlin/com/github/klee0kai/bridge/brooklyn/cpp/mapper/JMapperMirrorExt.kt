@@ -5,6 +5,7 @@ import com.github.klee0kai.bridge.brooklyn.cpp.typemirros.jniType
 import com.github.klee0kai.bridge.brooklyn.poet.Poet
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.util.classId
+import org.jetbrains.kotlin.ir.util.isObject
 
 fun CodeBuilder.mapMirrorClass(jClass: IrClass, isImpl: Boolean = false) = apply {
     header {
@@ -22,6 +23,7 @@ fun CodeBuilder.mapMirrorClass(jClass: IrClass, isImpl: Boolean = false) = apply
 
 
 private fun Poet.mapToJvmArray(jClass: IrClass, isImpl: Boolean = false) = apply {
+    if (jClass.isObject) return@apply
     val typeMirror = jClass.jniType()?.cppSimpleTypeMirrorStr ?: return@apply
     val indexClVariable = jClass.classId!!.indexVariableName
     val declare = "jobjectArray mapArrayToJvm(JNIEnv *env, const std::shared_ptr<std::vector<${typeMirror}>> &array)   "
@@ -41,6 +43,7 @@ private fun Poet.mapToJvmArray(jClass: IrClass, isImpl: Boolean = false) = apply
 }
 
 private fun Poet.mapToJvmArrayNullable(jClass: IrClass, isImpl: Boolean = false) = apply {
+    if (jClass.isObject) return@apply
     val typeMirror = jClass.jniType()?.cppSimpleTypeMirrorStr ?: return@apply
     val indexClVariable = jClass.classId!!.indexVariableName
     val declare =
@@ -61,6 +64,7 @@ private fun Poet.mapToJvmArrayNullable(jClass: IrClass, isImpl: Boolean = false)
 }
 
 private fun Poet.mapFromJvmArray(jClass: IrClass, isImpl: Boolean = false) = apply {
+    if (jClass.isObject) return@apply
     val typeMirror = jClass.jniType()?.cppSimpleTypeMirrorStr ?: return@apply
     val declare =
         "std::shared_ptr<std::vector<${typeMirror}>> mapArrayFromJvm(JNIEnv *env, const jobjectArray &jarray )"
@@ -82,6 +86,7 @@ private fun Poet.mapFromJvmArray(jClass: IrClass, isImpl: Boolean = false) = app
 
 
 private fun Poet.mapFromJvmArrayNullable(jClass: IrClass, isImpl: Boolean = false) = apply {
+    if (jClass.isObject) return@apply
     val typeMirror = jClass.jniType()?.cppSimpleTypeMirrorStr ?: return@apply
     val declare =
         "std::shared_ptr<std::vector<std::shared_ptr<${typeMirror}>>> mapArrayNullableFromJvm(JNIEnv *env, const jobjectArray &jarray )"

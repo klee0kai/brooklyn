@@ -9,6 +9,10 @@ plugins {
 
 group = "com.klee0kai.example"
 
+brooklyn {
+    cacheFile = null
+}
+
 buildConfig {
     buildConfigField("String", "NATIVE_LIB_PATH", "\"${File(buildDir, "libs/libnative_lib.so").absolutePath}\"")
 }
