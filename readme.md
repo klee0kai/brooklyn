@@ -37,7 +37,13 @@ The plugin will generate models for a C++ project. Use annotations `@JniMirror` 
 To include cpp generated files, pull them into cmake.
 
 ```
-include(../../../build/generated/sources/brooklyn/FindBrooklynBridge.cmake)
+get_filename_component(BROOKLYN_FILE
+        ../../../build/generated/sources/brooklyn/FindBrooklynBridge.cmake
+        ABSOLUTE)
+if (EXISTS ${BROOKLYN_FILE})
+    include(${BROOKLYN_FILE})
+endif ()
+
 
 add_library(${CMAKE_PROJECT_NAME} SHARED  native-lib.cpp
         ${BROOKLYN_SRC}
@@ -47,6 +53,24 @@ target_include_directories(${CMAKE_PROJECT_NAME}
         PUBLIC
         ${BROOKLYN_INCLUDE_DIRS}
         )
+```
+
+If you are building an android project, correct the task sequence
+
+```kotlin
+afterEvaluate {
+    val kotlinCompileTasks = tasks.filterIsInstance<JavaCompile>()
+    val cmakeTasks =
+        (tasks.filterIsInstance<com.android.build.gradle.tasks.ExternalNativeBuildTask>() +
+                tasks.filterIsInstance<com.android.build.gradle.tasks.ExternalNativeBuildJsonTask>()
+                )
+
+    cmakeTasks.forEach { cmakeTask ->
+        kotlinCompileTasks.forEach { kotlinTask ->
+            cmakeTask.mustRunAfter(kotlinTask)
+        }
+    }
+}
 ```
 
 
