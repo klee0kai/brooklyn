@@ -11,9 +11,9 @@ fun CodeBuilder.cmakeLib(
 ) = apply {
 
     line("set(BROOKLYN_SRC ")
-    src.forEach { line("\t $it") }
+    src.forEach { line("\t \"$it\"") }
     line(")")
-    line("set(BROOKLYN_INCLUDE_DIRS $rootDir )")
+    line("set(BROOKLYN_INCLUDE_DIRS \"$rootDir\" )")
 
     lines(1)
 }
