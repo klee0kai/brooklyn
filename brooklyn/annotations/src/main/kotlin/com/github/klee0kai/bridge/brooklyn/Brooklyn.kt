@@ -8,13 +8,19 @@ object Brooklyn {
         if (result != 0) error("brooklyn init error $result")
     }
 
+    fun loadLibrary(libname: String) {
+        System.loadLibrary(libname)
+        val result = initLib()
+        if (result != 0) error("brooklyn init error $result")
+    }
+
     fun deinit() {
         val result = deInitLib()
         if (result != 0) error("brooklyn init error $result")
     }
 
-    private external fun initLib(): Int
+    external fun initLib(): Int
 
-    private external fun deInitLib(): Int
+    external fun deInitLib(): Int
 
 }

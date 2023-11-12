@@ -2,21 +2,12 @@ import com.android.build.gradle.internal.tasks.factory.dependsOn
 
 plugins {
     kotlin("jvm")
-    id("brooklyn")
+    id("brooklyn-plugin")
     id("klee0kai-crosscompile")
     id("com.github.gmazzo.buildconfig") version ("3.1.0")
 }
 
 group = "com.klee0kai.example"
-
-sourceSets {
-    main {
-        brooklyn {
-            enabled = true
-            cacheFile = null
-        }
-    }
-}
 
 buildConfig {
     buildConfigField("String", "NATIVE_LIB_PATH", "\"${File(buildDir, "libs/libnative_lib.so").absolutePath}\"")

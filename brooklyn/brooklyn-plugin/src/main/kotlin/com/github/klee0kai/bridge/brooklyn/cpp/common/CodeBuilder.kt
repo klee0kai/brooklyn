@@ -2,7 +2,6 @@ package com.github.klee0kai.bridge.brooklyn.cpp.common
 
 import com.github.klee0kai.bridge.brooklyn.poet.Poet
 import com.github.klee0kai.bridge.brooklyn.poet.PoetDelegate
-import org.jetbrains.kotlin.incremental.mkdirsOrThrow
 import java.io.File
 
 class CodeBuilder(
@@ -31,7 +30,7 @@ class CodeBuilder(
 
     fun gen(sym: String = "//") {
         collectDelayed()
-        file.parentFile.mkdirsOrThrow()
+        file.parentFile.mkdirs()
         file.writeBytes(
             Poet()
                 .brooklynHeaderComment(sym)

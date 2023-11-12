@@ -1,11 +1,20 @@
 plugins {
     kotlin("jvm")
     kotlin("kapt")
+    id("java-gradle-plugin")
     id("com.github.gmazzo.buildconfig")
     kotlin("plugin.serialization") version "1.7.0"
+    id("com.gradle.plugin-publish") version "1.0.0"
 }
 
+val brooklynPluginName = "brooklyn-plugin"
+group = rootProject.extra["group"].toString()
+version = rootProject.extra["version"].toString()
+
+
 dependencies {
+    implementation(kotlin("gradle-plugin-api"))
+
     compileOnly("org.jetbrains.kotlin:kotlin-compiler-embeddable")
     implementation("${group}:annotations:${version}")
 
@@ -27,8 +36,22 @@ dependencies {
 }
 
 buildConfig {
-    packageName(group.toString())
-    buildConfigField("String", "KOTLIN_PLUGIN_ID", "\"${rootProject.extra["name"]}\"")
+    val project = project(":brooklyn-plugin")
+    packageName(project.group.toString())
+    buildConfigField("String", "KOTLIN_PLUGIN_ID", "\"${brooklynPluginName}\"")
+    buildConfigField("String", "KOTLIN_PLUGIN_GROUP", "\"${project.group}\"")
+    buildConfigField("String", "KOTLIN_PLUGIN_NAME", "\"${project.name}\"")
     buildConfigField("String", "KOTLIN_PLUGIN_VERSION", "\"${project.version}\"")
     buildConfigField("String", "KOTLIN_PLUGIN_SITE", "\"${rootProject.extra["site"]}\"")
+}
+
+gradlePlugin {
+    plugins.register(brooklynPluginName) {
+        id = brooklynPluginName
+        group = rootProject.extra["group"].toString()
+        version = rootProject.extra["version"].toString()
+        displayName = rootProject.extra["displayName"].toString()
+        description = rootProject.extra["description"].toString()
+        implementationClass = "com.github.klee0kai.bridge.brooklyn.BrooklynGradlePlugin"
+    }
 }
