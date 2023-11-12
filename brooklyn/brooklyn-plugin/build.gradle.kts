@@ -52,6 +52,6 @@ gradlePlugin {
         version = rootProject.extra["version"].toString()
         displayName = rootProject.extra["displayName"].toString()
         description = rootProject.extra["description"].toString()
-        implementationClass = "com.github.klee0kai.bridge.brooklyn.BrooklynGradlePlugin"
+        implementationClass = "com.github.klee0kai.brooklyn.BrooklynGradlePlugin"
     }
 }
