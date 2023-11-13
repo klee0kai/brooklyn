@@ -42,7 +42,7 @@ brooklyn {
 The plugin will generate models for a C++ project. Use annotations `@JniMirror` and `@JniPojo`.
 To include cpp generated files, pull them into cmake.
 
-We pull up the Smak library in accordance with the source code set used.
+We pull up the Cmake library in accordance with the source code set used.
 For source set `main` use `../../../build/generated/sources/main/brooklyn/FindBrooklynBridge.cmake`.
 
 ```
