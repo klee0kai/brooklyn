@@ -1,6 +1,6 @@
 package com.klee0kai.example.model
 
-import com.github.klee0kai.bridge.brooklyn.JniPojo
+import com.github.klee0kai.brooklyn.JniPojo
 
 @JniPojo
 class BoxedArraysModel @JvmOverloads constructor(

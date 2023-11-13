@@ -1,7 +1,7 @@
 package com.klee0kai.example.mirrors
 
-import com.github.klee0kai.bridge.brooklyn.JniIgnore
-import com.github.klee0kai.bridge.brooklyn.JniMirror
+import com.github.klee0kai.brooklyn.JniIgnore
+import com.github.klee0kai.brooklyn.JniMirror
 import kotlin.random.Random
 
 @JniMirror

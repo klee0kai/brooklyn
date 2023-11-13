@@ -1,7 +1,7 @@
 package com.klee0kai.example.engine
 
-import com.github.klee0kai.bridge.brooklyn.Brooklyn
-import com.github.klee0kai.bridge.brooklyn.JniMirror
+import com.github.klee0kai.brooklyn.Brooklyn
+import com.github.klee0kai.brooklyn.JniMirror
 import com.klee0kai.example.mirrors.SimpleJniMirror
 import com.klee0kai.example.model.ArraysModel
 import com.klee0kai.example.model.BoxedArraysModel

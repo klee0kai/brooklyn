@@ -1,5 +1,9 @@
 ## Brooklyn Bridge
 
+[![](https://github.com/klee0kai/brooklyn/actions/workflows/deploy_dev.yml/badge.svg)](https://github.com/klee0kai/brooklyn/actions/workflows/deploy_dev.yml)
+[![](https://img.shields.io/badge/license-GNU_GPLv3-blue.svg?style=flat-square)](./LICENSE)
+[![](https://jitpack.io/v/klee0kai/brooklyn.svg)](https://jitpack.io/#klee0kai/brooklyn)
+
 Kotlin bridge to C++ over jni.
 
 ![](./.idea/brooklyn_bridge_poster.png)
@@ -18,7 +22,7 @@ buildscript {
         maven(url = "https://jitpack.io")
     }
     dependencies {
-        classpath("com.github.klee0kai.bridge.brooklyn:brooklyn-plugin:0.0.1")
+        classpath("com.github.klee0kai.brooklyn:brooklyn-plugin:0.0.1")
     }
 }
 ```
