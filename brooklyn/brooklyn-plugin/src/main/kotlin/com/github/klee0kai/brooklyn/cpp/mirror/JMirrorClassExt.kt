@@ -1,12 +1,12 @@
 package com.github.klee0kai.brooklyn.cpp.mirror
 
+import com.github.klee0kai.brooklyn.cpp.common.*
 import com.github.klee0kai.brooklyn.cpp.common.CommonNaming.BROOKLYN
 import com.github.klee0kai.brooklyn.cpp.common.CommonNaming.MAPPER
 import com.github.klee0kai.brooklyn.cpp.typemirros.cppMappingNameSpace
 import com.github.klee0kai.brooklyn.cpp.typemirros.cppModelMirror
 import com.github.klee0kai.brooklyn.cpp.typemirros.jniType
 import com.github.klee0kai.brooklyn.cpp.typemirros.joinArgs
-import com.github.klee0kai.brooklyn.cpp.common.*
 import org.jetbrains.kotlin.backend.jvm.fullValueParameterList
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.types.IrType
@@ -81,8 +81,9 @@ fun CodeBuilder.declareClassMirror(jClass: IrClass) = apply {
     header {
         usedTypes.mapNotNull { type ->
             type.jniType()?.classId
-        }.toSet().forEach { classId ->
-            include(classId.modelHeaderFile.path)
+        }.toSet().forEach { depClassId ->
+            include(depClassId.modelHeaderFile.path)
+            if (depClassId != jClass.classId) include(depClassId.mapperHeaderFile.path)
         }
     }
 }
@@ -115,6 +116,7 @@ fun CodeBuilder.implementClassMirror(jClass: IrClass) = apply {
 
             jClass.constructors.forEach { func ->
                 if (func.isExternal || func.isIgnoringJni) return@forEach
+                usedTypes.addAll(func.allUsedTypes())
                 val args = func.mirrorFuncArgs(env = true)?.joinToString(", ") ?: return@forEach
                 line("${clMirror}::${clMirror}($args) {")
 
@@ -140,6 +142,8 @@ fun CodeBuilder.implementClassMirror(jClass: IrClass) = apply {
 
         jClass.functions.forEach { func ->
             if (func.isExternal || func.isIgnoringJni) return@forEach
+            usedTypes.addAll(func.allUsedTypes())
+
             val argsDeclaration = func.mirrorFuncArgs()?.joinToString(", ") ?: return@forEach
             val returnType = func.returnType.jniType()
             val arguments = func.fullValueParameterList.joinToString(",\n ") { param ->
@@ -185,6 +189,8 @@ fun CodeBuilder.implementClassMirror(jClass: IrClass) = apply {
 
         jClass.properties.forEach { prop ->
             if (prop.isExternal || prop.isIgnoringJni) return@forEach
+            prop.getter?.let { usedTypes.addAll(it.allUsedTypes()) }
+
             val type = prop.jniType() ?: return@forEach
 
             line("${type.cppFullTypeMirror} ${clMirror}::get${prop.nameUpperCase}() {")
@@ -250,8 +256,9 @@ fun CodeBuilder.implementClassMirror(jClass: IrClass) = apply {
     header {
         usedTypes.mapNotNull { type ->
             type.jniType()?.classId
-        }.toSet().forEach { classId ->
-            include(classId.modelHeaderFile.path)
+        }.toSet().forEach { depClassId ->
+            include(depClassId.modelHeaderFile.path)
+            if (depClassId != jClass.classId) include(depClassId.mapperHeaderFile.path)
         }
     }
 }
