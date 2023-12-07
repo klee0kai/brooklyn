@@ -13,7 +13,6 @@ import com.github.klee0kai.brooklyn.cpp.mapper.std.initStdTypes
 import com.github.klee0kai.brooklyn.cpp.mapper.std.stdTypeMappers
 import com.github.klee0kai.brooklyn.di.DI
 import kotlinx.coroutines.withContext
-import org.jetbrains.kotlin.ir.util.classId
 
 class MappersGenController {
 
@@ -24,7 +23,10 @@ class MappersGenController {
     private val gen by DI.cppBuilderLazy()
 
     suspend fun gen() = withContext(defDispatcher) {
-        gen.getOrCreate(CommonNaming.commonClassesMapperHeader, headersInitBlock(namespaces = arrayOf(CommonNaming.MAPPER)))
+        gen.getOrCreate(
+            CommonNaming.commonClassesMapperHeader,
+            headersInitBlock(namespaces = arrayOf(CommonNaming.MAPPER))
+        )
             .initStdTypes()
             .deinitStdTypes()
             .stdTypeMappers()
@@ -52,6 +54,7 @@ class MappersGenController {
             CommonNaming.mapperCpp,
             headersInitBlock(doubleImportCheck = false, namespaces = arrayOf(CommonNaming.MAPPER))
         )
+            .include(CommonNaming.mapperHeader)
             .initAllImpl(booklynTypes.pojoJniClasses + booklynTypes.mirrorJniClasses)
             .deinitAllImpl(booklynTypes.pojoJniClasses + booklynTypes.mirrorJniClasses)
 

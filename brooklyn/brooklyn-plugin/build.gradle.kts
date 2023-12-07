@@ -39,9 +39,9 @@ buildConfig {
     val project = project(":brooklyn-plugin")
     packageName(project.group.toString())
     buildConfigField("String", "KOTLIN_PLUGIN_ID", "\"${brooklynPluginName}\"")
-    buildConfigField("String", "KOTLIN_PLUGIN_GROUP", "\"${project.group}\"")
+    buildConfigField("String", "KOTLIN_PLUGIN_GROUP", "\"${rootProject.extra["group"].toString()}\"")
     buildConfigField("String", "KOTLIN_PLUGIN_NAME", "\"${project.name}\"")
-    buildConfigField("String", "KOTLIN_PLUGIN_VERSION", "\"${project.version}\"")
+    buildConfigField("String", "KOTLIN_PLUGIN_VERSION", "\"${rootProject.extra["version"].toString()}\"")
     buildConfigField("String", "KOTLIN_PLUGIN_SITE", "\"${rootProject.extra["site"]}\"")
 }
 
