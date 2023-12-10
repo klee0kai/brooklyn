@@ -1,7 +1,6 @@
 package com.github.klee0kai.brooklyn.cpp.common
 
 import com.github.klee0kai.brooklyn.di.DI
-import com.github.klee0kai.brooklyn.model.InOutFilePair
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -16,8 +15,6 @@ class CppBuildersCollection(
 
     val files get() = builders.keys
 
-    val inOutFiles = mutableListOf<InOutFilePair>()
-
     @Synchronized
     fun getOrCreate(
         relativeFile: String,
@@ -31,7 +28,6 @@ class CppBuildersCollection(
         initBlock: CodeBuilder.() -> Unit = {}
     ): CodeBuilder {
         val file = File(outDir, relativeFile.path)
-        inOutFiles.add(InOutFilePair(inFile = srcFile, outFile = file.path))
         if (!builders.contains(file)) builders.putIfAbsent(file, CodeBuilder(file).apply(initBlock))
         return builders[file]!!
     }

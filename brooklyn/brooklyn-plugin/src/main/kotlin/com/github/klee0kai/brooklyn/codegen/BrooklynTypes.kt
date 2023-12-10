@@ -6,11 +6,11 @@ import com.github.klee0kai.brooklyn.cpp.typemirros.addSupportedMirrorClass
 import com.github.klee0kai.brooklyn.cpp.typemirros.addSupportedPojoClass
 import com.github.klee0kai.brooklyn.cpp.typemirros.allCppTypeMirrors
 import com.github.klee0kai.brooklyn.di.DI
+import com.github.klee0kai.brooklyn.model.SupportClassMirror
+import com.github.klee0kai.brooklyn.model.toSupportClassMirror
 import kotlinx.coroutines.withContext
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.declarations.IrClass
-import org.jetbrains.kotlin.ir.declarations.path
-import org.jetbrains.kotlin.ir.util.file
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.ir.visitors.acceptVoid
@@ -22,21 +22,33 @@ class BrooklynTypes : IrElementVisitorVoid {
 
     private val project by lazy { DI.project() }
 
-    private val cacheController by DI.cacheControllerLazy()
+    private val cacheStore by DI.cacheStoreLazy()
 
-    val pojoJniClasses = mutableListOf<IrClass>()
+    val pojoJniClasses = mutableListOf<SupportClassMirror>()
 
-    val mirrorJniClasses = mutableListOf<IrClass>()
+    val mirrorJniClasses = mutableListOf<SupportClassMirror>()
 
-    var nonCachedPojoJniClasses = listOf<IrClass>()
-        private set
-    var nonCachedMirrorJniClasses = listOf<IrClass>()
-        private set
+    val nonCachedPojoJniClasses = mutableListOf<IrClass>()
+    val nonCachedMirrorJniClasses = mutableListOf<IrClass>()
 
     suspend fun process() = withContext(defDispatcher) {
         project.files.forEach { file ->
             file.acceptVoid(this@BrooklynTypes)
         }
+        val fingerPrint = cacheStore.currentFingerPrint
+        val nonChangedPojoClasses = fingerPrint.supportPojoClasses.filter { cached ->
+            pojoJniClasses.none { cached.classId == it.classId }
+        }
+        val nonChangedMirrorClasses = fingerPrint.supportMirrorClasses.filter { cached ->
+            mirrorJniClasses.none { cached.classId == it.classId }
+        }
+        pojoJniClasses.addAll(nonChangedPojoClasses)
+        mirrorJniClasses.addAll(nonChangedMirrorClasses)
+        cacheStore.setSupportTypes(
+            pojoJniClasses = pojoJniClasses,
+            mirrorJniClasses = mirrorJniClasses
+        )
+
 
         pojoJniClasses.forEach {
             allCppTypeMirrors.addSupportedPojoClass(it)
@@ -45,12 +57,6 @@ class BrooklynTypes : IrElementVisitorVoid {
             allCppTypeMirrors.addSupportedMirrorClass(it)
         }
 
-        nonCachedPojoJniClasses = pojoJniClasses.filter { irClass ->
-            !cacheController.isCached(irClass.file.path)
-        }
-        nonCachedMirrorJniClasses = mirrorJniClasses.filter { irClass ->
-            !cacheController.isCached(irClass.file.path)
-        }
     }
 
 
@@ -59,8 +65,15 @@ class BrooklynTypes : IrElementVisitorVoid {
     override fun visitClass(declaration: IrClass) {
         super.visitClass(declaration)
         when {
-            declaration.isBrooklynPojo -> pojoJniClasses.add(declaration)
-            declaration.isBrooklynMirror -> mirrorJniClasses.add(declaration)
+            declaration.isBrooklynPojo -> {
+                nonCachedPojoJniClasses.add(declaration)
+                pojoJniClasses.add(declaration.toSupportClassMirror())
+            }
+
+            declaration.isBrooklynMirror -> {
+                nonCachedMirrorJniClasses.add(declaration)
+                mirrorJniClasses.add(declaration.toSupportClassMirror())
+            }
         }
     }
 

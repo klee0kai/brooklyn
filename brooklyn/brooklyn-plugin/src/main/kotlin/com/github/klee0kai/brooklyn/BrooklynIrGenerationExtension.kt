@@ -24,8 +24,13 @@ class BrooklynIrGenerationExtension : IrGenerationExtension {
         DI.context(pluginContext)
         DI.project(moduleFragment)
 
+        if (moduleFragment.files.isEmpty()) {
+            //do nothing
+            return@runBlocking
+        }
+
         // calc source changes
-        cacheController.calcDiff()
+        cacheController.loadFingerPrint()
 
         // collect support types
         brooklynTypes.process()
@@ -46,7 +51,7 @@ class BrooklynIrGenerationExtension : IrGenerationExtension {
         cmakeGenController.gen()
 
         // save fingerprint
-        cacheController.saveFingerPrint(gen.inOutFiles)
+        cacheController.saveFingerPrint()
 
     }
 
