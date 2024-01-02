@@ -22,7 +22,7 @@ buildscript {
         maven(url = "https://jitpack.io")
     }
     dependencies {
-        classpath("com.github.klee0kai.brooklyn:brooklyn-plugin:0.0.2")
+        classpath("com.github.klee0kai.brooklyn:brooklyn-plugin:0.0.3")
     }
 }
 ```
