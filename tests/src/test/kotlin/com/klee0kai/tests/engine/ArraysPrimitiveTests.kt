@@ -1,6 +1,5 @@
-package org.template.term.test
+package com.klee0kai.tests.engine
 
-import com.klee0kai.tests.engine.SimpleJniEngine
 import com.klee0kai.tests.model.ArraysModel
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull

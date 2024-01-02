@@ -1,7 +1,7 @@
 package com.github.klee0kai.brooklyn.cpp.mapper
 
-import com.github.klee0kai.brooklyn.cpp.typemirros.jniType
 import com.github.klee0kai.brooklyn.cpp.common.*
+import com.github.klee0kai.brooklyn.cpp.typemirros.jniType
 import org.jetbrains.kotlin.backend.jvm.fullValueParameterList
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.util.*
@@ -20,7 +20,7 @@ fun CodeBuilder.declareClassIndexStructure(jClass: IrClass, pojo: Boolean = fals
         }
         val methods = if (pojo) jClass.constructors else (jClass.constructors + jClass.functions)
         methods.forEach { func ->
-            if (func.isIgnoringJni) return@forEach
+            if (func.isIgnoringJni || func.isFakeOverriddenFromAny()) return@forEach
             statement("\tjmethodID ${func.cppNameMirror} = NULL")
         }
         statement("}")
@@ -82,7 +82,7 @@ fun CodeBuilder.initJniClassImpl(jClass: IrClass, pojo: Boolean = false) = apply
         }
         val methods = if (pojo) jClass.constructors else (jClass.constructors + jClass.functions)
         methods.forEach { func ->
-            if (func.isIgnoringJni) return@forEach
+            if (func.isIgnoringJni || func.isFakeOverriddenFromAny()) return@forEach
             val argTypes = runCatching {
                 func.fullValueParameterList.joinToString("") { it.type.jniType()!!.jniTypeCode }
             }.getOrNull() ?: return@forEach

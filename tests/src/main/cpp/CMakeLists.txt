@@ -21,6 +21,7 @@ endif ()
 add_library(native_lib
         SHARED
         native-lib.cpp
+        interface-callback.cpp
         ${BROOKLYN_SRC}
 )
 
@@ -41,6 +42,7 @@ target_include_directories(
 add_executable(
         term
         native-lib.cpp
+        interface-callback.cpp
         term.cpp
         ${BROOKLYN_SRC}
 )
