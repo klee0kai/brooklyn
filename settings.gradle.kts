@@ -34,4 +34,4 @@ buildscript {
 
 rootProject.name = "BrooklynBridge"
 includeBuild("brooklyn")
-include("example")
+include("tests")

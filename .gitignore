@@ -62,10 +62,10 @@ out/
 !**/src/test/**/out/
 
 ### clion project artefacts ####
-example/src/main/cpp/.idea/**
-example/src/main/cpp/.idea/
-example/src/main/cpp/**build**/
-example/src/main/cpp/**build**/**
+tests/src/main/cpp/.idea/**
+tests/src/main/cpp/.idea/
+tests/src/main/cpp/**build**/
+tests/src/main/cpp/**build**/**
 
 
 
@@ -93,3 +93,5 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+

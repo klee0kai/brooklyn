@@ -35,7 +35,7 @@ fun CodeBuilder.declareClassMirror(jClass: IrClass) = apply {
         }
 
         jClass.functions.forEach { func ->
-            if (func.isIgnoringJni) return@forEach
+            if (func.isIgnoringJni || func.isFakeOverriddenFromAny()) return@forEach
             val args = func.mirrorFuncArgs()?.joinToString(", ") ?: return@forEach
             val returnType = func.returnType.jniType()?.cppFullTypeMirror ?: "void"
             usedTypes.addAll(func.allUsedTypes())
@@ -141,7 +141,7 @@ fun CodeBuilder.implementClassMirror(jClass: IrClass) = apply {
         }
 
         jClass.functions.forEach { func ->
-            if (func.isExternal || func.isIgnoringJni) return@forEach
+            if (func.isExternal || func.isIgnoringJni || func.isFakeOverriddenFromAny()) return@forEach
             usedTypes.addAll(func.allUsedTypes())
 
             val argsDeclaration = func.mirrorFuncArgs()?.joinToString(", ") ?: return@forEach
