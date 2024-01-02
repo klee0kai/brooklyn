@@ -46,8 +46,8 @@ class BrooklynGradlePlugin : KotlinCompilerPluginSupportPlugin {
         val brooklynExtension = extension ?: return project.provider { emptyList() }
 
         val sourceSetGenerated = File(project.buildDir, "generated/sources/${kotlinCompilation.defaultSourceSet.name}")
-        val outDir = extension?.outDir?.path?.let { File(sourceSetGenerated, it) }
-        val cacheFile = extension?.cacheFile?.path?.let { File(sourceSetGenerated, it) }
+        val outDir = extension?.outDir?.let { sourceSetGenerated.resolve(it) }
+        val cacheFile = extension?.cacheFile?.let { sourceSetGenerated.resolve(it) }
 
         val group = brooklynExtension.group ?: project.group.toString()
         return project.provider {
