@@ -4,6 +4,9 @@
 [![](https://img.shields.io/badge/license-GNU_GPLv3-blue.svg?style=flat-square)](./LICENSE)
 [![](https://jitpack.io/v/klee0kai/brooklyn.svg)](https://jitpack.io/#klee0kai/brooklyn)
 
+[![](https://img.shields.io/badge/Platform-Android-brightgreen)]()
+[![](https://img.shields.io/badge/Platform-Kotlin-blue)]()
+
 Kotlin bridge to C++ over jni.
 
 ![](./.idea/brooklyn_bridge_poster.png)
@@ -101,9 +104,18 @@ Name spaces
 
 - [HawtJNI](https://github.com/fusesource/hawtjni) - Implementing JNI libraries is a piece of cake when you use HawtJNI
 
+
+## Find this library useful? :heart:
+Support it by joining __[stargazers](https://github.com/klee0kai/brooklyn/stargazers)__ for this repository. :star: <br>
+Also, __[follow me](https://github.com/klee0kai)__ on GitHub for more libraries! 🤩
+
+You can always
+<a href="https://www.buymeacoffee.com/kee0kai"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=kee0kai&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff" /></a>
+
+
 ## License
 
 ```
-Copyright (c) 2023 Andrey Kuzubov
+Copyright (c) 2024 Andrey Kuzubov
 ```
 
