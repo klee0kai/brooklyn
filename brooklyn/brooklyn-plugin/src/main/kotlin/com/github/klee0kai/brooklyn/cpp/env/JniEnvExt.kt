@@ -15,8 +15,23 @@ fun CodeBuilder.envCppVariables() = apply {
                     " JNIEnv *env = NULL;\n" +
                     "}"
         )
+        statement(
+            "class Locker {\n" +
+                    "private:\n" +
+                    "    pthread_mutex_t *pthreadMutex;\n" +
+                    "public:\n" +
+                    "    explicit Locker(pthread_mutex_t *m) : pthreadMutex(m) {\n" +
+                    "        pthread_mutex_lock(m);\n" +
+                    "    }\n" +
+                    "    ~Locker() {\n" +
+                    "        pthread_mutex_unlock(pthreadMutex);\n" +
+                    "    }\n" +
+                    "};"
+        )
+
         statement("static map <thread::id, EnvBind> envs = {}")
         statement("static JavaVM *g_vm")
+        statement("static pthread_mutex_t mutex")
     }
 }
 
@@ -40,6 +55,7 @@ fun CodeBuilder.initEnv(isImpl: Boolean = false) = apply {
         return@apply
     }
     line("$declare {")
+    statement("Locker locker = Locker(&mutex)")
     statement("return mapper::init(env) || env->GetJavaVM(&g_vm)")
     line("}")
 }
@@ -51,9 +67,11 @@ fun CodeBuilder.deInitEnv(isImpl: Boolean = false) = apply {
         return@apply
     }
     line("$declare {")
+    statement("Locker locker = Locker(&mutex)")
     statement("mapper::deinit(env)")
     statement("envs.clear()")
-    statement("g_vm = NULL;")
+    statement("g_vm = NULL")
+    statement("return 0")
     line("}")
 }
 
@@ -66,6 +84,7 @@ fun CodeBuilder.getEnv(isImpl: Boolean = false) = apply {
     }
     line("$declare {")
     statement("thread::id id = this_thread::get_id()")
+    statement("Locker locker = Locker(&mutex)")
     statement("return envs[id].env")
     line("}")
 }
@@ -79,6 +98,7 @@ fun CodeBuilder.attachEnv(isImpl: Boolean = false) = apply {
     }
     line("$declare {")
     statement("thread::id id = this_thread::get_id()")
+    statement("Locker locker = Locker(&mutex)")
     statement("if (envs.find(id) != envs.end()) return 0")
     statement(" JNIEnv *g_env = NULL")
 
@@ -108,6 +128,7 @@ fun CodeBuilder.detactEnv(isImpl: Boolean = false) = apply {
     }
     line("$declare {")
     statement("thread::id id = this_thread::get_id()")
+    statement("Locker locker = Locker(&mutex)")
     statement("auto it = envs.find(id)")
     statement("if (it != envs.end()) return")
     line("if (it->second.attached) {")
@@ -125,6 +146,7 @@ fun CodeBuilder.bindEnv(isImpl: Boolean = false) = apply {
     }
     line("$declare {")
     statement("thread::id id = this_thread::get_id()")
+    statement("Locker locker = Locker(&mutex)")
     statement("if (envs.find(id) != envs.end()) return")
     statement("envs[id] = EnvBind{.attached = 0, .env =env}")
     line("}")
