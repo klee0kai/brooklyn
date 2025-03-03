@@ -18,6 +18,9 @@ dependencies {
     compileOnly(libs.kotlin.compiler)
     implementation("${group}:annotations:${version}")
 
+    kapt(libs.auto.service.kapt)
+    compileOnly(libs.auto.service.annotations)
+
     implementation(libs.stone.kotlin)
     kapt(libs.stone.kapt)
 

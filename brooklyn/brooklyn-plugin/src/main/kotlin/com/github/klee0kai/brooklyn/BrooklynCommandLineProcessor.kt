@@ -1,5 +1,8 @@
+@file:OptIn(ExperimentalCompilerApi::class)
+
 package com.github.klee0kai.brooklyn
 
+import com.google.auto.service.AutoService
 import org.jetbrains.kotlin.compiler.plugin.AbstractCliOption
 import org.jetbrains.kotlin.compiler.plugin.CliOption
 import org.jetbrains.kotlin.compiler.plugin.CommandLineProcessor
@@ -8,6 +11,7 @@ import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
 
 @OptIn(ExperimentalCompilerApi::class)
+@AutoService(CommandLineProcessor::class)
 class BrooklynCommandLineProcessor : CommandLineProcessor {
 
     companion object {
