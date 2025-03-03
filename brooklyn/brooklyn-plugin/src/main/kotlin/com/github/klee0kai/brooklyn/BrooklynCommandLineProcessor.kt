@@ -1,14 +1,15 @@
 package com.github.klee0kai.brooklyn
 
-import com.google.auto.service.AutoService
 import org.jetbrains.kotlin.compiler.plugin.AbstractCliOption
 import org.jetbrains.kotlin.compiler.plugin.CliOption
 import org.jetbrains.kotlin.compiler.plugin.CommandLineProcessor
+import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
 
-@AutoService(CommandLineProcessor::class)
+@OptIn(ExperimentalCompilerApi::class)
 class BrooklynCommandLineProcessor : CommandLineProcessor {
+
     companion object {
         private const val OUT_DIR = "outDir"
         private const val CACHE_FILE = "cacheFile"

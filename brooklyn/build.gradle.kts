@@ -12,9 +12,3 @@ allprojects {
     version = rootProject.extra["version"].toString()
 }
 
-subprojects {
-    repositories {
-        mavenCentral()
-        maven(url = "https://jitpack.io")
-    }
-}

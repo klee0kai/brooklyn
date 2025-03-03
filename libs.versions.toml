@@ -1,8 +1,6 @@
 [versions]
 
-kotlin = "1.7.10"
-kotlin-json = "1.6.3"
-ksp = "2.1.10-1.0.30"
+kotlin = "2.1.10"
 
 auto-service = "1.1.1"
 
@@ -12,7 +10,6 @@ android-coroutines = "1.6.4"
 jetbrain-coroutines = "1.10.1"
 
 stone = "1.0.7"
-kotlinpoet = "2.0.0"
 
 jupiter = "5.9.2"
 
@@ -49,9 +46,7 @@ kotlin = ["jetbrain-coroutines", "jetbrain-immutable"]
 jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-dokka = { id = "org.jetbrains.dokka", version.ref = "kotlin" }
 
-publish-maven = { id = "org.gradle.maven-publish", version = "2.1.0" }
 publish-plugin = { id = "com.gradle.plugin-publish", version = "1.0.0" }
 
 buildconfig = { id = "com.github.gmazzo.buildconfig", version = "3.1.0" }
