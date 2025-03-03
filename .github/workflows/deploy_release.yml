@@ -23,7 +23,7 @@ jobs:
           cmd: "gh_release_diff  -l -d --summary -w changes.md"
 
       - name: Upload changes artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: changes
           path: |
@@ -51,7 +51,7 @@ jobs:
         run: ./gradlew :brooklyn:brooklyn-plugin:publishToMavenLocal
 
       - name: Upload changes artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: artifacts
           path: |
