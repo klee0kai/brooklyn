@@ -1,6 +1,6 @@
 plugins {
-    kotlin("jvm")
-    id("maven-publish")
+    alias(libs.plugins.jvm)
+    `maven-publish`
 }
 
 group = rootProject.extra["group"].toString()
