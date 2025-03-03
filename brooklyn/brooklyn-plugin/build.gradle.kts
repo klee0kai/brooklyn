@@ -6,25 +6,22 @@ plugins {
     alias(libs.plugins.publish.plugin)
 }
 
-val brooklynPluginName = "brooklyn-plugin"
+val brooklynPluginName = rootProject.extra["group"].toString()
 group = rootProject.extra["group"].toString()
 version = rootProject.extra["version"].toString()
 
 
 dependencies {
     implementation(kotlin("gradle-plugin-api"))
+    implementation(libs.bundles.kotlin)
 
     compileOnly(libs.kotlin.compiler)
     implementation("${group}:annotations:${version}")
-
-    kapt(libs.auto.service.kapt)
-    compileOnly(libs.auto.service.annotations)
 
     implementation(libs.stone.kotlin)
     kapt(libs.stone.kapt)
 
     implementation(libs.kotlinx.protobuf.jvm)
-    implementation(libs.android.coroutines)
 
     testImplementation(libs.kotlin.junit)
     testImplementation(libs.compiletesting)

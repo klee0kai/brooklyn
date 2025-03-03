@@ -2,7 +2,7 @@ import com.android.build.gradle.internal.tasks.factory.dependsOn
 
 plugins {
     alias(libs.plugins.jvm)
-    id("brooklyn-plugin")
+    alias(libs.plugins.brooklyn)
     id("klee0kai-crosscompile")
     alias(libs.plugins.buildconfig)
 }
