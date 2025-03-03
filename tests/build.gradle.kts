@@ -1,10 +1,10 @@
 import com.android.build.gradle.internal.tasks.factory.dependsOn
 
 plugins {
-    kotlin("jvm")
+    alias(libs.plugins.jvm)
     id("brooklyn-plugin")
     id("klee0kai-crosscompile")
-    id("com.github.gmazzo.buildconfig") version ("3.1.0")
+    alias(libs.plugins.buildconfig)
 }
 
 group = "com.klee0kai.tests"
@@ -40,7 +40,8 @@ tasks.getByName<Test>("test") {
 
 
 dependencies {
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.2")
+
+    testImplementation(libs.jupiter.api)
+    testRuntimeOnly(libs.jupiter.engine)
 }
 

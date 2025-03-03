@@ -1,9 +1,9 @@
 plugins {
-    kotlin("jvm")
+    alias(libs.plugins.jvm)
+    alias(libs.plugins.serialization)
+    alias(libs.plugins.buildconfig)
     kotlin("kapt")
     id("java-gradle-plugin")
-    id("com.github.gmazzo.buildconfig")
-    kotlin("plugin.serialization") version "1.7.0"
     id("com.gradle.plugin-publish") version "1.0.0"
 }
 
