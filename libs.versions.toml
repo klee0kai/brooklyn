@@ -1,57 +1,55 @@
 [versions]
 
-agp = "7.2.0"
 kotlin = "1.7.10"
 kotlin-json = "1.6.3"
 ksp = "2.1.10-1.0.30"
 
+auto-service = "1.1.1"
+
+kotlinx-serialization = "1.5.0"
 jetbrain-immutable = "0.3.7"
+android-coroutines = "1.6.4"
 jetbrain-coroutines = "1.10.1"
 
 stone = "1.0.7"
 kotlinpoet = "2.0.0"
-crosscompile = "0.0.1"
 
 jupiter = "5.9.2"
 
 
 [libraries]
 
-agp = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
-kotlin-gradle = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
-kotlin-serialization-gradle = { group = "org.jetbrains.kotlin", name = "kotlin-serialization", version.ref = "kotlin" }
-crosscompile-gradle = { group = "com.github.klee0kai", name = "crosscompile", version.ref = "crosscompile" }
+kotlin-compiler = { group = "org.jetbrains.kotlin", name = "kotlin-compiler-embeddable", version.ref = "kotlin" }
 
+kotlinx-protobuf-jvm = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-protobuf-jvm", version.ref = "kotlinx-serialization" }
 
 jetbrain-immutable = { group = "org.jetbrains.kotlinx", name = "kotlinx-collections-immutable", version.ref = "jetbrain-immutable" }
 jetbrain-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "jetbrain-coroutines" }
+android-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "android-coroutines" }
 
 # https://github.com/klee0kai/stone
 stone-kotlin = { group = "com.github.klee0kai.stone", name = "kotlin_lib", version.ref = "stone" }
 stone-kapt = { group = "com.github.klee0kai.stone", name = "stone_processor", version.ref = "stone" }
 
-ksp = { group = "com.google.devtools.ksp", name = "symbol-processing-api", version.ref = "ksp" }
-
-kotlinpoet = { group = "com.squareup", name = "kotlinpoet", version.ref = "kotlinpoet" }
-kotlinpoet-ksp = { group = "com.squareup", name = "kotlinpoet-ksp", version.ref = "kotlinpoet" }
+auto-service-kapt = { group = "com.google.auto.service", name = "auto-service", version.ref = "auto-service" }
+auto-service-annotations = { group = "com.google.auto.service", name = "auto-service-annotations", version.ref = "auto-service" }
 
 # test
 jupiter-api = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "jupiter" }
 jupiter-engine = { group = "org.junit.jupiter", name = "junit-jupiter-engine", version.ref = "jupiter" }
+kotlin-junit = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit", version.ref = "kotlin" }
+compiletesting = { group = "com.github.tschuchortdev", name = "kotlin-compile-testing", version = "1.5.0" }
 
 [bundles]
 
 kotlin = ["jetbrain-coroutines", "jetbrain-immutable"]
-kotlinpoet = ["kotlinpoet", "kotlinpoet-ksp"]
 
 [plugins]
 
-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "kotlin" }
-agp = { id = "com.android.tools.build.gradle", version.ref = "agp" }
 
 publish-maven = { id = "org.gradle.maven-publish", version = "2.1.0" }
 publish-plugin = { id = "com.gradle.plugin-publish", version = "1.0.0" }

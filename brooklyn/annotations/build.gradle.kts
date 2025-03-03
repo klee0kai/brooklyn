@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.jvm)
-//    alias(libs.plugins.publish.maven)
-    id("maven-publish")
+    `maven-publish`
 }
 
 group = rootProject.extra["group"].toString()
