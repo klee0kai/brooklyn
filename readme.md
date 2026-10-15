@@ -104,10 +104,9 @@ Name spaces
 
 - [HawtJNI](https://github.com/fusesource/hawtjni) - Implementing JNI libraries is a piece of cake when you use HawtJNI
 
+## Projects 
 
-## Find this library useful? :heart:
-Support it by joining __[stargazers](https://github.com/klee0kai/brooklyn/stargazers)__ for this repository. :star: <br>
-Also, __[follow me](https://github.com/klee0kai)__ on GitHub for more libraries! 🤩
+https://thekeysecurity.com/ - Integration of a JVM implementation into an Android application with an encryption core written in C++ 
 
 ## License
 
